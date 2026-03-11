@@ -2,8 +2,7 @@
 import { useState, useEffect } from "react";
 import {
   collection, addDoc, updateDoc, deleteDoc, doc, getDocs,
-  writeBatch, query, where,
-  query, where, onSnapshot, getDoc, arrayUnion, arrayRemove,
+  writeBatch, query, where, onSnapshot, getDoc, arrayUnion, arrayRemove,
   serverTimestamp, orderBy,
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
