@@ -505,64 +505,102 @@ function NotificationModal({ notifications, onClose, onMarkAllRead }) {
 }
 
 
-/* ══ NOTICE TAB ══ */
-function NoticeTab({ currentSet, isAdmin, onAdd, onDelete }) {
+/* ══ CHAT TAB ══ */
+function ChatTab({ setId, currentUser }) {
+  const { messages, loading, sendMessage } = useChat(setId);
   const [text, setText] = useState("");
-  const [posting, setPosting] = useState(false);
-  const notices = [...(currentSet?.notices || [])].reverse();
+  const [sending, setSending] = useState(false);
+  const bottomRef = useRef(null);
 
-  const relTime = (iso) => {
-    const d = Date.now() - new Date(iso).getTime();
+  // 새 메시지 오면 자동 스크롤
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const relTime = (val) => {
+    const ts = val?.toDate ? val.toDate() : new Date(val || 0);
+    const d = Date.now() - ts.getTime();
+    if (isNaN(d) || d < 0) return "방금";
     if (d < 60000) return "방금";
     if (d < 3600000) return `${Math.floor(d/60000)}분 전`;
     if (d < 86400000) return `${Math.floor(d/3600000)}시간 전`;
     return `${Math.floor(d/86400000)}일 전`;
   };
 
-  const handlePost = async () => {
-    if (!text.trim()) return;
-    setPosting(true);
-    await onAdd(text.trim());
+  const handleSend = async () => {
+    if (!text.trim() || sending) return;
+    setSending(true);
+    await sendMessage(text, currentUser);
     setText("");
-    setPosting(false);
+    setSending(false);
   };
 
+  const handleKey = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  if (loading) return (
+    <div style={{ display: "flex", justifyContent: "center", paddingTop: 60 }}>
+      <div style={{ width: 28, height: 28, border: "2px solid #00ff88", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+    </div>
+  );
+
   return (
-    <div>
-      {isAdmin && (
-        <div style={{ marginBottom: 18 }}>
-          <textarea value={text} onChange={e => setText(e.target.value)}
-            placeholder="크루 멤버에게 공지를 작성하세요..." rows={3} maxLength={300}
-            style={{ width: "100%", background: "#080808", border: "1px solid #1e1e1e", borderRadius: 14, padding: "14px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 15, outline: "none", resize: "none", boxSizing: "border-box", lineHeight: 1.7 }} />
-          <button onClick={handlePost} disabled={!text.trim() || posting}
-            style={{ width: "100%", marginTop: 8, padding: "13px", background: text.trim() ? "#00ff88" : "#0d0d0d", border: "none", borderRadius: 12, color: text.trim() ? "#000" : "#333", fontFamily: "inherit", fontSize: 16, fontWeight: 800, minHeight: 50 }}>
-            {posting ? "공지 중..." : "📣 공지 올리기"}
-          </button>
-        </div>
-      )}
-
-      {notices.length === 0 && (
-        <div style={{ textAlign: "center", padding: "50px 0", color: "#2a2a2a" }}>
-          <div style={{ fontSize: 42, marginBottom: 10 }}>📣</div>
-          <div style={{ fontSize: 15 }}>아직 공지가 없어요</div>
-        </div>
-      )}
-
-      {notices.map(n => (
-        <div key={n.id} style={{ background: "#0a0f0a", border: "1px solid #1a3020", borderRadius: 16, padding: "16px", marginBottom: 10, position: "relative" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 16, background: "#0d1f14", border: "1px solid #1a3d28", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{n.authorAvatar}</div>
-            <div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "#00cc66" }}>{n.authorName}</div>
-              <div style={{ fontSize: 12, color: "#2a2a2a" }}>{relTime(n.createdAt)}</div>
-            </div>
-            {isAdmin && (
-              <button onClick={() => onDelete(n.id)} style={{ marginLeft: "auto", background: "none", border: "none", color: "#333", fontSize: 16, cursor: "pointer", minWidth: 28, minHeight: 28 }}>✕</button>
-            )}
+    <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 280px)" }}>
+      {/* 메시지 목록 */}
+      <div style={{ flex: 1, overflowY: "auto", paddingBottom: 12 }}>
+        {messages.length === 0 && (
+          <div style={{ textAlign: "center", padding: "50px 0", color: "#2a2a2a" }}>
+            <div style={{ fontSize: 42, marginBottom: 10 }}>💬</div>
+            <div style={{ fontSize: 15 }}>첫 메시지를 보내보세요!</div>
           </div>
-          <div style={{ fontSize: 16, lineHeight: 1.7, color: "#ccc", whiteSpace: "pre-wrap" }}>{n.text}</div>
-        </div>
-      ))}
+        )}
+
+        {messages.map((msg, i) => {
+          const isMe = msg.userId === currentUser?.uid;
+          const showAvatar = !isMe && (i === 0 || messages[i-1]?.userId !== msg.userId);
+          const showName = !isMe && showAvatar;
+
+          return (
+            <div key={msg.id} style={{ display: "flex", flexDirection: isMe ? "row-reverse" : "row", alignItems: "flex-end", gap: 8, marginBottom: 6, padding: "0 2px" }}>
+              {/* 아바타 (상대방만) */}
+              {!isMe && (
+                <div style={{ width: 32, height: 32, borderRadius: 16, background: showAvatar ? "#111" : "transparent", border: showAvatar ? "1px solid #1e1e1e" : "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>
+                  {showAvatar ? msg.userAvatar : ""}
+                </div>
+              )}
+
+              <div style={{ maxWidth: "72%", display: "flex", flexDirection: "column", alignItems: isMe ? "flex-end" : "flex-start" }}>
+                {showName && <div style={{ fontSize: 11, color: "#444", marginBottom: 3, paddingLeft: 4 }}>{msg.userName}</div>}
+                <div style={{ background: isMe ? "#00ff88" : "#141414", color: isMe ? "#000" : "#e0e0e0", borderRadius: isMe ? "18px 18px 4px 18px" : "18px 18px 18px 4px", padding: "10px 14px", fontSize: 14, lineHeight: 1.5, wordBreak: "break-word", border: isMe ? "none" : "1px solid #1e1e1e" }}>
+                  {msg.text}
+                </div>
+                <div style={{ fontSize: 10, color: "#2a2a2a", marginTop: 3, paddingLeft: 4, paddingRight: 4 }}>{relTime(msg.createdAt)}</div>
+              </div>
+            </div>
+          );
+        })}
+        <div ref={bottomRef} />
+      </div>
+
+      {/* 입력창 */}
+      <div style={{ display: "flex", gap: 10, alignItems: "flex-end", paddingTop: 10, borderTop: "1px solid #111" }}>
+        <input
+          value={text}
+          onChange={e => setText(e.target.value)}
+          onKeyDown={handleKey}
+          placeholder="메시지 입력..."
+          maxLength={500}
+          style={{ flex: 1, background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 22, padding: "12px 16px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none" }}
+        />
+        <button onClick={handleSend} disabled={!text.trim() || sending}
+          style={{ width: 46, height: 46, borderRadius: 23, background: text.trim() ? "#00ff88" : "#111", border: "none", color: text.trim() ? "#000" : "#333", fontSize: 20, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          ➤
+        </button>
+      </div>
     </div>
   );
 }
@@ -823,7 +861,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
 
       {/* 탭 */}
       <div style={{ display: "flex", gap: 8, padding: "12px 18px 0", flexShrink: 0 }}>
-        {[["feed", "피드"], ["rank", "랭킹"], ["stats", "통계"], ["notice", "공지"]].map(([id, label]) => (
+        {[["feed", "피드"], ["rank", "랭킹"], ["stats", "통계"], ["chat", "채팅"]].map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)} style={{ flex: 1, padding: "11px", borderRadius: 12, border: "none", background: tab === id ? "#00ff88" : "#0d0d0d", color: tab === id ? "#000" : "#444", fontFamily: "inherit", fontSize: 15, fontWeight: 700, minHeight: 44 }}>{label}</button>
         ))}
       </div>
@@ -868,10 +906,8 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
 
         {tab === "rank" && !loading && <LeaderboardTab posts={posts} currentUser={currentUser} />}
 
-        {tab === "notice" && !loading && (
-          <NoticeTab currentSet={currentSet} isAdmin={isAdmin}
-            onAdd={(text) => addNotice(currentSet.id, text)}
-            onDelete={(nid) => deleteNotice(currentSet.id, nid)} />
+        {tab === "chat" && (
+          <ChatTab setId={currentSet?.id} currentUser={currentUser} />
         )}
 
         {tab === "stats" && !loading && (
