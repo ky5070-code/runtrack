@@ -549,9 +549,9 @@ function ChatTab({ setId, currentUser }) {
   );
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 280px)" }}>
+    <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, height: "100%" }}>
       {/* 메시지 목록 */}
-      <div style={{ flex: 1, overflowY: "auto", paddingBottom: 12 }}>
+      <div style={{ flex: 1, overflowY: "auto", paddingBottom: 12, minHeight: 0 }}>
         {messages.length === 0 && (
           <div style={{ textAlign: "center", padding: "50px 0", color: "#2a2a2a" }}>
             <div style={{ fontSize: 42, marginBottom: 10 }}>💬</div>
@@ -867,7 +867,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
       </div>
 
       {/* 컨텐츠 */}
-      <div style={{ flex: 1, padding: "14px 18px", paddingBottom: `calc(80px + ${safeBottom})`, overflowY: "auto" }}>
+      <div style={{ flex: 1, padding: tab === "chat" ? "0" : "14px 18px", paddingBottom: tab === "chat" ? "0" : `calc(80px + ${safeBottom})`, overflowY: tab === "chat" ? "hidden" : "auto", display: "flex", flexDirection: "column" }}>
         {loading && (
           <div style={{ display: "flex", justifyContent: "center", paddingTop: 60 }}>
             <div style={{ width: 34, height: 34, border: "2px solid #00ff88", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
@@ -907,7 +907,9 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
         {tab === "rank" && !loading && <LeaderboardTab posts={posts} currentUser={currentUser} />}
 
         {tab === "chat" && (
-          <ChatTab setId={currentSet?.id} currentUser={currentUser} />
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, padding: "0 18px", paddingBottom: `calc(80px + ${safeBottom})` }}>
+            <ChatTab setId={currentSet?.id} currentUser={currentUser} />
+          </div>
         )}
 
         {tab === "stats" && !loading && (
