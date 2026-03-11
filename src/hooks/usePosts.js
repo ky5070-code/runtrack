@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import {
   collection, addDoc, updateDoc, deleteDoc, doc,
-  query, orderBy, limit, onSnapshot,
+  query, where, orderBy, limit, onSnapshot,
   serverTimestamp, getDoc, arrayUnion,
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
@@ -28,12 +28,18 @@ const resizeAndEncode = (file) => new Promise((resolve, reject) => {
   img.src = url;
 });
 
-export function usePosts(currentUser) {
+export function usePosts(currentUser, setId) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const q = query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(50));
+    if (!setId) return;
+    const q = query(
+      collection(db, "posts"),
+      where("setId", "==", setId),
+      orderBy("createdAt", "desc"),
+      limit(50)
+    );
     const unsub = onSnapshot(q, async (snap) => {
       const data = await Promise.all(
         snap.docs.map(async (d) => {
@@ -53,6 +59,7 @@ export function usePosts(currentUser) {
 
   // 게시글 생성 - 이미지는 base64로 Firestore에 저장
   const createPost = async ({ dist, duration, pace, calories, date, caption, imageFile, source, appName, aiFeedback }) => {
+    if (!setId) return;
     if (!currentUser) return;
 
     let imageUrl = null;
@@ -66,6 +73,7 @@ export function usePosts(currentUser) {
 
     await addDoc(collection(db, "posts"), {
       userId: currentUser.uid,
+      setId,
       dist: Number(dist) || 0,
       duration: Number(duration) || 0,
       pace: pace || "",
@@ -112,13 +120,13 @@ export function usePosts(currentUser) {
     });
   };
 
-  // 게시글 삭제 (본인 것만)
-  const deletePost = async (postId) => {
+  // 게시글 삭제 (본인 또는 세트 관리자)
+  const deletePost = async (postId, isAdmin = false) => {
     if (!currentUser) return;
     const postRef = doc(db, "posts", postId);
     const snap = await getDoc(postRef);
     if (!snap.exists()) return;
-    if (snap.data().userId !== currentUser.uid) return; // 본인 글만
+    if (!isAdmin && snap.data().userId !== currentUser.uid) return;
     await deleteDoc(postRef);
   };
 

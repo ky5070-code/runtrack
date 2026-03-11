@@ -1,0 +1,62 @@
+// src/hooks/useNotifications.js
+import { useState, useEffect } from "react";
+import {
+  collection, query, where, orderBy, limit,
+  onSnapshot, addDoc, updateDoc, doc, serverTimestamp, writeBatch, getDocs
+} from "firebase/firestore";
+import { db } from "../lib/firebase";
+
+export function useNotifications(currentUser) {
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (!currentUser?.uid) return;
+    const q = query(
+      collection(db, "notifications"),
+      where("toUserId", "==", currentUser.uid),
+      orderBy("createdAt", "desc"),
+      limit(30)
+    );
+    const unsub = onSnapshot(q, (snap) => {
+      const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      setNotifications(data);
+      setUnreadCount(data.filter(n => !n.read).length);
+    });
+    return unsub;
+  }, [currentUser?.uid]);
+
+  // 알림 생성 (반응/댓글 시 호출)
+  const createNotification = async ({ toUserId, fromUser, type, postId, postDist, emoji, commentText }) => {
+    if (!toUserId || toUserId === fromUser.uid) return; // 본인 글엔 알림 X
+    await addDoc(collection(db, "notifications"), {
+      toUserId,
+      fromUserId: fromUser.uid,
+      fromUserName: fromUser.name,
+      fromUserAvatar: fromUser.avatar || "🏃",
+      type,        // "reaction" | "comment"
+      postId,
+      postDist,
+      emoji: emoji || null,
+      commentText: commentText || null,
+      read: false,
+      createdAt: serverTimestamp(),
+    });
+  };
+
+  // 전체 읽음 처리
+  const markAllRead = async () => {
+    if (!currentUser?.uid) return;
+    const q = query(
+      collection(db, "notifications"),
+      where("toUserId", "==", currentUser.uid),
+      where("read", "==", false)
+    );
+    const snap = await getDocs(q);
+    const batch = writeBatch(db);
+    snap.docs.forEach(d => batch.update(doc(db, "notifications", d.id), { read: true }));
+    await batch.commit();
+  };
+
+  return { notifications, unreadCount, createNotification, markAllRead };
+}

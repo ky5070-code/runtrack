@@ -1,6 +1,8 @@
 // src/components/CommunityApp.js
 import React, { useState, useRef } from "react";
 import { usePosts } from "../hooks/usePosts";
+import { useNotifications } from "../hooks/useNotifications";
+import { useSets } from "../hooks/useSets";
 import { analyzeRunImage, generateRunFeedback } from "../lib/analyzeRun";
 
 /* ─── helpers ─── */
@@ -33,7 +35,7 @@ const Avatar = ({ user, size = 38 }) => (
 );
 
 /* ══ POST CARD ══ */
-function PostCard({ post, currentUser, onReact, onComment, onDelete }) {
+function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = false }) {
   const author = post.author || {};
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
@@ -41,6 +43,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete }) {
   const [showFeedback, setShowFeedback] = useState(true);
   const myReaction = post[`myReaction_${currentUser?.uid}`];
   const isMyPost = post.userId === currentUser?.uid;
+  const canDelete = isMyPost || isAdmin;
 
   const submitComment = () => {
     if (!commentText.trim()) return;
@@ -73,7 +76,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete }) {
               {post.appName && <span style={{ fontSize: 10, color: "#2a2a2a" }}>{post.appName}</span>}
             </div>
           </div>
-          {isMyPost && (
+          {canDelete && (
             <button onClick={() => setShowDeleteConfirm(true)} style={{ background: "none", border: "none", color: "#333", fontSize: 18, minWidth: 36, minHeight: 36, display: "flex", alignItems: "center", justifyContent: "center" }}>⋯</button>
           )}
         </div>
@@ -409,8 +412,72 @@ function LeaderboardTab({ posts, currentUser }) {
   );
 }
 
+/* ══ NOTIFICATION MODAL ══ */
+function NotificationModal({ notifications, onClose, onMarkAllRead }) {
+  const relTime = (val) => {
+    const ts = val?.toDate ? val.toDate() : new Date(val || 0);
+    const d = Date.now() - ts.getTime();
+    if (isNaN(d) || d < 0) return "방금";
+    if (d < 60000) return "방금";
+    if (d < 3600000) return `${Math.floor(d / 60000)}분 전`;
+    if (d < 86400000) return `${Math.floor(d / 3600000)}시간 전`;
+    return `${Math.floor(d / 86400000)}일 전`;
+  };
+
+  return (
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.92)", zIndex: 200, display: "flex", alignItems: "flex-end" }}>
+      <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "#0d0d0d", borderRadius: "22px 22px 0 0", border: "1px solid #1a1a1a", padding: "20px 20px", paddingBottom: `calc(24px + ${safeBottom})`, maxHeight: "80vh", overflowY: "auto" }}>
+        <div style={{ width: 40, height: 4, background: "#222", borderRadius: 2, margin: "0 auto 18px" }} />
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
+          <div style={{ fontSize: 16, fontWeight: 800 }}>🔔 알림</div>
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            {notifications.some(n => !n.read) && (
+              <button onClick={onMarkAllRead} style={{ background: "none", border: "none", color: "#00ff88", fontFamily: "inherit", fontSize: 12, cursor: "pointer" }}>모두 읽음</button>
+            )}
+            <button onClick={onClose} style={{ background: "#111", border: "none", borderRadius: "50%", width: 32, height: 32, color: "#666", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+          </div>
+        </div>
+
+        {notifications.length === 0 && (
+          <div style={{ textAlign: "center", padding: "40px 0", color: "#2a2a2a" }}>
+            <div style={{ fontSize: 40, marginBottom: 10 }}>🔔</div>
+            <div style={{ fontSize: 13 }}>아직 알림이 없어요</div>
+          </div>
+        )}
+
+        {notifications.map(n => (
+          <div key={n.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: n.read ? "#080808" : "#0a1a0f", border: `1px solid ${n.read ? "#111" : "#1a3d28"}`, borderRadius: 14, marginBottom: 8 }}>
+            <div style={{ width: 42, height: 42, borderRadius: 21, background: "#111", border: "1.5px solid #1e1e1e", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, position: "relative" }}>
+              {n.fromUserAvatar || "🏃"}
+              <div style={{ position: "absolute", bottom: -2, right: -2, width: 18, height: 18, borderRadius: 9, background: "#0d0d0d", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11 }}>
+                {n.type === "reaction" ? n.emoji : "💬"}
+              </div>
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 13, lineHeight: 1.5 }}>
+                <span style={{ fontWeight: 700, color: n.read ? "#aaa" : "#e0e0e0" }}>{n.fromUserName}</span>
+                <span style={{ color: "#555" }}>
+                  {n.type === "reaction" ? ` 님이 ${n.emoji} 반응했어요` : " 님이 댓글을 달았어요"}
+                </span>
+              </div>
+              {n.type === "comment" && n.commentText && (
+                <div style={{ fontSize: 11, color: "#444", marginTop: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>"{n.commentText}"</div>
+              )}
+              {n.postDist && (
+                <div style={{ fontSize: 10, color: "#2a2a2a", marginTop: 2 }}>{Number(n.postDist).toFixed(2)}km 기록</div>
+              )}
+            </div>
+            <div style={{ fontSize: 10, color: "#2a2a2a", flexShrink: 0 }}>{relTime(n.createdAt)}</div>
+            {!n.read && <div style={{ width: 7, height: 7, borderRadius: 4, background: "#00ff88", flexShrink: 0 }} />}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ══ PROFILE MODAL ══ */
-function ProfileModal({ currentUser, posts, onClose, onLogout, onUpdateProfile }) {
+function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTransfer, onLeaveSet, onClose, onLogout, onUpdateProfile }) {
   const myPosts = posts.filter(p => p.userId === currentUser?.uid);
   const totalDist = myPosts.reduce((a, p) => a + (parseFloat(p.dist) || 0), 0);
   const [editMode, setEditMode] = useState(false);
@@ -470,7 +537,37 @@ function ProfileModal({ currentUser, posts, onClose, onLogout, onUpdateProfile }
           </div>
         ))}
 
-        <button onClick={onLogout} style={{ width: "100%", marginTop: 18, padding: "15px", background: "transparent", border: "1px solid #2a2a2a", borderRadius: 14, color: "#444", fontFamily: "inherit", fontSize: 14, minHeight: 52 }}>로그아웃</button>
+        {/* 세트 멤버 관리 (관리자만) */}
+        {currentSet && (
+          <div style={{ marginTop: 18 }}>
+            <div style={{ fontSize: 10, color: "#333", letterSpacing: 2, marginBottom: 12 }}>
+              {isAdmin ? "👑 멤버 관리" : "👥 멤버 목록"}
+            </div>
+            {(currentSet.members || []).map(m => (
+              <div key={m.uid} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: "#080808", border: "1px solid #111", borderRadius: 12, marginBottom: 6 }}>
+                <div style={{ width: 34, height: 34, borderRadius: 17, background: "#111", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>{m.avatar || "🏃"}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700 }}>
+                    {m.name}
+                    {m.uid === currentUser?.uid && <span style={{ color: "#00ff88", fontSize: 10, marginLeft: 6 }}>나</span>}
+                    {m.uid === currentSet.adminId && <span style={{ color: "#ffaa00", fontSize: 9, marginLeft: 6 }}>👑 관리자</span>}
+                  </div>
+                </div>
+                {isAdmin && m.uid !== currentUser?.uid && (
+                  <div style={{ display: "flex", gap: 6 }}>
+                    <button onClick={() => onTransfer(m.uid, m.name)} style={{ padding: "5px 10px", borderRadius: 8, background: "#1a1000", border: "1px solid #4d3300", color: "#ffaa00", fontFamily: "inherit", fontSize: 10, minHeight: 30 }}>👑 이전</button>
+                    <button onClick={() => onKick(m.uid, m.name)} style={{ padding: "5px 10px", borderRadius: 8, background: "#1a0808", border: "1px solid #3d1010", color: "#ff7070", fontFamily: "inherit", fontSize: 10, minHeight: 30 }}>강퇴</button>
+                  </div>
+                )}
+              </div>
+            ))}
+            {!isAdmin && (
+              <button onClick={onLeaveSet} style={{ width: "100%", marginTop: 8, padding: "13px", background: "transparent", border: "1px solid #2a2a2a", borderRadius: 14, color: "#555", fontFamily: "inherit", fontSize: 13, minHeight: 48 }}>세트 나가기</button>
+            )}
+          </div>
+        )}
+
+        <button onClick={onLogout} style={{ width: "100%", marginTop: 12, padding: "15px", background: "transparent", border: "1px solid #2a2a2a", borderRadius: 14, color: "#444", fontFamily: "inherit", fontSize: 14, minHeight: 52 }}>로그아웃</button>
       </div>
     </div>
   );
@@ -494,11 +591,15 @@ function BottomNav({ tab, setTab, onUpload }) {
 }
 
 /* ══ MAIN ══ */
-export default function CommunityApp({ currentUser, onLogout, onUpdateProfile }) {
-  const { posts, loading, createPost, toggleReaction, addComment, deletePost } = usePosts(currentUser);
+export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLogout, onUpdateProfile }) {
+  const { posts, loading, createPost, toggleReaction, addComment, deletePost } = usePosts(currentUser, currentSet?.id);
+  const { kickMember, transferAdmin, leaveSet } = useSets(currentUser);
+  const isAdmin = currentSet?.adminId === currentUser?.uid;
+  const { notifications, unreadCount, createNotification, markAllRead } = useNotifications(currentUser);
   const [tab, setTab] = useState("feed");
   const [showUpload, setShowUpload] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showNotif, setShowNotif] = useState(false);
 
   const myWeekDist = posts.filter(p => {
     const ts = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt || 0);
@@ -516,10 +617,22 @@ export default function CommunityApp({ currentUser, onLogout, onUpdateProfile })
       <div style={{ padding: "14px 18px 0", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
         <div>
           <div style={{ fontSize: 8, color: "#1e1e1e", letterSpacing: 4 }}>RUNTRACK</div>
-          <div style={{ fontSize: 22, fontWeight: 800, color: "#00ff88", letterSpacing: -0.5 }}>COMMUNITY</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <button onClick={onLeaveSet} style={{ background: "none", border: "none", color: "#333", fontSize: 18, padding: 0, cursor: "pointer" }}>‹</button>
+            <div style={{ fontSize: 18, fontWeight: 800, color: "#00ff88", letterSpacing: -0.5 }}>{currentSet?.emoji} {currentSet?.name}</div>
+          </div>
         </div>
-        <div onClick={() => setShowProfile(true)}>
+        <div style={{ position: "relative", cursor: "pointer" }} onClick={() => { setShowNotif(true); }}>
           <Avatar user={currentUser} size={44} />
+          {unreadCount > 0 && (
+            <div style={{ position: "absolute", top: -3, right: -3, minWidth: 18, height: 18, borderRadius: 9, background: "#ff3b3b", border: "2px solid #060606", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800, color: "#fff", padding: "0 4px" }}>
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </div>
+          )}
+        </div>
+        <div style={{ width: 8 }} />
+        <div onClick={() => setShowProfile(true)} style={{ cursor: "pointer" }}>
+          <div style={{ width: 32, height: 32, borderRadius: 16, background: "#111", border: "1.5px solid #222", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>👤</div>
         </div>
       </div>
 
@@ -558,10 +671,22 @@ export default function CommunityApp({ currentUser, onLogout, onUpdateProfile })
               </div>
             )}
             {posts.map(post => (
-              <PostCard key={post.id} post={post} currentUser={currentUser}
-                onReact={(id, e) => toggleReaction(id, e, currentUser?.uid)}
-                onComment={(id, t) => addComment(id, t, currentUser)}
-                onDelete={(id) => deletePost(id)} />
+              <PostCard key={post.id} post={post} currentUser={currentUser} isAdmin={isAdmin}
+                onReact={async (id, e) => {
+                  await toggleReaction(id, e, currentUser?.uid);
+                  const p = posts.find(p => p.id === id);
+                  if (p && p.userId !== currentUser?.uid) {
+                    createNotification({ toUserId: p.userId, fromUser: currentUser, type: "reaction", postId: id, postDist: p.dist, emoji: e });
+                  }
+                }}
+                onComment={async (id, t) => {
+                  await addComment(id, t, currentUser);
+                  const p = posts.find(p => p.id === id);
+                  if (p && p.userId !== currentUser?.uid) {
+                    createNotification({ toUserId: p.userId, fromUser: currentUser, type: "comment", postId: id, postDist: p.dist, commentText: t });
+                  }
+                }}
+                onDelete={(id) => deletePost(id, isAdmin)} />
             ))}
           </>
         )}
@@ -574,7 +699,28 @@ export default function CommunityApp({ currentUser, onLogout, onUpdateProfile })
 
       {/* 모달 */}
       {showUpload && <UploadModal onClose={() => setShowUpload(false)} onPost={createPost} currentUser={currentUser} />}
-      {showProfile && <ProfileModal currentUser={currentUser} posts={posts} onClose={() => setShowProfile(false)} onLogout={onLogout} onUpdateProfile={onUpdateProfile} />}
+      {showNotif && <NotificationModal notifications={notifications} onClose={() => { setShowNotif(false); markAllRead(); }} onMarkAllRead={markAllRead} />}
+      {showProfile && <ProfileModal
+        currentUser={currentUser} posts={posts}
+        currentSet={currentSet} isAdmin={isAdmin}
+        onKick={async (uid, name) => {
+          if (window.confirm(`${name}님을 강퇴할까요?`)) {
+            await kickMember(currentSet.id, uid);
+          }
+        }}
+        onTransfer={async (uid, name) => {
+          if (window.confirm(`${name}님에게 관리자를 이전할까요?`)) {
+            await transferAdmin(currentSet.id, uid);
+          }
+        }}
+        onLeaveSet={async () => {
+          try {
+            await leaveSet(currentSet.id);
+            onLeaveSet();
+          } catch(e) { alert(e.message); }
+        }}
+        onClose={() => setShowProfile(false)}
+        onLogout={onLogout} onUpdateProfile={onUpdateProfile} />}
     </div>
   );
 }
