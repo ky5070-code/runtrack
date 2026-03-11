@@ -792,7 +792,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
 
       {/* 탭 */}
       <div style={{ display: "flex", gap: 8, padding: "12px 18px 0", flexShrink: 0 }}>
-        {[["feed", "피드"], ["rank", "랭킹"], ["notice", "공지"], ["stats", "통계"]].map(([id, label]) => (
+        {[["feed", "피드"], ["rank", "랭킹"], ["stats", "통계"], ["notice", "공지"]].map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)} style={{ flex: 1, padding: "11px", borderRadius: 12, border: "none", background: tab === id ? "#00ff88" : "#0d0d0d", color: tab === id ? "#000" : "#444", fontFamily: "inherit", fontSize: 13, fontWeight: 700, minHeight: 44 }}>{label}</button>
         ))}
       </div>
