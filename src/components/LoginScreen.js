@@ -25,17 +25,17 @@ export default function LoginScreen({ onLogin }) {
           background: "#1a1000", border: "1px solid #4d3300",
           borderRadius: 14, padding: "16px",
         }}>
-          <div style={{ fontSize: 20, marginBottom: 8, textAlign: "center" }}>⚠️</div>
-          <div style={{ fontSize: 13, fontWeight: 800, color: "#ffaa00", marginBottom: 6, textAlign: "center" }}>
+          <div style={{ fontSize: 22, marginBottom: 8, textAlign: "center" }}>⚠️</div>
+          <div style={{ fontSize: 15, fontWeight: 800, color: "#ffaa00", marginBottom: 6, textAlign: "center" }}>
             외부 브라우저에서 열어주세요
           </div>
-          <div style={{ fontSize: 12, color: "#886600", lineHeight: 1.8, textAlign: "center" }}>
+          <div style={{ fontSize: 14, color: "#886600", lineHeight: 1.8, textAlign: "center" }}>
             카카오톡·인스타 등 앱 내 브라우저에서는<br />
             Google 로그인이 차단됩니다.
           </div>
           <div style={{ marginTop: 12, background: "#110d00", borderRadius: 10, padding: "10px 12px" }}>
-            <div style={{ fontSize: 11, color: "#664400", marginBottom: 6, fontWeight: 700 }}>여는 방법</div>
-            <div style={{ fontSize: 11, color: "#886600", lineHeight: 2 }}>
+            <div style={{ fontSize: 13, color: "#664400", marginBottom: 6, fontWeight: 700 }}>여는 방법</div>
+            <div style={{ fontSize: 13, color: "#886600", lineHeight: 2 }}>
               📱 아이폰 → 우측 하단 <b style={{color:"#ffaa00"}}>⋯</b> → Safari로 열기<br />
               🤖 안드로이드 → 우측 상단 <b style={{color:"#ffaa00"}}>⋮</b> → 기본 브라우저로 열기
             </div>
@@ -45,10 +45,10 @@ export default function LoginScreen({ onLogin }) {
 
       {/* Logo */}
       <div style={{ textAlign: "center", marginBottom: 40 }}>
-        <div style={{ fontSize: 56, marginBottom: 16 }}>🏃</div>
-        <div style={{ fontSize: 10, color: "#2a2a2a", letterSpacing: 6, marginBottom: 6 }}>WELCOME TO</div>
-        <div style={{ fontSize: 36, fontWeight: 800, color: "#00ff88", letterSpacing: -1, lineHeight: 1 }}>RUNTRACK</div>
-        <div style={{ fontSize: 13, color: "#444", marginTop: 10 }}>AI 기반 러닝 커뮤니티</div>
+        <div style={{ fontSize: 58, marginBottom: 16 }}>🏃</div>
+        <div style={{ fontSize: 12, color: "#2a2a2a", letterSpacing: 6, marginBottom: 6 }}>WELCOME TO</div>
+        <div style={{ fontSize: 38, fontWeight: 800, color: "#00ff88", letterSpacing: -1, lineHeight: 1 }}>RUNTRACK</div>
+        <div style={{ fontSize: 15, color: "#444", marginTop: 10 }}>AI 기반 러닝 커뮤니티</div>
       </div>
 
       {/* Features */}
@@ -59,8 +59,8 @@ export default function LoginScreen({ onLogin }) {
           ["🔥", "커뮤니티 피드 & 반응"],
         ].map(([icon, text]) => (
           <div key={text} style={{ display: "flex", gap: 12, alignItems: "center", padding: "12px 16px", background: "#0a0a0a", border: "1px solid #161616", borderRadius: 12 }}>
-            <span style={{ fontSize: 20 }}>{icon}</span>
-            <span style={{ fontSize: 13, color: "#888" }}>{text}</span>
+            <span style={{ fontSize: 22 }}>{icon}</span>
+            <span style={{ fontSize: 15, color: "#888" }}>{text}</span>
           </div>
         ))}
       </div>
@@ -75,7 +75,7 @@ export default function LoginScreen({ onLogin }) {
           background: inApp ? "#111" : "#00ff88",
           border: inApp ? "1px solid #222" : "none",
           borderRadius: 14,
-          fontFamily: "'Black Han Sans', 'Noto Sans KR', sans-serif", fontSize: 15, fontWeight: 800,
+          fontFamily: "'Black Han Sans', 'Noto Sans KR', sans-serif", fontSize: 17, fontWeight: 800,
           color: inApp ? "#333" : "#000",
           cursor: inApp ? "not-allowed" : "pointer",
           letterSpacing: 0.5,
@@ -91,7 +91,7 @@ export default function LoginScreen({ onLogin }) {
         {inApp ? "외부 브라우저에서 로그인 가능" : "Google로 시작하기"}
       </button>
 
-      <div style={{ marginTop: 20, fontSize: 10, color: "#1e1e1e", textAlign: "center", lineHeight: 1.8 }}>
+      <div style={{ marginTop: 20, fontSize: 12, color: "#1e1e1e", textAlign: "center", lineHeight: 1.8 }}>
         가입하면 이용약관 및 개인정보처리방침에 동의하는 것으로 간주됩니다
       </div>
     </div>

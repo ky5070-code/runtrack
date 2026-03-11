@@ -158,14 +158,18 @@ export function useSets(currentUser) {
   // 공지 추가 (관리자 전용)
   const addNotice = async (setId, text) => {
     if (!currentUser?.uid) return;
+    const snap = await getDoc(doc(db, "sets", setId));
+    if (!snap.exists()) return;
+    const existing = snap.data().notices || [];
+    const newNotice = {
+      id: Math.random().toString(36).slice(2),
+      text,
+      authorName: currentUser.name,
+      authorAvatar: currentUser.avatar || "🏃",
+      createdAt: new Date().toISOString(),
+    };
     await updateDoc(doc(db, "sets", setId), {
-      notices: arrayUnion({
-        id: Math.random().toString(36).slice(2),
-        text,
-        authorName: currentUser.name,
-        authorAvatar: currentUser.avatar || "🏃",
-        createdAt: new Date().toISOString(),
-      }),
+      notices: [...existing, newNotice],
     });
   };
 
