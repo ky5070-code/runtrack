@@ -1,7 +1,7 @@
 // src/components/CommunityApp.js
 import React, { useState, useRef } from "react";
 import { usePosts } from "../hooks/usePosts";
-import { analyzeRunImage } from "../lib/analyzeRun";
+import { analyzeRunImage, generateRunFeedback } from "../lib/analyzeRun";
 
 /* ─── helpers ─── */
 const pad = (n) => String(n).padStart(2, "0");
@@ -157,6 +157,7 @@ function UploadModal({ onClose, onPost, currentUser }) {
   const [caption, setCaption] = useState("");
   const [error, setError] = useState(null);
   const [posting, setPosting] = useState(false);
+  const [feedback, setFeedback] = useState(null);
   const inputRef = useRef();
 
   const handleFile = async (f) => {
@@ -176,6 +177,13 @@ function UploadModal({ onClose, onPost, currentUser }) {
           setResult(r);
           setEdited({ ...r, durationStr: r.duration ? fmtTime(r.duration) : "" });
           setStep("confirm");
+          // 피드백 비동기 요청 (분석과 별개로)
+          generateRunFeedback({
+            distance: r.distance,
+            duration: r.duration,
+            pace: r.pace,
+            calories: r.calories,
+          }).then(fb => setFeedback(fb)).catch(() => {});
         }
       } catch (err) {
         setError("AI 분석 실패: " + err.message);
@@ -257,6 +265,23 @@ function UploadModal({ onClose, onPost, currentUser }) {
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom,transparent 40%,#0d0d0d)" }} />
             {result && <div style={{ position: "absolute", top: 10, right: 10, background: "#0d1f14", border: "1px solid #00ff88", borderRadius: 6, padding: "4px 10px", fontSize: 10, color: "#00ff88" }}>AI 분석 완료 ✓</div>}
           </div>}
+          {/* AI 피드백 */}
+          {feedback && (
+            <div style={{ background: "#080f0b", border: "1px solid #1a3d28", borderRadius: 14, padding: "14px 16px", marginBottom: 16 }}>
+              <div style={{ fontSize: 10, color: "#00ff88", letterSpacing: 2, marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+                <span>✨</span> AI 코치 피드백
+              </div>
+              {feedback.split("\n").filter(l => l.trim()).map((line, i) => (
+                <div key={i} style={{ fontSize: 13, color: "#aaa", lineHeight: 1.7, marginBottom: i < 2 ? 4 : 0 }}>{line}</div>
+              ))}
+            </div>
+          )}
+          {!feedback && result && (
+            <div style={{ background: "#080808", border: "1px solid #161616", borderRadius: 14, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 16, height: 16, border: "2px solid #00ff88", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
+              <div style={{ fontSize: 12, color: "#333" }}>AI 코치가 피드백 작성 중...</div>
+            </div>
+          )}
           <div style={{ fontSize: 10, color: "#333", letterSpacing: 2, marginBottom: 14 }}>데이터 확인 · 수정 가능</div>
           <div style={{ display: "flex", gap: 14, marginBottom: 14 }}>{ef("distance", "거리", "km")}{ef("durationStr", "시간", "")}{ef("pace", "페이스", "/km", "text")}</div>
           <div style={{ display: "flex", gap: 14, marginBottom: 22 }}>{ef("calories", "칼로리", "kcal")}{ef("date", "날짜", "", "text")}</div>
