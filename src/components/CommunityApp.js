@@ -33,11 +33,13 @@ const Avatar = ({ user, size = 38 }) => (
 );
 
 /* ══ POST CARD ══ */
-function PostCard({ post, currentUser, onReact, onComment }) {
+function PostCard({ post, currentUser, onReact, onComment, onDelete }) {
   const author = post.author || {};
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const myReaction = post[`myReaction_${currentUser?.uid}`];
+  const isMyPost = post.userId === currentUser?.uid;
 
   const submitComment = () => {
     if (!commentText.trim()) return;
@@ -70,7 +72,21 @@ function PostCard({ post, currentUser, onReact, onComment }) {
               {post.appName && <span style={{ fontSize: 10, color: "#2a2a2a" }}>{post.appName}</span>}
             </div>
           </div>
+          {isMyPost && (
+            <button onClick={() => setShowDeleteConfirm(true)} style={{ background: "none", border: "none", color: "#333", fontSize: 18, minWidth: 36, minHeight: 36, display: "flex", alignItems: "center", justifyContent: "center" }}>⋯</button>
+          )}
         </div>
+
+        {/* 삭제 확인 */}
+        {showDeleteConfirm && (
+          <div style={{ background: "#1a0808", border: "1px solid #3d1010", borderRadius: 12, padding: "12px 14px", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: 12, color: "#ff7070" }}>이 기록을 삭제할까요?</span>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button onClick={() => setShowDeleteConfirm(false)} style={{ padding: "6px 12px", borderRadius: 8, background: "transparent", border: "1px solid #333", color: "#666", fontFamily: "inherit", fontSize: 12, minHeight: 34 }}>취소</button>
+              <button onClick={() => { onDelete(post.id); setShowDeleteConfirm(false); }} style={{ padding: "6px 12px", borderRadius: 8, background: "#ff3b3b", border: "none", color: "#fff", fontFamily: "inherit", fontSize: 12, fontWeight: 700, minHeight: 34 }}>삭제</button>
+            </div>
+          </div>
+        )}
 
         <div style={{ background: "#070707", border: "1px solid #141414", borderRadius: 14, padding: "12px 14px", marginBottom: 12, display: "flex" }}>
           {[[Number(post.dist).toFixed(2) + "km", "거리", true], [fmtTime(post.duration), "시간", false], [post.pace || "--", "페이스", false], [post.calories || "--", "칼로리", false]].map(([v, l, accent], i) => (
@@ -267,6 +283,21 @@ function UploadModal({ onClose, onPost, currentUser }) {
 }
 
 /* ══ LEADERBOARD ══ */
+function parsePaceToSec(paceStr) {
+  if (!paceStr) return 0;
+  const m = paceStr.match(/(\d+)'(\d+)/);
+  if (m) return parseInt(m[1]) * 60 + parseInt(m[2]);
+  const parts = paceStr.replace(/[^0-9:]/g, "").split(":");
+  if (parts.length === 2) return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+  return 0;
+}
+function fmtPace(secPerKm) {
+  if (!secPerKm || secPerKm <= 0) return "--'--\"";
+  const m = Math.floor(secPerKm / 60);
+  const s = Math.round(secPerKm % 60);
+  return `${m}'${String(s).padStart(2,"0")}"`;
+}
+
 function LeaderboardTab({ posts, currentUser }) {
   const [period, setPeriod] = useState("week");
   const cutoff = period === "week" ? 7 * 86400000 : 30 * 86400000;
@@ -275,11 +306,16 @@ function LeaderboardTab({ posts, currentUser }) {
     if (!p.author) return;
     const ts = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt || 0);
     if (Date.now() - ts.getTime() > cutoff) return;
-    if (!userMap[p.userId]) userMap[p.userId] = { user: p.author, dist: 0, runs: 0 };
+    if (!userMap[p.userId]) userMap[p.userId] = { user: p.author, dist: 0, runs: 0, totalDuration: 0 };
     userMap[p.userId].dist += parseFloat(p.dist) || 0;
     userMap[p.userId].runs += 1;
+    userMap[p.userId].totalDuration += parseInt(p.duration) || 0;
   });
-  const scores = Object.values(userMap).sort((a, b) => b.dist - a.dist);
+  // 누적 거리 합산, 페이스 = 총 시간 / 총 거리 (가중평균)
+  const scores = Object.values(userMap).map(s => ({
+    ...s,
+    avgPace: s.dist > 0 ? fmtPace(s.totalDuration / s.dist) : "--'--\"",
+  })).sort((a, b) => b.dist - a.dist);
   const medals = ["🥇", "🥈", "🥉"];
 
   return (
@@ -321,11 +357,11 @@ function LeaderboardTab({ posts, currentUser }) {
           <div style={{ width: 42, height: 42, borderRadius: 21, background: "#111", border: "1.5px solid #222", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>{s.user.avatar || "🏃"}</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 14, fontWeight: 700 }}>{s.user.name}{s.user.uid === currentUser?.uid && <span style={{ color: "#00ff88", fontSize: 10, marginLeft: 6 }}>ME</span>}</div>
-            <div style={{ fontSize: 11, color: "#383838", marginTop: 2 }}>{s.runs}회 러닝</div>
+            <div style={{ fontSize: 11, color: "#383838", marginTop: 2 }}>{s.runs}회 러닝 · 평균 {s.avgPace}/km</div>
           </div>
           <div style={{ textAlign: "right" }}>
             <div style={{ fontSize: 20, fontWeight: 800, color: i === 0 ? "#00ff88" : "#aaa" }}>{s.dist.toFixed(1)}</div>
-            <div style={{ fontSize: 10, color: "#2a2a2a" }}>km</div>
+            <div style={{ fontSize: 10, color: "#2a2a2a" }}>km 누적</div>
           </div>
         </div>
       ))}
@@ -419,7 +455,7 @@ function BottomNav({ tab, setTab, onUpload }) {
 
 /* ══ MAIN ══ */
 export default function CommunityApp({ currentUser, onLogout, onUpdateProfile }) {
-  const { posts, loading, createPost, toggleReaction, addComment } = usePosts(currentUser);
+  const { posts, loading, createPost, toggleReaction, addComment, deletePost } = usePosts(currentUser);
   const [tab, setTab] = useState("feed");
   const [showUpload, setShowUpload] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
@@ -484,7 +520,8 @@ export default function CommunityApp({ currentUser, onLogout, onUpdateProfile })
             {posts.map(post => (
               <PostCard key={post.id} post={post} currentUser={currentUser}
                 onReact={(id, e) => toggleReaction(id, e, currentUser?.uid)}
-                onComment={(id, t) => addComment(id, t, currentUser)} />
+                onComment={(id, t) => addComment(id, t, currentUser)}
+                onDelete={(id) => deletePost(id)} />
             ))}
           </>
         )}
