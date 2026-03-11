@@ -504,7 +504,7 @@ function NoticeTab({ currentSet, isAdmin, onAdd, onDelete }) {
       {isAdmin && (
         <div style={{ marginBottom: 18 }}>
           <textarea value={text} onChange={e => setText(e.target.value)}
-            placeholder="세트 멤버에게 공지를 작성하세요..." rows={3} maxLength={300}
+            placeholder="크루 멤버에게 공지를 작성하세요..." rows={3} maxLength={300}
             style={{ width: "100%", background: "#080808", border: "1px solid #1e1e1e", borderRadius: 14, padding: "14px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 13, outline: "none", resize: "none", boxSizing: "border-box", lineHeight: 1.7 }} />
           <button onClick={handlePost} disabled={!text.trim() || posting}
             style={{ width: "100%", marginTop: 8, padding: "13px", background: text.trim() ? "#00ff88" : "#0d0d0d", border: "none", borderRadius: 12, color: text.trim() ? "#000" : "#333", fontFamily: "inherit", fontSize: 14, fontWeight: 800, minHeight: 50 }}>
@@ -676,7 +676,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
           </div>
         ))}
 
-        {/* 세트 멤버 관리 (관리자만) */}
+        {/* 크루 멤버 관리 (관리자만) */}
         {currentSet && (
           <div style={{ marginTop: 18 }}>
             <div style={{ fontSize: 10, color: "#333", letterSpacing: 2, marginBottom: 12 }}>
@@ -701,14 +701,14 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
               </div>
             ))}
             {!isAdmin && (
-              <button onClick={onLeaveSet} style={{ width: "100%", marginTop: 8, padding: "13px", background: "transparent", border: "1px solid #2a2a2a", borderRadius: 14, color: "#555", fontFamily: "inherit", fontSize: 13, minHeight: 48 }}>세트 나가기</button>
+              <button onClick={onLeaveSet} style={{ width: "100%", marginTop: 8, padding: "13px", background: "transparent", border: "1px solid #2a2a2a", borderRadius: 14, color: "#555", fontFamily: "inherit", fontSize: 13, minHeight: 48 }}>크루 나가기</button>
             )}
           </div>
         )}
 
         {isAdmin && (
           <button onClick={onDeleteSet} style={{ width: "100%", marginTop: 12, padding: "15px", background: "transparent", border: "1px solid #3d1010", borderRadius: 14, color: "#ff4444", fontFamily: "inherit", fontSize: 14, minHeight: 52 }}>
-            🗑️ 세트 삭제
+            🗑️ 크루 삭제
           </button>
         )}
         <button onClick={onLogout} style={{ width: "100%", marginTop: 12, padding: "15px", background: "transparent", border: "1px solid #2a2a2a", borderRadius: 14, color: "#444", fontFamily: "inherit", fontSize: 14, minHeight: 52 }}>로그아웃</button>
@@ -877,7 +877,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
           } catch(e) { alert(e.message); }
         }}
         onDeleteSet={async () => {
-          if (window.confirm(`"${currentSet.name}" 세트를 삭제할까요?\n게시물이 모두 삭제되고 복구할 수 없어요.`)) {
+          if (window.confirm(`"${currentSet.name}" 크루를 삭제할까요?\n게시물이 모두 삭제되고 복구할 수 없어요.`)) {
             try {
               await deleteSet(currentSet.id);
               onLeaveSet();

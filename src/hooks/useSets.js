@@ -123,14 +123,14 @@ export function useSets(currentUser) {
     return snap.exists() ? { id: snap.id, ...snap.data() } : null;
   };
 
-  // 세트 삭제 (관리자 전용)
+  // 크루 삭제 (관리자 전용)
   const deleteSet = async (setId) => {
     if (!currentUser?.uid) return;
     const setRef = doc(db, "sets", setId);
     const snap = await getDoc(setRef);
     if (!snap.exists()) return;
     if (snap.data().adminId !== currentUser.uid) throw new Error("관리자만 삭제할 수 있어요");
-    // 세트 내 게시물도 함께 삭제
+    // 크루 내 게시물도 함께 삭제
     const postsSnap = await getDocs(
       query(collection(db, "posts"), where("setId", "==", setId))
     );
@@ -148,7 +148,7 @@ export function useSets(currentUser) {
   // 초대 링크로 입장
   const joinByInvite = async (setId) => {
     const snap = await getDoc(doc(db, "sets", setId));
-    if (!snap.exists()) throw new Error("존재하지 않는 세트예요");
+    if (!snap.exists()) throw new Error("존재하지 않는 크루예요");
     const data = snap.data();
     if (data.memberIds?.includes(currentUser?.uid)) throw new Error("already_member");
     await joinSet(setId);
