@@ -616,7 +616,7 @@ function StatsTab({ posts, currentUser }) {
 }
 
 /* ══ PROFILE MODAL ══ */
-function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTransfer, onLeaveSet, onClose, onLogout, onUpdateProfile }) {
+function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTransfer, onLeaveSet, onDeleteSet, onClose, onLogout, onUpdateProfile }) {
   const myPosts = posts.filter(p => p.userId === currentUser?.uid);
   const totalDist = myPosts.reduce((a, p) => a + (parseFloat(p.dist) || 0), 0);
   const [editMode, setEditMode] = useState(false);
@@ -706,6 +706,11 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
           </div>
         )}
 
+        {isAdmin && (
+          <button onClick={onDeleteSet} style={{ width: "100%", marginTop: 12, padding: "15px", background: "transparent", border: "1px solid #3d1010", borderRadius: 14, color: "#ff4444", fontFamily: "inherit", fontSize: 14, minHeight: 52 }}>
+            🗑️ 세트 삭제
+          </button>
+        )}
         <button onClick={onLogout} style={{ width: "100%", marginTop: 12, padding: "15px", background: "transparent", border: "1px solid #2a2a2a", borderRadius: 14, color: "#444", fontFamily: "inherit", fontSize: 14, minHeight: 52 }}>로그아웃</button>
       </div>
     </div>
@@ -732,7 +737,7 @@ function BottomNav({ tab, setTab, onUpload }) {
 /* ══ MAIN ══ */
 export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLogout, onUpdateProfile }) {
   const { posts, loading, createPost, toggleReaction, addComment, deletePost } = usePosts(currentUser, currentSet?.id);
-  const { kickMember, transferAdmin, leaveSet, addNotice, deleteNotice, getInviteLink } = useSets(currentUser);
+  const { kickMember, transferAdmin, leaveSet, addNotice, deleteNotice, getInviteLink, deleteSet } = useSets(currentUser);
   const isAdmin = currentSet?.adminId === currentUser?.uid;
   const { notifications, unreadCount, createNotification, markAllRead } = useNotifications(currentUser);
   const [tab, setTab] = useState("feed");
@@ -867,6 +872,14 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
             await leaveSet(currentSet.id);
             onLeaveSet();
           } catch(e) { alert(e.message); }
+        }}
+        onDeleteSet={async () => {
+          if (window.confirm(`"${currentSet.name}" 세트를 삭제할까요?\n게시물이 모두 삭제되고 복구할 수 없어요.`)) {
+            try {
+              await deleteSet(currentSet.id);
+              onLeaveSet();
+            } catch(e) { alert(e.message); }
+          }
         }}
         onClose={() => setShowProfile(false)}
         onLogout={onLogout} onUpdateProfile={onUpdateProfile} />}

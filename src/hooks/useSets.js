@@ -1,7 +1,8 @@
 // src/hooks/useSets.js
 import { useState, useEffect } from "react";
 import {
-  collection, addDoc, updateDoc, deleteDoc, doc,
+  collection, addDoc, updateDoc, deleteDoc, doc, getDocs,
+  writeBatch, query, where,
   query, where, onSnapshot, getDoc, arrayUnion, arrayRemove,
   serverTimestamp, orderBy,
 } from "firebase/firestore";
@@ -123,6 +124,23 @@ export function useSets(currentUser) {
     return snap.exists() ? { id: snap.id, ...snap.data() } : null;
   };
 
+  // 세트 삭제 (관리자 전용)
+  const deleteSet = async (setId) => {
+    if (!currentUser?.uid) return;
+    const setRef = doc(db, "sets", setId);
+    const snap = await getDoc(setRef);
+    if (!snap.exists()) return;
+    if (snap.data().adminId !== currentUser.uid) throw new Error("관리자만 삭제할 수 있어요");
+    // 세트 내 게시물도 함께 삭제
+    const postsSnap = await getDocs(
+      query(collection(db, "posts"), where("setId", "==", setId))
+    );
+    const batch = writeBatch(db);
+    postsSnap.docs.forEach(d => batch.delete(d.ref));
+    batch.delete(setRef);
+    await batch.commit();
+  };
+
   // 초대 링크 생성 (setId를 URL에 포함)
   const getInviteLink = (setId) => {
     return `${window.location.origin}?invite=${setId}`;
@@ -160,5 +178,5 @@ export function useSets(currentUser) {
     await updateDoc(doc(db, "sets", setId), { notices: newNotices });
   };
 
-  return { mySets, publicSets, loading, createSet, joinSet, leaveSet, kickMember, transferAdmin, getSet, searchPublicSets, getInviteLink, joinByInvite, addNotice, deleteNotice };
+  return { mySets, publicSets, loading, createSet, joinSet, leaveSet, kickMember, transferAdmin, getSet, searchPublicSets, getInviteLink, joinByInvite, addNotice, deleteNotice, deleteSet };
 }
