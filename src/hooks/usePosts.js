@@ -33,14 +33,8 @@ export function usePosts(currentUser, setId) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!setId) return;
-    const q = query(
-      collection(db, "posts"),
-      where("setId", "==", setId),
-      orderBy("createdAt", "desc"),
-      limit(50)
-    );
-    const unsub = onSnapshot(q, async (snap) => {
+    if (!setId) { setLoading(false); return; }
+    const processSnap = async (snap) => {
       const data = await Promise.all(
         snap.docs.map(async (d) => {
           const post = { id: d.id, ...d.data() };
@@ -51,11 +45,23 @@ export function usePosts(currentUser, setId) {
           return post;
         })
       );
+      data.sort((a, b) => {
+        const ta = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+        const tb = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+        return tb - ta;
+      });
       setPosts(data);
       setLoading(false);
+    };
+    // where + orderBy 복합 쿼리 시도, 인덱스 없으면 fallback
+    const q = query(collection(db, "posts"), where("setId", "==", setId), orderBy("createdAt", "desc"), limit(50));
+    const unsub = onSnapshot(q, processSnap, (err) => {
+      console.warn("index fallback:", err.message);
+      const fallbackQ = query(collection(db, "posts"), where("setId", "==", setId), limit(50));
+      onSnapshot(fallbackQ, processSnap);
     });
     return unsub;
-  }, []);
+  }, [setId]);
 
   // 게시글 생성 - 이미지는 base64로 Firestore에 저장
   const createPost = async ({ dist, duration, pace, calories, date, caption, imageFile, source, appName, aiFeedback }) => {
