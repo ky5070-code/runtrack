@@ -718,18 +718,32 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
 }
 
 /* ══ BOTTOM NAV ══ */
-function BottomNav({ tab, setTab, onUpload }) {
+function BottomNav({ onUpload, onNotif, onProfile, unreadCount }) {
   return (
     <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 480, background: "rgba(6,6,6,0.96)", borderTop: "1px solid #161616", paddingBottom: safeBottom, display: "flex", zIndex: 100, backdropFilter: "blur(20px)" }}>
-      {[["feed", "◎", "피드"], ["upload", "+", ""], ["rank", "△", "랭킹"]].map(([id, icon, label]) => {
-        const isSpecial = id === "upload";
-        return (
-          <button key={id} onClick={() => isSpecial ? onUpload() : setTab(id)} style={{ flex: 1, padding: "10px 0", border: "none", background: "transparent", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, minHeight: 56 }}>
-            <div style={{ width: isSpecial ? 48 : "auto", height: isSpecial ? 48 : "auto", borderRadius: isSpecial ? 24 : 0, background: isSpecial ? "#00ff88" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: isSpecial ? 26 : 22, color: isSpecial ? "#000" : tab === id ? "#00ff88" : "#383838", marginTop: isSpecial ? -18 : 0, boxShadow: isSpecial ? "0 0 24px rgba(0,255,136,0.35)" : "none", fontWeight: 800 }}>{icon}</div>
-            {!isSpecial && <div style={{ fontSize: 10, color: tab === id ? "#00ff88" : "#383838", fontWeight: tab === id ? 700 : 400 }}>{label}</div>}
-          </button>
-        );
-      })}
+      {/* 알림 버튼 */}
+      <button onClick={onNotif} style={{ flex: 1, padding: "10px 0", border: "none", background: "transparent", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, minHeight: 56, position: "relative" }}>
+        <div style={{ position: "relative", display: "inline-flex" }}>
+          <div style={{ fontSize: 22, color: "#383838" }}>🔔</div>
+          {unreadCount > 0 && (
+            <div style={{ position: "absolute", top: -4, right: -6, minWidth: 16, height: 16, borderRadius: 8, background: "#ff3b3b", border: "2px solid #060606", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 800, color: "#fff", padding: "0 3px" }}>
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </div>
+          )}
+        </div>
+        <div style={{ fontSize: 10, color: "#383838" }}>알림</div>
+      </button>
+
+      {/* 업로드 버튼 */}
+      <button onClick={onUpload} style={{ flex: 1, padding: "10px 0", border: "none", background: "transparent", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, minHeight: 56 }}>
+        <div style={{ width: 48, height: 48, borderRadius: 24, background: "#00ff88", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, color: "#000", marginTop: -18, boxShadow: "0 0 24px rgba(0,255,136,0.35)", fontWeight: 800 }}>+</div>
+      </button>
+
+      {/* 프로필 버튼 */}
+      <button onClick={onProfile} style={{ flex: 1, padding: "10px 0", border: "none", background: "transparent", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, minHeight: 56 }}>
+        <div style={{ fontSize: 22, color: "#383838" }}>👤</div>
+        <div style={{ fontSize: 10, color: "#383838" }}>프로필</div>
+      </button>
     </div>
   );
 }
@@ -766,18 +780,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
             <div style={{ fontSize: 18, fontWeight: 800, color: "#00ff88", letterSpacing: -0.5 }}>{currentSet?.emoji} {currentSet?.name}</div>
           </div>
         </div>
-        <div style={{ position: "relative", cursor: "pointer" }} onClick={() => { setShowNotif(true); }}>
-          <Avatar user={currentUser} size={44} />
-          {unreadCount > 0 && (
-            <div style={{ position: "absolute", top: -3, right: -3, minWidth: 18, height: 18, borderRadius: 9, background: "#ff3b3b", border: "2px solid #060606", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800, color: "#fff", padding: "0 4px" }}>
-              {unreadCount > 9 ? "9+" : unreadCount}
-            </div>
-          )}
-        </div>
-        <div style={{ width: 8 }} />
-        <div onClick={() => setShowProfile(true)} style={{ cursor: "pointer" }}>
-          <div style={{ width: 32, height: 32, borderRadius: 16, background: "#111", border: "1.5px solid #222", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>👤</div>
-        </div>
+        <Avatar user={currentUser} size={40} />
       </div>
 
       {/* 주간 요약 */}
@@ -849,7 +852,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
       </div>
 
       {/* 하단 네비게이션 */}
-      <BottomNav tab={tab} setTab={setTab} onUpload={() => setShowUpload(true)} />
+      <BottomNav onUpload={() => setShowUpload(true)} onNotif={() => { setShowNotif(true); }} onProfile={() => setShowProfile(true)} unreadCount={unreadCount} />
 
       {/* 모달 */}
       {showUpload && <UploadModal onClose={() => setShowUpload(false)} onPost={createPost} currentUser={currentUser} />}
