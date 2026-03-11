@@ -129,7 +129,7 @@ function JoinSetModal({ onClose, onJoin, currentUser }) {
 }
 
 export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
-  const { mySets, loading, createSet, joinSet } = useSets(currentUser);
+  const { mySets, loading, createSet, joinSet, getInviteLink } = useSets(currentUser);
   const [showCreate, setShowCreate] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
 
@@ -198,7 +198,14 @@ export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
               {set.description && <div style={{ fontSize: 12, color: "#444", marginTop: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{set.description}</div>}
               <div style={{ fontSize: 11, color: "#2e2e2e", marginTop: 4 }}>멤버 {set.memberIds?.length || 0}명</div>
             </div>
-            <div style={{ color: "#2a2a2a", fontSize: 18, flexShrink: 0 }}>›</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+              <button onClick={e => {
+                e.stopPropagation();
+                const link = getInviteLink(set.id);
+                navigator.clipboard.writeText(link).then(() => alert("초대 링크가 복사됐어요! 🔗"));
+              }} style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 8, padding: "6px 10px", color: "#555", fontFamily: "inherit", fontSize: 11, minHeight: 32 }}>🔗</button>
+              <div style={{ color: "#2a2a2a", fontSize: 18 }}>›</div>
+            </div>
           </div>
         ))}
       </div>

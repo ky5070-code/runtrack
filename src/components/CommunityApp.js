@@ -476,6 +476,145 @@ function NotificationModal({ notifications, onClose, onMarkAllRead }) {
   );
 }
 
+
+/* ══ NOTICE TAB ══ */
+function NoticeTab({ currentSet, isAdmin, onAdd, onDelete }) {
+  const [text, setText] = useState("");
+  const [posting, setPosting] = useState(false);
+  const notices = [...(currentSet?.notices || [])].reverse();
+
+  const relTime = (iso) => {
+    const d = Date.now() - new Date(iso).getTime();
+    if (d < 60000) return "방금";
+    if (d < 3600000) return `${Math.floor(d/60000)}분 전`;
+    if (d < 86400000) return `${Math.floor(d/3600000)}시간 전`;
+    return `${Math.floor(d/86400000)}일 전`;
+  };
+
+  const handlePost = async () => {
+    if (!text.trim()) return;
+    setPosting(true);
+    await onAdd(text.trim());
+    setText("");
+    setPosting(false);
+  };
+
+  return (
+    <div>
+      {isAdmin && (
+        <div style={{ marginBottom: 18 }}>
+          <textarea value={text} onChange={e => setText(e.target.value)}
+            placeholder="세트 멤버에게 공지를 작성하세요..." rows={3} maxLength={300}
+            style={{ width: "100%", background: "#080808", border: "1px solid #1e1e1e", borderRadius: 14, padding: "14px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 13, outline: "none", resize: "none", boxSizing: "border-box", lineHeight: 1.7 }} />
+          <button onClick={handlePost} disabled={!text.trim() || posting}
+            style={{ width: "100%", marginTop: 8, padding: "13px", background: text.trim() ? "#00ff88" : "#0d0d0d", border: "none", borderRadius: 12, color: text.trim() ? "#000" : "#333", fontFamily: "inherit", fontSize: 14, fontWeight: 800, minHeight: 50 }}>
+            {posting ? "공지 중..." : "📣 공지 올리기"}
+          </button>
+        </div>
+      )}
+
+      {notices.length === 0 && (
+        <div style={{ textAlign: "center", padding: "50px 0", color: "#2a2a2a" }}>
+          <div style={{ fontSize: 40, marginBottom: 10 }}>📣</div>
+          <div style={{ fontSize: 13 }}>아직 공지가 없어요</div>
+        </div>
+      )}
+
+      {notices.map(n => (
+        <div key={n.id} style={{ background: "#0a0f0a", border: "1px solid #1a3020", borderRadius: 16, padding: "16px", marginBottom: 10, position: "relative" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+            <div style={{ width: 32, height: 32, borderRadius: 16, background: "#0d1f14", border: "1px solid #1a3d28", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>{n.authorAvatar}</div>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#00cc66" }}>{n.authorName}</div>
+              <div style={{ fontSize: 10, color: "#2a2a2a" }}>{relTime(n.createdAt)}</div>
+            </div>
+            {isAdmin && (
+              <button onClick={() => onDelete(n.id)} style={{ marginLeft: "auto", background: "none", border: "none", color: "#333", fontSize: 14, cursor: "pointer", minWidth: 28, minHeight: 28 }}>✕</button>
+            )}
+          </div>
+          <div style={{ fontSize: 14, lineHeight: 1.7, color: "#ccc", whiteSpace: "pre-wrap" }}>{n.text}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ══ STATS TAB ══ */
+function StatsTab({ posts, currentUser }) {
+  const myPosts = posts.filter(p => p.userId === currentUser?.uid);
+
+  // 최근 8주 데이터
+  const weeks = [];
+  for (let i = 7; i >= 0; i--) {
+    const start = Date.now() - (i + 1) * 7 * 86400000;
+    const end = Date.now() - i * 7 * 86400000;
+    const label = i === 0 ? "이번주" : `${i}주전`;
+    const dist = myPosts.filter(p => {
+      const t = p.createdAt?.toDate ? p.createdAt.toDate().getTime() : new Date(p.createdAt || 0).getTime();
+      return t >= start && t < end;
+    }).reduce((a, p) => a + (parseFloat(p.dist) || 0), 0);
+    weeks.push({ label, dist });
+  }
+
+  const maxDist = Math.max(...weeks.map(w => w.dist), 1);
+  const totalDist = myPosts.reduce((a, p) => a + (parseFloat(p.dist) || 0), 0);
+  const totalRuns = myPosts.length;
+  const avgDist = totalRuns > 0 ? totalDist / totalRuns : 0;
+  const bestDist = myPosts.reduce((a, p) => Math.max(a, parseFloat(p.dist) || 0), 0);
+
+  // 페이스 계산
+  const validPace = myPosts.filter(p => p.pace && p.pace !== "--");
+  const avgPace = validPace.length > 0
+    ? validPace[validPace.length > 5 ? validPace.length - 5 : 0]?.pace || "--"
+    : "--";
+
+  return (
+    <div>
+      {/* 요약 카드 */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
+        {[
+          [`${totalDist.toFixed(1)}km`, "총 누적 거리", "🏃"],
+          [`${totalRuns}회`, "총 러닝 횟수", "📅"],
+          [`${avgDist.toFixed(1)}km`, "평균 거리", "📊"],
+          [`${bestDist.toFixed(1)}km`, "최장 거리", "🏆"],
+        ].map(([v, l, icon]) => (
+          <div key={l} style={{ background: "#080808", border: "1px solid #161616", borderRadius: 16, padding: "16px 14px" }}>
+            <div style={{ fontSize: 11, marginBottom: 6 }}>{icon}</div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: "#00ff88" }}>{v}</div>
+            <div style={{ fontSize: 10, color: "#333", marginTop: 4 }}>{l}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* 주간 거리 바 차트 */}
+      <div style={{ background: "#080808", border: "1px solid #161616", borderRadius: 16, padding: "18px 16px", marginBottom: 16 }}>
+        <div style={{ fontSize: 11, color: "#333", letterSpacing: 2, marginBottom: 16 }}>주간 러닝 거리</div>
+        <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 100 }}>
+          {weeks.map((w, i) => {
+            const h = maxDist > 0 ? Math.max((w.dist / maxDist) * 90, w.dist > 0 ? 6 : 0) : 0;
+            const isThis = i === 7;
+            return (
+              <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+                {w.dist > 0 && <div style={{ fontSize: 8, color: isThis ? "#00ff88" : "#444" }}>{w.dist.toFixed(1)}</div>}
+                <div style={{ width: "100%", height: h, background: isThis ? "#00ff88" : "#1a3020", borderRadius: "4px 4px 0 0", minHeight: h > 0 ? 4 : 0, transition: "height 0.3s" }} />
+                <div style={{ fontSize: 8, color: isThis ? "#00ff88" : "#2a2a2a", textAlign: "center" }}>{w.label}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 최근 기록 */}
+      {myPosts.length === 0 && (
+        <div style={{ textAlign: "center", padding: "40px 0", color: "#2a2a2a" }}>
+          <div style={{ fontSize: 40, marginBottom: 10 }}>📊</div>
+          <div style={{ fontSize: 13 }}>러닝 기록을 추가하면 통계가 보여요!</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ══ PROFILE MODAL ══ */
 function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTransfer, onLeaveSet, onClose, onLogout, onUpdateProfile }) {
   const myPosts = posts.filter(p => p.userId === currentUser?.uid);
@@ -593,7 +732,7 @@ function BottomNav({ tab, setTab, onUpload }) {
 /* ══ MAIN ══ */
 export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLogout, onUpdateProfile }) {
   const { posts, loading, createPost, toggleReaction, addComment, deletePost } = usePosts(currentUser, currentSet?.id);
-  const { kickMember, transferAdmin, leaveSet } = useSets(currentUser);
+  const { kickMember, transferAdmin, leaveSet, addNotice, deleteNotice, getInviteLink } = useSets(currentUser);
   const isAdmin = currentSet?.adminId === currentUser?.uid;
   const { notifications, unreadCount, createNotification, markAllRead } = useNotifications(currentUser);
   const [tab, setTab] = useState("feed");
@@ -648,8 +787,8 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
 
       {/* 탭 */}
       <div style={{ display: "flex", gap: 8, padding: "12px 18px 0", flexShrink: 0 }}>
-        {[["feed", "피드"], ["rank", "랭킹"]].map(([id, label]) => (
-          <button key={id} onClick={() => setTab(id)} style={{ flex: 1, padding: "11px", borderRadius: 12, border: "none", background: tab === id ? "#00ff88" : "#0d0d0d", color: tab === id ? "#000" : "#444", fontFamily: "inherit", fontSize: 14, fontWeight: 700, minHeight: 44 }}>{label}</button>
+        {[["feed", "피드"], ["rank", "랭킹"], ["notice", "공지"], ["stats", "통계"]].map(([id, label]) => (
+          <button key={id} onClick={() => setTab(id)} style={{ flex: 1, padding: "11px", borderRadius: 12, border: "none", background: tab === id ? "#00ff88" : "#0d0d0d", color: tab === id ? "#000" : "#444", fontFamily: "inherit", fontSize: 13, fontWeight: 700, minHeight: 44 }}>{label}</button>
         ))}
       </div>
 
@@ -692,6 +831,16 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
         )}
 
         {tab === "rank" && !loading && <LeaderboardTab posts={posts} currentUser={currentUser} />}
+
+        {tab === "notice" && !loading && (
+          <NoticeTab currentSet={currentSet} isAdmin={isAdmin}
+            onAdd={(text) => addNotice(currentSet.id, text)}
+            onDelete={(nid) => deleteNotice(currentSet.id, nid)} />
+        )}
+
+        {tab === "stats" && !loading && (
+          <StatsTab posts={posts} currentUser={currentUser} />
+        )}
       </div>
 
       {/* 하단 네비게이션 */}

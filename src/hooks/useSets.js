@@ -123,5 +123,42 @@ export function useSets(currentUser) {
     return snap.exists() ? { id: snap.id, ...snap.data() } : null;
   };
 
-  return { mySets, publicSets, loading, createSet, joinSet, leaveSet, kickMember, transferAdmin, getSet, searchPublicSets };
+  // 초대 링크 생성 (setId를 URL에 포함)
+  const getInviteLink = (setId) => {
+    return `${window.location.origin}?invite=${setId}`;
+  };
+
+  // 초대 링크로 입장
+  const joinByInvite = async (setId) => {
+    const snap = await getDoc(doc(db, "sets", setId));
+    if (!snap.exists()) throw new Error("존재하지 않는 세트예요");
+    const data = snap.data();
+    if (data.memberIds?.includes(currentUser?.uid)) throw new Error("already_member");
+    await joinSet(setId);
+    return { id: snap.id, ...data };
+  };
+
+  // 공지 추가 (관리자 전용)
+  const addNotice = async (setId, text) => {
+    if (!currentUser?.uid) return;
+    await updateDoc(doc(db, "sets", setId), {
+      notices: arrayUnion({
+        id: Math.random().toString(36).slice(2),
+        text,
+        authorName: currentUser.name,
+        authorAvatar: currentUser.avatar || "🏃",
+        createdAt: new Date().toISOString(),
+      }),
+    });
+  };
+
+  // 공지 삭제 (관리자 전용)
+  const deleteNotice = async (setId, noticeId) => {
+    const snap = await getDoc(doc(db, "sets", setId));
+    if (!snap.exists()) return;
+    const newNotices = (snap.data().notices || []).filter(n => n.id !== noticeId);
+    await updateDoc(doc(db, "sets", setId), { notices: newNotices });
+  };
+
+  return { mySets, publicSets, loading, createSet, joinSet, leaveSet, kickMember, transferAdmin, getSet, searchPublicSets, getInviteLink, joinByInvite, addNotice, deleteNotice };
 }

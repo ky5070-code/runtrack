@@ -1,13 +1,32 @@
 // src/App.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "./hooks/useAuth";
+import { useSets } from "./hooks/useSets";
 import LoginScreen from "./components/LoginScreen";
 import HomeScreen from "./components/HomeScreen";
 import CommunityApp from "./components/CommunityApp";
 
-export default function App() {
-  const { user, profile, loading, loginWithGoogle, logout, updateUserProfile } = useAuth();
+function AppInner({ user, profile, loading, loginWithGoogle, logout, updateUserProfile }) {
   const [currentSet, setCurrentSet] = useState(null);
+  const currentUser = profile ? { ...profile, uid: user?.uid } : null;
+  const { joinByInvite } = useSets(currentUser);
+
+  // 초대 링크 처리
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const inviteId = params.get("invite");
+    if (inviteId && user && profile) {
+      joinByInvite(inviteId)
+        .then(set => {
+          window.history.replaceState({}, "", window.location.pathname);
+          setCurrentSet(set);
+        })
+        .catch(e => {
+          if (e.message !== "already_member") alert(e.message);
+          window.history.replaceState({}, "", window.location.pathname);
+        });
+    }
+  }, [user?.uid, profile]);
 
   if (loading) {
     return (
@@ -25,8 +44,6 @@ export default function App() {
   }
 
   if (!user) return <LoginScreen onLogin={loginWithGoogle} />;
-
-  const currentUser = { ...profile, uid: user.uid };
 
   if (!currentSet) {
     return (
@@ -47,4 +64,9 @@ export default function App() {
       onUpdateProfile={updateUserProfile}
     />
   );
+}
+
+export default function App() {
+  const auth = useAuth();
+  return <AppInner {...auth} />;
 }
