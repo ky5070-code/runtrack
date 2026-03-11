@@ -412,6 +412,34 @@ function LeaderboardTab({ posts, currentUser }) {
   );
 }
 
+/* ══ STREAK CALCULATOR ══ */
+function calcStreak(posts, userId) {
+  // 내 게시물의 날짜만 추출 (YYYY-MM-DD)
+  const myDates = [...new Set(
+    posts
+      .filter(p => p.userId === userId)
+      .map(p => p.date || (p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt || 0)).toISOString().slice(0, 10))
+  )].sort().reverse(); // 최신순
+
+  if (myDates.length === 0) return 0;
+
+  const today = new Date().toISOString().slice(0, 10);
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+
+  // 오늘 또는 어제 기록이 없으면 스트릭 0
+  if (myDates[0] !== today && myDates[0] !== yesterday) return 0;
+
+  let streak = 1;
+  for (let i = 1; i < myDates.length; i++) {
+    const prev = new Date(myDates[i - 1]);
+    const curr = new Date(myDates[i]);
+    const diff = (prev - curr) / 86400000;
+    if (diff === 1) streak++;
+    else break;
+  }
+  return streak;
+}
+
 /* ══ NOTIFICATION MODAL ══ */
 function NotificationModal({ notifications, onClose, onMarkAllRead }) {
   const relTime = (val) => {
@@ -654,7 +682,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
         </div>}
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 18 }}>
-          {[[`${totalDist.toFixed(1)}km`, "총 거리"], [`${myPosts.length}개`, "게시물"], [`${currentUser?.streak || 0}일`, "스트릭"]].map(([v, l]) => (
+          {[[`${totalDist.toFixed(1)}km`, "총 거리"], [`${myPosts.length}개`, "게시물"], [`${calcStreak(posts, currentUser?.uid)}일`, "🔥 스트릭"]].map(([v, l]) => (
             <div key={l} style={{ background: "#080808", border: "1px solid #161616", borderRadius: 12, padding: "12px 10px", textAlign: "center" }}>
               <div style={{ fontSize: 19, fontWeight: 800, color: "#00ff88" }}>{v}</div>
               <div style={{ fontSize: 12, color: "#333", marginTop: 3 }}>{l}</div>
@@ -785,7 +813,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
 
       {/* 주간 요약 */}
       <div style={{ margin: "12px 18px 0", background: "#0a0a0a", border: "1px solid #161616", borderRadius: 16, padding: "12px 16px", display: "flex", flexShrink: 0 }}>
-        {[[`${myWeekDist.toFixed(1)}km`, "이번 주"], [`${posts.filter(p => p.userId === currentUser?.uid).length}회`, "총 러닝"], [`${currentUser?.streak || 0}일`, "스트릭"]].map(([v, l], i) => (
+        {[[`${myWeekDist.toFixed(1)}km`, "이번 주"], [`${posts.filter(p => p.userId === currentUser?.uid).length}회`, "총 러닝"], [`${calcStreak(posts, currentUser?.uid)}일`, "🔥 스트릭"]].map(([v, l], i) => (
           <div key={l} style={{ flex: 1, borderLeft: i > 0 ? "1px solid #141414" : "none", paddingLeft: i > 0 ? 14 : 0 }}>
             <div style={{ fontSize: 19, fontWeight: 800, color: "#00ff88" }}>{v}</div>
             <div style={{ fontSize: 12, color: "#2e2e2e" }}>{l}</div>
