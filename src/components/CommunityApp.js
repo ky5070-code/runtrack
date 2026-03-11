@@ -38,6 +38,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete }) {
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(true);
   const myReaction = post[`myReaction_${currentUser?.uid}`];
   const isMyPost = post.userId === currentUser?.uid;
 
@@ -48,7 +49,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete }) {
   };
 
   return (
-    <div style={{ background: "#0b0b0b", border: "1px solid #181818", borderRadius: 18, overflow: "hidden", marginBottom: 12 }}>
+    <div style={{ background: isMyPost ? "#0c110e" : "#0b0b0b", border: isMyPost ? "1.5px solid #00ff88" : "1px solid #181818", borderRadius: 18, overflow: "hidden", marginBottom: 12, boxShadow: isMyPost ? "0 0 12px rgba(0,255,136,0.06)" : "none" }}>
       <div style={{ height: 4, background: post.source === "ai" ? "linear-gradient(90deg,#00ff88,#009944)" : "#1a1a1a" }} />
 
       {post.imageUrl && (
@@ -98,6 +99,20 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete }) {
         </div>
 
         {post.caption && <div style={{ fontSize: 13, color: "#aaa", marginBottom: 12, lineHeight: 1.6 }}>{post.caption}</div>}
+
+        {/* AI 코치 피드백 */}
+        {post.aiFeedback && showFeedback && (
+          <div style={{ background: "#060e09", border: "1px solid #1a3028", borderRadius: 12, padding: "12px 14px", marginBottom: 12, position: "relative" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 8 }}>
+              <span style={{ fontSize: 11 }}>✨</span>
+              <span style={{ fontSize: 10, color: "#00cc66", fontWeight: 700, letterSpacing: 1 }}>AI 코치 피드백</span>
+              <button onClick={() => setShowFeedback(false)} style={{ marginLeft: "auto", background: "none", border: "none", color: "#2a2a2a", fontSize: 14, padding: 0, lineHeight: 1 }}>✕</button>
+            </div>
+            {post.aiFeedback.split("\n").filter(l => l.trim()).map((line, i) => (
+              <div key={i} style={{ fontSize: 12, color: "#7a9e87", lineHeight: 1.8 }}>{line}</div>
+            ))}
+          </div>
+        )}
 
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <div style={{ display: "flex", gap: 5, flex: 1, flexWrap: "wrap" }}>
@@ -177,7 +192,7 @@ function UploadModal({ onClose, onPost, currentUser }) {
           setResult(r);
           setEdited({ ...r, durationStr: r.duration ? fmtTime(r.duration) : "" });
           setStep("confirm");
-          // 피드백 비동기 요청 (분석과 별개로)
+          // 피드백 비동기 요청
           generateRunFeedback({
             distance: r.distance,
             duration: r.duration,
@@ -200,7 +215,7 @@ function UploadModal({ onClose, onPost, currentUser }) {
       const p = edited.durationStr.split(":").map(Number);
       duration = p.length === 3 ? p[0] * 3600 + p[1] * 60 + p[2] : p[0] * 60 + (p[1] || 0);
     }
-    await onPost({ dist: parseFloat(edited.distance) || 0, duration, pace: edited.pace || "", calories: parseInt(edited.calories) || 0, date: edited.date || new Date().toISOString().slice(0, 10), caption, imageFile: file, source: result ? "ai" : "manual", appName: result?.appName || null });
+    await onPost({ dist: parseFloat(edited.distance) || 0, duration, pace: edited.pace || "", calories: parseInt(edited.calories) || 0, date: edited.date || new Date().toISOString().slice(0, 10), caption, imageFile: file, source: result ? "ai" : "manual", appName: result?.appName || null, aiFeedback: feedback || null });
     setPosting(false);
     onClose();
   };

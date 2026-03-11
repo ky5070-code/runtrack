@@ -52,7 +52,7 @@ export function usePosts(currentUser) {
   }, []);
 
   // 게시글 생성 - 이미지는 base64로 Firestore에 저장
-  const createPost = async ({ dist, duration, pace, calories, date, caption, imageFile, source, appName }) => {
+  const createPost = async ({ dist, duration, pace, calories, date, caption, imageFile, source, appName, aiFeedback }) => {
     if (!currentUser) return;
 
     let imageUrl = null;
@@ -75,6 +75,7 @@ export function usePosts(currentUser) {
       imageUrl,
       source: source || "manual",
       appName: appName || null,
+      aiFeedback: aiFeedback || null,
       reactions: {},
       comments: [],
       createdAt: serverTimestamp(),
