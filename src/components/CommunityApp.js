@@ -718,20 +718,13 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
 }
 
 /* ══ BOTTOM NAV ══ */
-function BottomNav({ onUpload, onNotif, onProfile, unreadCount }) {
+function BottomNav({ onUpload, onHome, onProfile }) {
   return (
     <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 480, background: "rgba(6,6,6,0.96)", borderTop: "1px solid #161616", paddingBottom: safeBottom, display: "flex", zIndex: 100, backdropFilter: "blur(20px)" }}>
-      {/* 알림 버튼 */}
-      <button onClick={onNotif} style={{ flex: 1, padding: "10px 0", border: "none", background: "transparent", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, minHeight: 56, position: "relative" }}>
-        <div style={{ position: "relative", display: "inline-flex" }}>
-          <div style={{ fontSize: 22, color: "#383838" }}>🔔</div>
-          {unreadCount > 0 && (
-            <div style={{ position: "absolute", top: -4, right: -6, minWidth: 16, height: 16, borderRadius: 8, background: "#ff3b3b", border: "2px solid #060606", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 800, color: "#fff", padding: "0 3px" }}>
-              {unreadCount > 9 ? "9+" : unreadCount}
-            </div>
-          )}
-        </div>
-        <div style={{ fontSize: 10, color: "#383838" }}>알림</div>
+      {/* 홈 버튼 */}
+      <button onClick={onHome} style={{ flex: 1, padding: "10px 0", border: "none", background: "transparent", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, minHeight: 56 }}>
+        <div style={{ fontSize: 22, color: "#383838" }}>🏠</div>
+        <div style={{ fontSize: 10, color: "#383838" }}>홈</div>
       </button>
 
       {/* 업로드 버튼 */}
@@ -780,7 +773,14 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
             <div style={{ fontSize: 18, fontWeight: 800, color: "#00ff88", letterSpacing: -0.5 }}>{currentSet?.emoji} {currentSet?.name}</div>
           </div>
         </div>
-        <Avatar user={currentUser} size={40} />
+        <div style={{ position: "relative", cursor: "pointer" }} onClick={() => setShowNotif(true)}>
+          <Avatar user={currentUser} size={40} />
+          {unreadCount > 0 && (
+            <div style={{ position: "absolute", top: -3, right: -3, minWidth: 17, height: 17, borderRadius: 9, background: "#ff3b3b", border: "2px solid #060606", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 800, color: "#fff", padding: "0 3px" }}>
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 주간 요약 */}
@@ -852,7 +852,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
       </div>
 
       {/* 하단 네비게이션 */}
-      <BottomNav onUpload={() => setShowUpload(true)} onNotif={() => { setShowNotif(true); }} onProfile={() => setShowProfile(true)} unreadCount={unreadCount} />
+      <BottomNav onUpload={() => setShowUpload(true)} onHome={onLeaveSet} onProfile={() => setShowProfile(true)} />
 
       {/* 모달 */}
       {showUpload && <UploadModal onClose={() => setShowUpload(false)} onPost={createPost} currentUser={currentUser} />}
