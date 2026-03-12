@@ -3,6 +3,7 @@ import React, { useState, useRef } from "react";
 import { usePosts } from "../hooks/usePosts";
 import { useNotifications } from "../hooks/useNotifications";
 import { useSets } from "../hooks/useSets";
+import { useChat } from "../hooks/useChat";
 import { analyzeRunImage, generateRunFeedback } from "../lib/analyzeRun";
 
 /* ─── helpers ─── */
@@ -507,12 +508,10 @@ function NotificationModal({ notifications, onClose, onMarkAllRead }) {
 
 /* ══ CHAT TAB ══ */
 function ChatTab({ setId, currentUser }) {
-  const { messages, loading, sendMessage } = useChat(setId);
+  const { messages, sendMessage } = useChat(setId);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const bottomRef = useRef(null);
-  const gnbH = `calc(70px + ${safeBottom})`;
-  const inputH = "64px";
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -536,56 +535,45 @@ function ChatTab({ setId, currentUser }) {
     setSending(false);
   };
 
-  const handleKey = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
-  };
-
   return (
-    <div style={{ position: "fixed", top: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 480, bottom: 0, background: "#060606", zIndex: 50, display: "flex", flexDirection: "column" }}>
-      {/* 상단 여백 (헤더+탭 높이만큼) */}
-      <div style={{ height: "calc(env(safe-area-inset-top, 0px) + 130px)", flexShrink: 0 }} />
+    <div>
+      {messages.length === 0 && (
+        <div style={{ textAlign: "center", padding: "50px 0", color: "#2a2a2a" }}>
+          <div style={{ fontSize: 42, marginBottom: 10 }}>💬</div>
+          <div style={{ fontSize: 15 }}>첫 메시지를 보내보세요!</div>
+        </div>
+      )}
 
-      {/* 메시지 목록 */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "8px 18px", paddingBottom: inputH }}>
-        {loading && (
-          <div style={{ display: "flex", justifyContent: "center", paddingTop: 40 }}>
-            <div style={{ width: 28, height: 28, border: "2px solid #00ff88", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-          </div>
-        )}
-        {!loading && messages.length === 0 && (
-          <div style={{ textAlign: "center", padding: "50px 0", color: "#2a2a2a" }}>
-            <div style={{ fontSize: 42, marginBottom: 10 }}>💬</div>
-            <div style={{ fontSize: 15 }}>첫 메시지를 보내보세요!</div>
-          </div>
-        )}
-        {messages.map((msg, i) => {
-          const isMe = msg.userId === currentUser?.uid;
-          const showAvatar = !isMe && (i === 0 || messages[i-1]?.userId !== msg.userId);
-          return (
-            <div key={msg.id} style={{ display: "flex", flexDirection: isMe ? "row-reverse" : "row", alignItems: "flex-end", gap: 8, marginBottom: 6 }}>
-              {!isMe && (
-                <div style={{ width: 32, height: 32, borderRadius: 16, background: showAvatar ? "#111" : "transparent", border: showAvatar ? "1px solid #1e1e1e" : "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>
-                  {showAvatar ? msg.userAvatar : ""}
-                </div>
-              )}
-              <div style={{ maxWidth: "72%", display: "flex", flexDirection: "column", alignItems: isMe ? "flex-end" : "flex-start" }}>
-                {showAvatar && !isMe && <div style={{ fontSize: 11, color: "#444", marginBottom: 3, paddingLeft: 4 }}>{msg.userName}</div>}
-                <div style={{ background: isMe ? "#00ff88" : "#141414", color: isMe ? "#000" : "#e0e0e0", borderRadius: isMe ? "18px 18px 4px 18px" : "18px 18px 18px 4px", padding: "10px 14px", fontSize: 14, lineHeight: 1.5, wordBreak: "break-word", border: isMe ? "none" : "1px solid #1e1e1e" }}>
-                  {msg.text}
-                </div>
-                <div style={{ fontSize: 10, color: "#2a2a2a", marginTop: 3, paddingLeft: 4 }}>{relTime(msg.createdAt)}</div>
+      {messages.map((msg, i) => {
+        const isMe = msg.userId === currentUser?.uid;
+        const showAvatar = !isMe && (i === 0 || messages[i-1]?.userId !== msg.userId);
+        return (
+          <div key={msg.id} style={{ display: "flex", flexDirection: isMe ? "row-reverse" : "row", alignItems: "flex-end", gap: 8, marginBottom: 8 }}>
+            {!isMe && (
+              <div style={{ width: 32, height: 32, borderRadius: 16, background: showAvatar ? "#111" : "transparent", border: showAvatar ? "1px solid #1e1e1e" : "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>
+                {showAvatar ? msg.userAvatar : ""}
               </div>
+            )}
+            <div style={{ maxWidth: "72%", display: "flex", flexDirection: "column", alignItems: isMe ? "flex-end" : "flex-start" }}>
+              {showAvatar && !isMe && <div style={{ fontSize: 11, color: "#444", marginBottom: 3 }}>{msg.userName}</div>}
+              <div style={{ background: isMe ? "#00ff88" : "#141414", color: isMe ? "#000" : "#e0e0e0", borderRadius: isMe ? "18px 18px 4px 18px" : "18px 18px 18px 4px", padding: "10px 14px", fontSize: 14, lineHeight: 1.5, wordBreak: "break-word", border: isMe ? "none" : "1px solid #1e1e1e" }}>
+                {msg.text}
+              </div>
+              <div style={{ fontSize: 10, color: "#2a2a2a", marginTop: 3 }}>{relTime(msg.createdAt)}</div>
             </div>
-          );
-        })}
-        <div ref={bottomRef} />
-      </div>
+          </div>
+        );
+      })}
+      <div ref={bottomRef} />
 
-      {/* 입력창 - GNB 바로 위에 고정 */}
-      <div style={{ position: "absolute", bottom: gnbH, left: 0, right: 0, padding: "10px 18px", background: "rgba(6,6,6,0.97)", borderTop: "1px solid #111", display: "flex", gap: 10, alignItems: "center", backdropFilter: "blur(10px)" }}>
+      {/* 입력창 */}
+      <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 16, position: "sticky", bottom: 80, background: "#060606", paddingTop: 10, borderTop: "1px solid #111" }}>
         <input
-          value={text} onChange={e => setText(e.target.value)} onKeyDown={handleKey}
-          placeholder="메시지 입력..." maxLength={500}
+          value={text}
+          onChange={e => setText(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), handleSend())}
+          placeholder="메시지 입력..."
+          maxLength={500}
           style={{ flex: 1, background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 22, padding: "12px 16px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none" }}
         />
         <button onClick={handleSend} disabled={!text.trim() || sending}

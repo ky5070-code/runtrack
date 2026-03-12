@@ -1,7 +1,7 @@
 // src/hooks/useNotifications.js
 import { useState, useEffect } from "react";
 import {
-  collection, query, where, orderBy, limit,
+  collection, query, where, limit,
   onSnapshot, addDoc, updateDoc, doc, serverTimestamp, writeBatch, getDocs
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
@@ -15,11 +15,15 @@ export function useNotifications(currentUser) {
     const q = query(
       collection(db, "notifications"),
       where("toUserId", "==", currentUser.uid),
-      orderBy("createdAt", "desc"),
       limit(30)
     );
     const unsub = onSnapshot(q, (snap) => {
       const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      data.sort((a, b) => {
+        const ta = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+        const tb = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+        return tb - ta;
+      });
       setNotifications(data);
       setUnreadCount(data.filter(n => !n.read).length);
     });
