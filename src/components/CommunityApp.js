@@ -679,7 +679,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
 
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.92)", zIndex: 200, display: "flex", alignItems: "flex-end" }}>
-      <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "#0d0d0d", borderRadius: "22px 22px 0 0", border: "1px solid #1a1a1a", padding: "20px 20px", paddingBottom: `calc(24px + ${safeBottom})`, maxHeight: "88vh", overflowY: "auto", position: "relative" }}>
+      <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "#0d0d0d", borderRadius: "22px 22px 0 0", border: "1px solid #1a1a1a", padding: "16px 18px", paddingBottom: `calc(20px + ${safeBottom})`, maxHeight: "70vh", overflowY: "auto", position: "relative" }}>
         <div style={{ width: 40, height: 4, background: "#222", borderRadius: 2, margin: "0 auto 14px" }} />
         {/* 닫기 버튼 - 모바일 터치 영역 확보 */}
         <button onClick={onClose} style={{ position: "absolute", top: 18, right: 20, width: 44, height: 44, borderRadius: 22, background: "#111", border: "1px solid #222", color: "#888", fontSize: 20, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10 }}>✕</button>
@@ -713,20 +713,6 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
             </div>
           ))}
         </div>
-
-        <div style={{ fontSize: 12, color: "#333", letterSpacing: 2, marginBottom: 12 }}>내 러닝 기록</div>
-        {myPosts.slice(0, 5).map(p => (
-          <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px", background: "#080808", border: "1px solid #111", borderRadius: 12, marginBottom: 8, minHeight: 60 }}>
-            <div style={{ width: 46, height: 46, borderRadius: 12, background: "#0d1f14", border: "1px solid #1a3d28", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-              <div style={{ fontSize: 16, fontWeight: 800, color: "#00ff88", lineHeight: 1 }}>{Number(p.dist).toFixed(1)}</div>
-              <div style={{ fontSize: 10, color: "#1a6640" }}>KM</div>
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 15, color: "#ccc" }}>{p.date}</div>
-              <div style={{ fontSize: 13, color: "#444", marginTop: 2 }}>{fmtTime(p.duration)} · {p.pace || "--"}/km</div>
-            </div>
-          </div>
-        ))}
 
         {/* 크루 멤버 관리 (관리자만) */}
         {currentSet && (
