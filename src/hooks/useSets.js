@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import {
   collection, addDoc, updateDoc, deleteDoc, doc, getDocs,
   writeBatch, query, where, onSnapshot, getDoc, arrayUnion, arrayRemove,
-  serverTimestamp, orderBy,
+  serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
@@ -17,11 +17,16 @@ export function useSets(currentUser) {
     if (!currentUser?.uid) return;
     const q = query(
       collection(db, "sets"),
-      where("memberIds", "array-contains", currentUser.uid),
-      orderBy("createdAt", "desc")
+      where("memberIds", "array-contains", currentUser.uid)
     );
     const unsub = onSnapshot(q, (snap) => {
-      setMySets(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      data.sort((a, b) => {
+        const ta = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+        const tb = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+        return tb - ta;
+      });
+      setMySets(data);
       setLoading(false);
     });
     return unsub;
@@ -31,11 +36,16 @@ export function useSets(currentUser) {
   const searchPublicSets = (callback) => {
     const q = query(
       collection(db, "sets"),
-      where("isPublic", "==", true),
-      orderBy("createdAt", "desc")
+      where("isPublic", "==", true)
     );
     return onSnapshot(q, (snap) => {
-      callback(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      data.sort((a, b) => {
+        const ta = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+        const tb = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+        return tb - ta;
+      });
+      callback(data);
     });
   };
 
