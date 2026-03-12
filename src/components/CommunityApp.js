@@ -1,5 +1,5 @@
 // src/components/CommunityApp.js
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { usePosts } from "../hooks/usePosts";
 import { useNotifications } from "../hooks/useNotifications";
 import { useSets } from "../hooks/useSets";
