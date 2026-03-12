@@ -546,20 +546,24 @@ function ChatTab({ setId, currentUser }) {
 
       {messages.map((msg, i) => {
         const isMe = msg.userId === currentUser?.uid;
-        const showAvatar = !isMe && (i === 0 || messages[i-1]?.userId !== msg.userId);
+        const isNewSender = i === 0 || messages[i-1]?.userId !== msg.userId;
         return (
-          <div key={msg.id} style={{ display: "flex", flexDirection: isMe ? "row-reverse" : "row", alignItems: "flex-end", gap: 8, marginBottom: 8 }}>
-            {!isMe && (
-              <div style={{ width: 32, height: 32, borderRadius: 16, background: showAvatar ? "#111" : "transparent", border: showAvatar ? "1px solid #1e1e1e" : "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>
-                {showAvatar ? msg.userAvatar : ""}
+          <div key={msg.id} style={{ marginBottom: 6, marginTop: isNewSender ? 12 : 0 }}>
+            {!isMe && isNewSender && (
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
+                <div style={{ width: 28, height: 28, borderRadius: 14, background: "#111", border: "1px solid #1e1e1e", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, flexShrink: 0 }}>
+                  {msg.userAvatar}
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#888" }}>{msg.userName}</div>
               </div>
             )}
-            <div style={{ maxWidth: "72%", display: "flex", flexDirection: "column", alignItems: isMe ? "flex-end" : "flex-start" }}>
-              {showAvatar && !isMe && <div style={{ fontSize: 11, color: "#444", marginBottom: 3 }}>{msg.userName}</div>}
-              <div style={{ background: isMe ? "#00ff88" : "#141414", color: isMe ? "#000" : "#e0e0e0", borderRadius: isMe ? "18px 18px 4px 18px" : "18px 18px 18px 4px", padding: "10px 14px", fontSize: 14, lineHeight: 1.5, wordBreak: "break-word", border: isMe ? "none" : "1px solid #1e1e1e" }}>
-                {msg.text}
+            <div style={{ display: "flex", flexDirection: isMe ? "row-reverse" : "row", paddingLeft: !isMe ? 36 : 0 }}>
+              <div style={{ maxWidth: "75%", display: "flex", flexDirection: "column", alignItems: isMe ? "flex-end" : "flex-start" }}>
+                <div style={{ background: isMe ? "#00ff88" : "#141414", color: isMe ? "#000" : "#e0e0e0", borderRadius: isMe ? "18px 18px 4px 18px" : "18px 18px 18px 4px", padding: "10px 14px", fontSize: 14, lineHeight: 1.5, wordBreak: "break-word", border: isMe ? "none" : "1px solid #1e1e1e" }}>
+                  {msg.text}
+                </div>
+                <div style={{ fontSize: 10, color: "#2a2a2a", marginTop: 3 }}>{relTime(msg.createdAt)}</div>
               </div>
-              <div style={{ fontSize: 10, color: "#2a2a2a", marginTop: 3 }}>{relTime(msg.createdAt)}</div>
             </div>
           </div>
         );
@@ -675,8 +679,10 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
 
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.92)", zIndex: 200, display: "flex", alignItems: "flex-end" }}>
-      <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "#0d0d0d", borderRadius: "22px 22px 0 0", border: "1px solid #1a1a1a", padding: "20px 20px", paddingBottom: `calc(24px + ${safeBottom})`, maxHeight: "88vh", overflowY: "auto" }}>
-        <div style={{ width: 40, height: 4, background: "#222", borderRadius: 2, margin: "0 auto 18px" }} />
+      <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "#0d0d0d", borderRadius: "22px 22px 0 0", border: "1px solid #1a1a1a", padding: "20px 20px", paddingBottom: `calc(24px + ${safeBottom})`, maxHeight: "88vh", overflowY: "auto", position: "relative" }}>
+        <div style={{ width: 40, height: 4, background: "#222", borderRadius: 2, margin: "0 auto 14px" }} />
+        {/* 닫기 버튼 - 모바일 터치 영역 확보 */}
+        <button onClick={onClose} style={{ position: "absolute", top: 18, right: 20, width: 44, height: 44, borderRadius: 22, background: "#111", border: "1px solid #222", color: "#888", fontSize: 20, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10 }}>✕</button>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 18 }}>
           <div style={{ display: "flex", gap: 14, alignItems: "center", flex: 1 }}>
             <div style={{ width: 70, height: 70, borderRadius: 35, background: "#111", border: "1.5px solid #222", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 34 }}>{selectedAvatar}</div>
