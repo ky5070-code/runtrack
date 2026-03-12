@@ -137,7 +137,6 @@ export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
     <div style={{ minHeight: "100vh", background: "#060606", color: "#e0e0e0", fontFamily: "'Black Han Sans', 'Noto Sans KR', sans-serif", maxWidth: 480, margin: "0 auto" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700&display=swap'); *{font-family:'Black Han Sans',sans-serif!important}`}</style>
 
-      <div style={{ height: safeTop, background: "#060606" }} />
 
       {/* 헤더 */}
       <div style={{ padding: "14px 20px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -193,7 +192,7 @@ export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <div style={{ fontSize: 17, fontWeight: 800, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{set.name}</div>
                 {set.adminId === currentUser?.uid && <span style={{ background: "#0d1f14", border: "1px solid #1a3d28", borderRadius: 4, padding: "1px 6px", fontSize: 11, color: "#00cc66", flexShrink: 0 }}>관리자</span>}
-                {!set.isPublic && <span style={{ fontSize: 13, color: "#2a2a2a", flexShrink: 0 }}>🔒</span>}
+                
               </div>
               {set.description && <div style={{ fontSize: 14, color: "#444", marginTop: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{set.description}</div>}
               <div style={{ fontSize: 13, color: "#2e2e2e", marginTop: 4 }}>멤버 {set.memberIds?.length || 0}명</div>

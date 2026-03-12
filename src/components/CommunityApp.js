@@ -797,8 +797,6 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
     <div style={{ minHeight: "100vh", background: "#060606", color: "#e0e0e0", fontFamily: "'Black Han Sans', 'Noto Sans KR', sans-serif", maxWidth: 480, margin: "0 auto", display: "flex", flexDirection: "column" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700&display=swap'); *{font-family:'Black Han Sans',sans-serif!important}`}</style>
 
-      {/* 상태바 Safe Area */}
-      <div style={{ height: safeTop, background: "#060606", flexShrink: 0 }} />
 
       {/* 헤더 */}
       <div style={{ padding: "14px 18px 0", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
