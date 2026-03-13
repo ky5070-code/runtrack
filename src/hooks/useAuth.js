@@ -84,11 +84,12 @@ export function useAuth() {
   const redeemCoupon = async (code) => {
     if (!user) throw new Error("로그인이 필요해요.");
     const code_upper = code.trim().toUpperCase();
-    // coupons 컬렉션에서 코드 찾기
-    const q = query(collection(db, "coupons"), where("code", "==", code_upper), where("used", "==", false));
+    // coupons 컬렉션에서 코드 찾기 (인덱스 불필요하게 where 1개만)
+    const q = query(collection(db, "coupons"), where("code", "==", code_upper));
     const snap = await getDocs(q);
     if (snap.empty) throw new Error("유효하지 않은 코드예요.");
     const couponDoc = snap.docs[0];
+    if (couponDoc.data().used === true) throw new Error("이미 사용된 코드예요.");
     // 쿠폰 사용 처리
     await updateDoc(couponDoc.ref, { used: true, usedBy: user.uid, usedAt: serverTimestamp() });
     // 유저 PRO 업그레이드
