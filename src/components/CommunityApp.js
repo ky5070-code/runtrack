@@ -804,8 +804,7 @@ function StatsTab({ posts, currentUser }) {
 
 /* ══ PROFILE MODAL ══ */
 function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTransfer, onLeaveSet, onDeleteSet, onClose, onLogout, onUpdateProfile, onRedeemCoupon }) {
-  const myPosts = posts.filter(p => p.userId === currentUser?.uid);
-  const totalDist = myPosts.reduce((a, p) => a + (parseFloat(p.dist) || 0), 0);
+
   const [editMode, setEditMode] = useState(false);
   const [name, setName] = useState(currentUser?.name || "");
   const [bio, setBio] = useState(currentUser?.bio || "");
@@ -859,13 +858,47 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
           </div>
         </div>}
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 18 }}>
-          {[[`${totalDist.toFixed(1)}km`, "총 거리"], [`${myPosts.length}개`, "게시물"], [`${calcStreak(posts, currentUser?.uid)}일`, "🔥 스트릭"]].map(([v, l]) => (
-            <div key={l} style={{ background: "#080808", border: "1px solid #161616", borderRadius: 12, padding: "12px 10px", textAlign: "center" }}>
-              <div style={{ fontSize: 19, fontWeight: 800, color: "#00ff88" }}>{v}</div>
-              <div style={{ fontSize: 12, color: "#333", marginTop: 3 }}>{l}</div>
+        {/* PRO 업그레이드 영역 */}
+        <div style={{ marginBottom: 18, background: currentUser?.isPro ? "#080f08" : "#0a0a0a", border: currentUser?.isPro ? "1px solid #1a3028" : "1px solid #1e1e1e", borderRadius: 16, padding: "16px" }}>
+          {currentUser?.isPro ? (
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ width: 42, height: 42, borderRadius: 21, background: "#0d1f14", border: "1px solid #1a3d28", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>✨</div>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
+                  <span style={{ fontSize: 15, fontWeight: 800, color: "#e0e0e0" }}>PRO 회원</span>
+                  <span style={{ background: "transparent", border: "1px solid #00ff88", color: "#00ff88", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 800, letterSpacing: 1 }}>PRO</span>
+                </div>
+                <div style={{ fontSize: 13, color: "#2e2e2e" }}>AI 코치 · 무제한 업로드 이용 중</div>
+              </div>
             </div>
-          ))}
+          ) : (
+            <>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+                <div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: "#e0e0e0", marginBottom: 3 }}>PRO로 업그레이드</div>
+                  <div style={{ fontSize: 12, color: "#333" }}>AI 코치 피드백 · 무제한 업로드</div>
+                </div>
+                <span style={{ background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 8, padding: "3px 10px", fontSize: 12, fontWeight: 800, color: "#555" }}>FREE</span>
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <input
+                  value={couponCode}
+                  onChange={e => setCouponCode(e.target.value.toUpperCase())}
+                  onKeyDown={e => e.key === "Enter" && handleRedeem()}
+                  placeholder="쿠폰 코드 입력"
+                  maxLength={20}
+                  style={{ flex: 1, background: "#060606", border: "1px solid #222", borderRadius: 10, padding: "10px 12px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none", letterSpacing: 2 }}
+                />
+                <button onClick={handleRedeem} disabled={!couponCode.trim() || couponLoading}
+                  style={{ padding: "10px 16px", borderRadius: 10, background: couponCode.trim() ? "#00ff88" : "#111", border: "none", color: couponCode.trim() ? "#000" : "#333", fontFamily: "inherit", fontSize: 14, fontWeight: 800, flexShrink: 0 }}>
+                  {couponLoading ? "..." : "적용"}
+                </button>
+              </div>
+              {couponMsg && (
+                <div style={{ marginTop: 8, fontSize: 13, color: couponMsg.ok ? "#00ff88" : "#ff4444", fontWeight: 600 }}>{couponMsg.text}</div>
+              )}
+            </>
+          )}
         </div>
 
         {/* 크루 멤버 관리 (관리자만) */}
@@ -903,45 +936,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
             🗑️ 크루 삭제
           </button>
         )}
-        {/* PRO 섹션 */}
-        <div style={{ marginTop: 16, background: "#0a0a0a", border: currentUser?.isPro ? "1px solid #1a3028" : "1px solid #1e1e1e", borderRadius: 16, padding: "16px" }}>
-          {currentUser?.isPro ? (
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ fontSize: 22 }}>✨</div>
-              <div>
-                <div style={{ fontSize: 14, fontWeight: 800, color: "#00ff88" }}>PRO 회원</div>
-                <div style={{ fontSize: 12, color: "#2e2e2e", marginTop: 2 }}>AI 피드백 · 무제한 업로드 이용 중</div>
-              </div>
-            </div>
-          ) : (
-            <>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: "#e0e0e0" }}>PRO 업그레이드</div>
-                  <div style={{ fontSize: 12, color: "#333", marginTop: 2 }}>AI 코치 · 무제한 업로드</div>
-                </div>
-                <div style={{ background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 8, padding: "3px 10px", fontSize: 12, fontWeight: 800, color: "#888" }}>FREE</div>
-              </div>
-              <div style={{ display: "flex", gap: 8 }}>
-                <input
-                  value={couponCode}
-                  onChange={e => setCouponCode(e.target.value.toUpperCase())}
-                  onKeyDown={e => e.key === "Enter" && handleRedeem()}
-                  placeholder="쿠폰 코드 입력"
-                  maxLength={20}
-                  style={{ flex: 1, background: "#060606", border: "1px solid #222", borderRadius: 10, padding: "10px 12px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none", letterSpacing: 2 }}
-                />
-                <button onClick={handleRedeem} disabled={!couponCode.trim() || couponLoading}
-                  style={{ padding: "10px 16px", borderRadius: 10, background: couponCode.trim() ? "#00ff88" : "#111", border: "none", color: couponCode.trim() ? "#000" : "#333", fontFamily: "inherit", fontSize: 14, fontWeight: 800, flexShrink: 0 }}>
-                  {couponLoading ? "..." : "적용"}
-                </button>
-              </div>
-              {couponMsg && (
-                <div style={{ marginTop: 8, fontSize: 13, color: couponMsg.ok ? "#00ff88" : "#ff4444", fontWeight: 600 }}>{couponMsg.text}</div>
-              )}
-            </>
-          )}
-        </div>
+
         <button onClick={onLogout} style={{ width: "100%", marginTop: 12, padding: "15px", background: "transparent", border: "1px solid #2a2a2a", borderRadius: 14, color: "#444", fontFamily: "inherit", fontSize: 16, minHeight: 52 }}>로그아웃</button>
       </div>
     </div>
