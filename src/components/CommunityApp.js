@@ -962,7 +962,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
 
 
       {/* 헤더 */}
-      <div style={{ padding: "14px 18px 0", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+      <div style={{ padding: `calc(14px + ${safeTop}) 18px 0`, display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
         <div>
           <div style={{ fontSize: 10, color: "#1e1e1e", letterSpacing: 4 }}>RUNTRACK</div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
