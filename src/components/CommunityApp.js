@@ -86,16 +86,6 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
       {/* 상단 컬러 바 - 내 게시물은 초록, AI는 그라디언트 */}
       <div style={{ height: 3, background: isMyPost ? "#00ff88" : post.source === "ai" ? "linear-gradient(90deg,#00ff88,#009944)" : "#1e1e1e" }} />
 
-      {post.imageUrl && (
-        <div style={{ height: 200, overflow: "hidden", position: "relative" }}>
-          <img src={post.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.65 }} />
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom,transparent 50%,#0b0b0b)" }} />
-          {post.source === "ai" && (
-            <div style={{ position: "absolute", top: 10, right: 10, background: "#0d1f14", border: "1px solid #00ff88", borderRadius: 6, padding: "3px 8px", fontSize: 12, color: "#00ff88" }}>📸 AI</div>
-          )}
-        </div>
-      )}
-
       <div style={{ padding: "14px 14px 12px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
           {/* 아바타 - 내 게시물은 초록 테두리 */}
@@ -119,6 +109,16 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
             <button onClick={() => setShowDeleteConfirm(true)} style={{ background: "none", border: "none", color: "#333", fontSize: 20, minWidth: 36, minHeight: 36, display: "flex", alignItems: "center", justifyContent: "center" }}>⋯</button>
           )}
         </div>
+
+        {post.imageUrl && (
+          <div style={{ height: 200, overflow: "hidden", position: "relative", borderRadius: 12, marginBottom: 12 }}>
+            <img src={post.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.75 }} />
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom,transparent 50%,#0b0b0b)" }} />
+            {post.source === "ai" && (
+              <div style={{ position: "absolute", top: 10, right: 10, background: "#0d1f14", border: "1px solid #00ff88", borderRadius: 6, padding: "3px 8px", fontSize: 12, color: "#00ff88" }}>📸 AI</div>
+            )}
+          </div>
+        )}
 
         {/* 삭제 확인 */}
         {showDeleteConfirm && (
