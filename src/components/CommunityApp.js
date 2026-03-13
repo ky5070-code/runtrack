@@ -80,8 +80,10 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
   };
 
   return (
-    <div style={{ background: isMyPost ? "#0c110e" : "#0b0b0b", border: isMyPost ? "1.5px solid #00ff88" : "1px solid #181818", borderRadius: 18, overflow: "hidden", marginBottom: 12, boxShadow: isMyPost ? "0 0 12px rgba(0,255,136,0.06)" : "none" }}>
-      <div style={{ height: 4, background: post.source === "ai" ? "linear-gradient(90deg,#00ff88,#009944)" : "#1a1a1a" }} />
+    <div style={{ background: isMyPost ? "#0a0f0a" : "#0b0b0b", border: isMyPost ? "1.5px solid #00cc55" : "1px solid #181818", borderRadius: 18, overflow: "hidden", marginBottom: 12, boxShadow: isMyPost ? "0 2px 20px rgba(0,255,136,0.08)" : "none" }}>
+
+      {/* 상단 컬러 바 - 내 게시물은 초록, AI는 그라디언트 */}
+      <div style={{ height: 3, background: isMyPost ? "#00ff88" : post.source === "ai" ? "linear-gradient(90deg,#00ff88,#009944)" : "#1e1e1e" }} />
 
       {post.imageUrl && (
         <div style={{ height: 200, overflow: "hidden", position: "relative" }}>
@@ -95,9 +97,16 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
 
       <div style={{ padding: "14px 14px 12px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-          <Avatar user={author} size={42} />
+          {/* 아바타 - 내 게시물은 초록 테두리 */}
+          <div style={{ position: "relative" }}>
+            <Avatar user={isMyPost ? currentUser : author} size={42} />
+            {isMyPost && <div style={{ position: "absolute", inset: -2, borderRadius: 23, border: "2px solid #00ff88", pointerEvents: "none" }} />}
+          </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 16, fontWeight: 700 }}>{author.name || "러너"}</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: isMyPost ? "#fff" : "#e0e0e0" }}>{isMyPost ? (currentUser?.name || "나") : (author.name || "러너")}</div>
+              {isMyPost && <span style={{ background: "#00ff88", color: "#000", borderRadius: 5, padding: "1px 7px", fontSize: 11, fontWeight: 800 }}>나</span>}
+            </div>
             <div style={{ display: "flex", gap: 6, marginTop: 2, alignItems: "center" }}>
               <span style={{ fontSize: 13, color: "#383838" }}>{relTime(post.createdAt)}</span>
               {post.source === "ai" && <span style={{ background: "#0d1f14", border: "1px solid #1a3d28", borderRadius: 4, padding: "1px 6px", fontSize: 11, color: "#00cc66" }}>AI</span>}
@@ -120,7 +129,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
           </div>
         )}
 
-        <div style={{ background: "#070707", border: "1px solid #141414", borderRadius: 14, padding: "12px 14px", marginBottom: 12, display: "flex" }}>
+        <div style={{ background: isMyPost ? "#080f08" : "#070707", border: isMyPost ? "1px solid #1a3020" : "1px solid #141414", borderRadius: 14, padding: "12px 14px", marginBottom: 12, display: "flex" }}>
           {[[Number(post.dist).toFixed(2) + "km", "거리", true], [fmtTime(post.duration), "시간", false], [post.pace || "--", "페이스", false], [post.calories || "--", "칼로리", false]].map(([v, l, accent], i) => (
             <div key={l} style={{ flex: 1, borderLeft: i > 0 ? "1px solid #141414" : "none", paddingLeft: i > 0 ? 10 : 0 }}>
               <div style={{ fontSize: 11, color: "#2e2e2e", marginBottom: 3 }}>{l}</div>
