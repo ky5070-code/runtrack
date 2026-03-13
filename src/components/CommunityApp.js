@@ -25,6 +25,7 @@ const relTime = (val) => {
 const EMOJIS = ["🔥", "⚡", "👏", "💪", "🏆", "❤️"];
 const safeBottom = "env(safe-area-inset-bottom, 0px)";
 const safeTop = "env(safe-area-inset-top, 0px)";
+const FREE_MONTHLY_LIMIT = 5;
 
 /* ══ TOAST & CONFIRM ══ */
 function Toast({ message, type }) {
@@ -106,6 +107,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <div style={{ fontSize: 16, fontWeight: 700, color: isMyPost ? "#fff" : "#e0e0e0" }}>{isMyPost ? (currentUser?.name || "나") : (author.name || "러너")}</div>
               {isMyPost && <span style={{ background: "#00ff88", color: "#000", borderRadius: 5, padding: "1px 7px", fontSize: 11, fontWeight: 800 }}>나</span>}
+              {(isMyPost ? currentUser?.isPro : author?.isPro) && <span style={{ background: "transparent", border: "1px solid #555", color: "#888", borderRadius: 5, padding: "1px 7px", fontSize: 11, fontWeight: 800, letterSpacing: 0.5 }}>PRO</span>}
             </div>
             <div style={{ display: "flex", gap: 6, marginTop: 2, alignItems: "center" }}>
               <span style={{ fontSize: 13, color: "#383838" }}>{relTime(post.createdAt)}</span>
@@ -207,7 +209,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
 }
 
 /* ══ UPLOAD MODAL ══ */
-function UploadModal({ onClose, onPost, currentUser }) {
+function UploadModal({ onClose, onPost, currentUser, isPro }) {
   const [step, setStep] = useState("pick");
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -237,12 +239,14 @@ function UploadModal({ onClose, onPost, currentUser }) {
           setEdited({ ...r, durationStr: r.duration ? fmtTime(r.duration) : "" });
           setStep("confirm");
           // 피드백 비동기 요청
-          generateRunFeedback({
-            distance: r.distance,
-            duration: r.duration,
-            pace: r.pace,
-            calories: r.calories,
-          }).then(fb => setFeedback(fb)).catch(() => {});
+          if (isPro) {
+            generateRunFeedback({
+              distance: r.distance,
+              duration: r.duration,
+              pace: r.pace,
+              calories: r.calories,
+            }).then(fb => setFeedback(fb)).catch(() => {});
+          }
         }
       } catch (err) {
         setError("AI 분석 실패: " + err.message);
@@ -325,7 +329,7 @@ function UploadModal({ onClose, onPost, currentUser }) {
             {result && <div style={{ position: "absolute", top: 10, right: 10, background: "#0d1f14", border: "1px solid #00ff88", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "#00ff88" }}>AI 분석 완료 ✓</div>}
           </div>}
           {/* AI 피드백 */}
-          {feedback && (
+          {isPro && feedback && (
             <div style={{ background: "#080f0b", border: "1px solid #1a3d28", borderRadius: 14, padding: "14px 16px", marginBottom: 16 }}>
               <div style={{ fontSize: 12, color: "#00ff88", letterSpacing: 2, marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
                 <span>✨</span> AI 코치 피드백
@@ -335,10 +339,19 @@ function UploadModal({ onClose, onPost, currentUser }) {
               ))}
             </div>
           )}
-          {!feedback && result && (
+          {isPro && !feedback && result && (
             <div style={{ background: "#080808", border: "1px solid #161616", borderRadius: 14, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ width: 16, height: 16, border: "2px solid #00ff88", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
               <div style={{ fontSize: 14, color: "#333" }}>AI 코치가 피드백 작성 중...</div>
+            </div>
+          )}
+          {!isPro && result && (
+            <div style={{ background: "#0a0a0a", border: "1px solid #222", borderRadius: 14, padding: "14px 16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ fontSize: 22 }}>🔒</div>
+              <div>
+                <div style={{ fontSize: 13, color: "#555", fontWeight: 700, marginBottom: 3 }}>AI 코치 피드백</div>
+                <div style={{ fontSize: 12, color: "#333" }}>PRO 회원 전용 기능이에요</div>
+              </div>
             </div>
           )}
           <div style={{ fontSize: 12, color: "#333", letterSpacing: 2, marginBottom: 14 }}>데이터 확인 · 수정 가능</div>
@@ -790,16 +803,32 @@ function StatsTab({ posts, currentUser }) {
 }
 
 /* ══ PROFILE MODAL ══ */
-function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTransfer, onLeaveSet, onDeleteSet, onClose, onLogout, onUpdateProfile }) {
+function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTransfer, onLeaveSet, onDeleteSet, onClose, onLogout, onUpdateProfile, onRedeemCoupon }) {
   const myPosts = posts.filter(p => p.userId === currentUser?.uid);
   const totalDist = myPosts.reduce((a, p) => a + (parseFloat(p.dist) || 0), 0);
   const [editMode, setEditMode] = useState(false);
   const [name, setName] = useState(currentUser?.name || "");
   const [bio, setBio] = useState(currentUser?.bio || "");
   const [selectedAvatar, setSelectedAvatar] = useState(currentUser?.avatar || "🏃");
+  const [couponCode, setCouponCode] = useState("");
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponMsg, setCouponMsg] = useState(null);
   const AVATARS_LIST = ["🏃", "⚡", "🔥", "🌊", "💨", "🦅", "🐆", "🎯", "🚀", "💎", "🏅", "🌟"];
 
   const saveProfile = async () => { await onUpdateProfile({ name, bio, avatar: selectedAvatar }); setEditMode(false); };
+
+  const handleRedeem = async () => {
+    if (!couponCode.trim()) return;
+    setCouponLoading(true); setCouponMsg(null);
+    try {
+      await onRedeemCoupon(couponCode);
+      setCouponMsg({ ok: true, text: "PRO 활성화 완료! 🎉" });
+      setCouponCode("");
+    } catch (e) {
+      setCouponMsg({ ok: false, text: e.message });
+    }
+    setCouponLoading(false);
+  };
 
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.92)", zIndex: 200, display: "flex", alignItems: "flex-end" }}>
@@ -810,7 +839,10 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
             <div style={{ width: 70, height: 70, borderRadius: 35, background: "#111", border: "1.5px solid #222", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 34 }}>{selectedAvatar}</div>
             <div style={{ flex: 1 }}>
               {editMode ? <input value={name} onChange={e => setName(e.target.value)} style={{ background: "transparent", border: "none", borderBottom: "1px solid #333", color: "#fff", fontFamily: "inherit", fontSize: 19, fontWeight: 800, outline: "none", width: "100%" }} />
-                : <div style={{ fontSize: 19, fontWeight: 800 }}>{currentUser?.name}</div>}
+                : <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: 19, fontWeight: 800 }}>{currentUser?.name}</span>
+                    {currentUser?.isPro && <span style={{ background: "transparent", border: "1px solid #00ff88", color: "#00ff88", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 800, letterSpacing: 1 }}>PRO</span>}
+                  </div>}
               {editMode ? <input value={bio} onChange={e => setBio(e.target.value)} placeholder="한 줄 소개..." style={{ background: "transparent", border: "none", borderBottom: "1px solid #222", color: "#666", fontFamily: "inherit", fontSize: 14, outline: "none", width: "100%", marginTop: 6 }} />
                 : <div style={{ fontSize: 14, color: "#555", marginTop: 4 }}>{currentUser?.bio || "한 줄 소개를 입력해보세요"}</div>}
             </div>
@@ -871,6 +903,45 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
             🗑️ 크루 삭제
           </button>
         )}
+        {/* PRO 섹션 */}
+        <div style={{ marginTop: 16, background: "#0a0a0a", border: currentUser?.isPro ? "1px solid #1a3028" : "1px solid #1e1e1e", borderRadius: 16, padding: "16px" }}>
+          {currentUser?.isPro ? (
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ fontSize: 22 }}>✨</div>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "#00ff88" }}>PRO 회원</div>
+                <div style={{ fontSize: 12, color: "#2e2e2e", marginTop: 2 }}>AI 피드백 · 무제한 업로드 이용 중</div>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: "#e0e0e0" }}>PRO 업그레이드</div>
+                  <div style={{ fontSize: 12, color: "#333", marginTop: 2 }}>AI 코치 · 무제한 업로드</div>
+                </div>
+                <div style={{ background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 8, padding: "3px 10px", fontSize: 12, fontWeight: 800, color: "#888" }}>FREE</div>
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <input
+                  value={couponCode}
+                  onChange={e => setCouponCode(e.target.value.toUpperCase())}
+                  onKeyDown={e => e.key === "Enter" && handleRedeem()}
+                  placeholder="쿠폰 코드 입력"
+                  maxLength={20}
+                  style={{ flex: 1, background: "#060606", border: "1px solid #222", borderRadius: 10, padding: "10px 12px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none", letterSpacing: 2 }}
+                />
+                <button onClick={handleRedeem} disabled={!couponCode.trim() || couponLoading}
+                  style={{ padding: "10px 16px", borderRadius: 10, background: couponCode.trim() ? "#00ff88" : "#111", border: "none", color: couponCode.trim() ? "#000" : "#333", fontFamily: "inherit", fontSize: 14, fontWeight: 800, flexShrink: 0 }}>
+                  {couponLoading ? "..." : "적용"}
+                </button>
+              </div>
+              {couponMsg && (
+                <div style={{ marginTop: 8, fontSize: 13, color: couponMsg.ok ? "#00ff88" : "#ff4444", fontWeight: 600 }}>{couponMsg.text}</div>
+              )}
+            </>
+          )}
+        </div>
         <button onClick={onLogout} style={{ width: "100%", marginTop: 12, padding: "15px", background: "transparent", border: "1px solid #2a2a2a", borderRadius: 14, color: "#444", fontFamily: "inherit", fontSize: 16, minHeight: 52 }}>로그아웃</button>
       </div>
     </div>
@@ -931,10 +1002,11 @@ function BottomNav({ tab, setTab, onUpload }) {
 }
 
 /* ══ MAIN ══ */
-export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLogout, onUpdateProfile }) {
-  const { posts, loading, createPost, toggleReaction, addComment, deletePost } = usePosts(currentUser, currentSet?.id);
+export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLogout, onUpdateProfile, onRedeemCoupon }) {
+  const { posts, loading, createPost, toggleReaction, addComment, deletePost, getMyMonthlyPostCount } = usePosts(currentUser, currentSet?.id);
   const { kickMember, transferAdmin, leaveSet, addNotice, deleteNotice, getInviteLink, deleteSet } = useSets(currentUser);
   const isAdmin = currentSet?.adminId === currentUser?.uid;
+  const isPro = currentUser?.isPro === true;
   const { notifications, unreadCount, createNotification, markAllRead } = useNotifications(currentUser);
   const [tab, setTab] = useState("feed");
   const [showUpload, setShowUpload] = useState(false);
@@ -1055,10 +1127,19 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
       </div>
 
       {/* 하단 네비게이션 */}
-      <BottomNav tab={tab} setTab={setTab} onUpload={() => setShowUpload(true)} />
+      <BottomNav tab={tab} setTab={setTab} onUpload={() => {
+        if (!isPro) {
+          const count = getMyMonthlyPostCount();
+          if (count >= FREE_MONTHLY_LIMIT) {
+            showToast(`무료 회원은 월 ${FREE_MONTHLY_LIMIT}회까지만 업로드할 수 있어요. PRO로 업그레이드하세요! ⚡`, "warning");
+            return;
+          }
+        }
+        setShowUpload(true);
+      }} />
 
       {/* 모달 */}
-      {showUpload && <UploadModal onClose={() => setShowUpload(false)} onPost={createPost} currentUser={currentUser} />}
+      {showUpload && <UploadModal onClose={() => setShowUpload(false)} onPost={createPost} currentUser={currentUser} isPro={isPro} />}
       {showNotif && <NotificationModal notifications={notifications} onClose={() => { setShowNotif(false); markAllRead(); }} onMarkAllRead={markAllRead} />}
       {showProfile && <ProfileModal
         currentUser={currentUser} posts={posts}
@@ -1099,7 +1180,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
           }, "삭제", "#ff4444");
         }}
         onClose={() => setShowProfile(false)}
-        onLogout={onLogout} onUpdateProfile={onUpdateProfile} />}
+        onLogout={onLogout} onUpdateProfile={onUpdateProfile} onRedeemCoupon={onRedeemCoupon} />}
       {confirm && <ConfirmModal message={confirm.message} onConfirm={confirm.onConfirm} onCancel={() => setConfirm(null)} confirmLabel={confirm.confirmLabel} confirmColor={confirm.confirmColor} />}
       {toast && <Toast message={toast.message} type={toast.type} />}
     </div>

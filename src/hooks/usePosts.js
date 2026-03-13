@@ -96,6 +96,17 @@ export function usePosts(currentUser, setId) {
     });
   };
 
+  // 이번 달 내 게시물 수 체크
+  const getMyMonthlyPostCount = () => {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    return posts.filter(p => {
+      if (p.userId !== currentUser?.uid) return false;
+      const ts = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt || 0);
+      return ts >= startOfMonth;
+    }).length;
+  };
+
   // 반응 토글
   const toggleReaction = async (postId, emoji, userId) => {
     const postRef = doc(db, "posts", postId);
@@ -136,5 +147,5 @@ export function usePosts(currentUser, setId) {
     await deleteDoc(postRef);
   };
 
-  return { posts, loading, createPost, toggleReaction, addComment, deletePost };
+  return { posts, loading, createPost, toggleReaction, addComment, deletePost, getMyMonthlyPostCount };
 }

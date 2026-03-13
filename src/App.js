@@ -6,7 +6,7 @@ import LoginScreen from "./components/LoginScreen";
 import HomeScreen from "./components/HomeScreen";
 import CommunityApp from "./components/CommunityApp";
 
-function AppInner({ user, profile, loading, loginWithGoogle, logout, updateUserProfile }) {
+function AppInner({ user, profile, loading, loginWithGoogle, logout, updateUserProfile, redeemCoupon }) {
   const [currentSet, setCurrentSet] = useState(null);
   const currentUser = profile ? { ...profile, uid: user?.uid } : null;
   const { joinByInvite } = useSets(currentUser);
@@ -62,6 +62,7 @@ function AppInner({ user, profile, loading, loginWithGoogle, logout, updateUserP
       onLeaveSet={() => setCurrentSet(null)}
       onLogout={logout}
       onUpdateProfile={updateUserProfile}
+      onRedeemCoupon={redeemCoupon}
     />
   );
 }

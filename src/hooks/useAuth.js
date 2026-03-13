@@ -7,7 +7,7 @@ import {
   signOut,
   onAuthStateChanged,
 } from "firebase/auth";
-import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc, serverTimestamp, collection, query, where, getDocs } from "firebase/firestore";
 import { auth, db, googleProvider } from "../lib/firebase";
 
 async function createOrGetProfile(firebaseUser) {
@@ -81,5 +81,19 @@ export function useAuth() {
     setProfile((p) => ({ ...p, ...updates }));
   };
 
-  return { user, profile, loading, loginWithGoogle, logout, updateUserProfile };
+  const redeemCoupon = async (code) => {
+    if (!user) throw new Error("로그인이 필요해요.");
+    const code_upper = code.trim().toUpperCase();
+    // coupons 컬렉션에서 코드 찾기
+    const q = query(collection(db, "coupons"), where("code", "==", code_upper), where("used", "==", false));
+    const snap = await getDocs(q);
+    if (snap.empty) throw new Error("유효하지 않은 코드예요.");
+    const couponDoc = snap.docs[0];
+    // 쿠폰 사용 처리
+    await updateDoc(couponDoc.ref, { used: true, usedBy: user.uid, usedAt: serverTimestamp() });
+    // 유저 PRO 업그레이드
+    await updateUserProfile({ isPro: true, proActivatedAt: new Date().toISOString() });
+  };
+
+  return { user, profile, loading, loginWithGoogle, logout, updateUserProfile, redeemCoupon };
 }
