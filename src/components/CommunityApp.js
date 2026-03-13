@@ -1029,7 +1029,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
   }).reduce((a, p) => a + (parseFloat(p.dist) || 0), 0);
 
   return (
-    <div style={{ height: tab === "chat" ? "100dvh" : "auto", minHeight: tab === "chat" ? "unset" : "100vh", background: "#060606", color: "#e0e0e0", fontFamily: "'Pretendard', -apple-system, sans-serif", maxWidth: 480, margin: "0 auto", display: "flex", flexDirection: "column", overflow: tab === "chat" ? "hidden" : "visible", position: tab === "chat" ? "fixed" : "relative", inset: tab === "chat" ? "0 auto" : "auto", width: tab === "chat" ? "100%" : "auto" }}>
+    <div style={{ height: "100dvh", background: "#060606", color: "#e0e0e0", fontFamily: "'Pretendard', -apple-system, sans-serif", maxWidth: 480, margin: "0 auto", display: "flex", flexDirection: "column", overflow: "hidden", position: "fixed", inset: "0 auto", width: "100%" }}>
       <style>{`@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css'); *{font-family:'Pretendard',-apple-system,sans-serif!important}`}</style>
 
 
@@ -1076,7 +1076,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
 
 
       {/* 컨텐츠 */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: tab === "chat" ? "0" : "14px 18px", paddingBottom: tab === "chat" ? "0" : `calc(80px + ${safeBottom})`, overflowY: tab === "chat" ? "hidden" : "auto", minHeight: 0 }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: tab === "chat" ? "0" : "14px 18px", paddingBottom: tab === "chat" ? "0" : `calc(80px + ${safeBottom})`, overflowY: tab === "chat" ? "hidden" : "auto", minHeight: 0, WebkitOverflowScrolling: "touch" }}>
         {loading && (
           <div style={{ display: "flex", justifyContent: "center", paddingTop: 60 }}>
             <div style={{ width: 34, height: 34, border: "2px solid #00ff88", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
