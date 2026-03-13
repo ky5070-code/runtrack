@@ -1021,12 +1021,12 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
   }).reduce((a, p) => a + (parseFloat(p.dist) || 0), 0);
 
   return (
-    <div style={{ height: "100dvh", background: "#060606", color: "#e0e0e0", fontFamily: "'Pretendard', -apple-system, sans-serif", maxWidth: 480, margin: "0 auto", display: "flex", flexDirection: "column", overflow: "hidden", position: "fixed", inset: "0 auto", width: "100%" }}>
+    <div style={{ minHeight: "100dvh", background: "#060606", color: "#e0e0e0", fontFamily: "'Pretendard', -apple-system, sans-serif", maxWidth: 480, margin: "0 auto", display: "flex", flexDirection: "column" }}>
       <style>{`@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css'); *{font-family:'Pretendard',-apple-system,sans-serif!important}`}</style>
 
 
       {/* 헤더 */}
-      <div style={{ padding: `calc(14px + ${safeTop}) 18px 0`, display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+      <div style={{ padding: `calc(14px + ${safeTop}) 18px 10px`, display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 50, background: "#060606", backdropFilter: "blur(20px)" }}>
         <div>
           <div style={{ fontSize: 10, color: "#1e1e1e", letterSpacing: 4 }}>RUNTRACK</div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -1056,7 +1056,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
       </div>
 
       {/* 주간 요약 */}
-      <div style={{ margin: "12px 18px 0", background: "#0a0a0a", border: "1px solid #161616", borderRadius: 16, padding: "12px 16px", display: "flex", flexShrink: 0 }}>
+      <div style={{ margin: "0 18px", background: "#0a0a0a", border: "1px solid #161616", borderRadius: 16, padding: "12px 16px", display: "flex", position: "sticky", top: 58, zIndex: 49, backdropFilter: "blur(20px)" }}>
         {[[`${myWeekDist.toFixed(1)}km`, "이번 주"], [`${posts.filter(p => p.userId === currentUser?.uid).length}회`, "총 러닝"], [`${calcStreak(posts, currentUser?.uid)}일`, "🔥 스트릭"]].map(([v, l], i) => (
           <div key={l} style={{ flex: 1, borderLeft: i > 0 ? "1px solid #141414" : "none", paddingLeft: i > 0 ? 14 : 0 }}>
             <div style={{ fontSize: 19, fontWeight: 800, color: "#00ff88" }}>{v}</div>
@@ -1068,7 +1068,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
 
 
       {/* 컨텐츠 */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: tab === "chat" ? "0" : "14px 18px", paddingBottom: tab === "chat" ? "0" : `calc(80px + ${safeBottom})`, overflowY: tab === "chat" ? "hidden" : "auto", minHeight: 0, WebkitOverflowScrolling: "touch" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: tab === "chat" ? "0" : "14px 18px", paddingBottom: tab === "chat" ? "0" : `calc(80px + ${safeBottom})`, minHeight: 0 }}>
         {loading && (
           <div style={{ display: "flex", justifyContent: "center", paddingTop: 60 }}>
             <div style={{ width: 34, height: 34, border: "2px solid #00ff88", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
@@ -1108,7 +1108,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
         {tab === "rank" && !loading && <LeaderboardTab posts={posts} currentUser={currentUser} />}
 
         {tab === "chat" && (
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, padding: "0 0", paddingBottom: `calc(58px + ${safeBottom})` }}>
+          <div style={{ height: `calc(100dvh - 170px - ${safeTop} - ${safeBottom})`, display: "flex", flexDirection: "column", minHeight: 0 }}>
             <ChatTab setId={currentSet?.id} currentUser={currentUser} />
           </div>
         )}
