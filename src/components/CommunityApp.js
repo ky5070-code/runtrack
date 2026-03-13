@@ -26,6 +26,33 @@ const EMOJIS = ["🔥", "⚡", "👏", "💪", "🏆", "❤️"];
 const safeBottom = "env(safe-area-inset-bottom, 0px)";
 const safeTop = "env(safe-area-inset-top, 0px)";
 
+/* ══ TOAST & CONFIRM ══ */
+function Toast({ message, type }) {
+  const bg = type === "success" ? "#00ff88" : type === "error" ? "#ff4444" : "#ffaa00";
+  const color = type === "success" ? "#000" : "#fff";
+  return (
+    <div style={{ position: "fixed", top: 60, left: "50%", transform: "translateX(-50%)", background: bg, color, borderRadius: 14, padding: "12px 22px", fontSize: 15, fontWeight: 700, zIndex: 999, boxShadow: "0 4px 20px rgba(0,0,0,0.5)", whiteSpace: "nowrap", maxWidth: "85vw", textAlign: "center" }}>
+      {message}
+    </div>
+  );
+}
+
+function ConfirmModal({ message, onConfirm, onCancel, confirmLabel, confirmColor }) {
+  const btnColor = confirmColor || "#00ff88";
+  return (
+    <div onClick={onCancel} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", zIndex: 400, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 32px" }}>
+      <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 320, background: "#111", borderRadius: 20, padding: "24px 20px", border: "1px solid #222" }}>
+        <div style={{ fontSize: 15, color: "#e0e0e0", textAlign: "center", lineHeight: 1.7, marginBottom: 20, whiteSpace: "pre-line" }}>{message}</div>
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={onCancel} style={{ flex: 1, padding: "13px", borderRadius: 12, border: "1px solid #2a2a2a", background: "transparent", color: "#555", fontFamily: "inherit", fontSize: 15, fontWeight: 700 }}>취소</button>
+          <button onClick={onConfirm} style={{ flex: 1, padding: "13px", borderRadius: 12, border: "none", background: btnColor, color: btnColor === "#ff4444" ? "#fff" : "#000", fontFamily: "inherit", fontSize: 15, fontWeight: 700 }}>{confirmLabel || "확인"}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 const Avatar = ({ user, size = 38 }) => (
   <div style={{
     width: size, height: size, borderRadius: size / 2,
@@ -512,6 +539,7 @@ function ChatTab({ setId, currentUser }) {
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const bottomRef = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -533,40 +561,88 @@ function ChatTab({ setId, currentUser }) {
     await sendMessage(text, currentUser);
     setText("");
     setSending(false);
+    inputRef.current?.focus();
   };
 
-  // GNB(58px) + 주간요약+헤더(약 130px) + 입력창(60px) + 여유
-  const chatH = `calc(100vh - 260px - ${safeBottom})`;
+  const chatH = `calc(100vh - 250px - ${safeBottom})`;
+
+  // 날짜 구분선 표시용
+  const getDateLabel = (val) => {
+    const ts = val?.toDate ? val.toDate() : new Date(val || 0);
+    const today = new Date();
+    const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+    if (ts.toDateString() === today.toDateString()) return "오늘";
+    if (ts.toDateString() === yesterday.toDateString()) return "어제";
+    return `${ts.getMonth()+1}월 ${ts.getDate()}일`;
+  };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: chatH, background: "#060606", borderRadius: 16, border: "1px solid #161616", overflow: "hidden" }}>
+    <div style={{ display: "flex", flexDirection: "column", height: chatH, background: "#080808", borderRadius: 18, overflow: "hidden", border: "1px solid #161616" }}>
+
       {/* 메시지 스크롤 영역 */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "10px 12px", WebkitOverflowScrolling: "touch" }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "12px 14px 8px", WebkitOverflowScrolling: "touch" }}>
         {messages.length === 0 && (
-          <div style={{ textAlign: "center", padding: "40px 0", color: "#2a2a2a" }}>
-            <div style={{ fontSize: 36, marginBottom: 8 }}>💬</div>
-            <div style={{ fontSize: 14 }}>첫 메시지를 보내보세요!</div>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", color: "#2a2a2a", gap: 8 }}>
+            <div style={{ fontSize: 34 }}>💬</div>
+            <div style={{ fontSize: 13 }}>첫 메시지를 보내보세요!</div>
           </div>
         )}
+
         {messages.map((msg, i) => {
           const isMe = msg.userId === currentUser?.uid;
           const isNewSender = i === 0 || messages[i-1]?.userId !== msg.userId;
+          const isLastInGroup = i === messages.length - 1 || messages[i+1]?.userId !== msg.userId;
+
+          // 날짜 구분선
+          const prevTs = i > 0 ? (messages[i-1].createdAt?.toDate ? messages[i-1].createdAt.toDate() : new Date(messages[i-1].createdAt || 0)) : null;
+          const curTs = msg.createdAt?.toDate ? msg.createdAt.toDate() : new Date(msg.createdAt || 0);
+          const showDate = i === 0 || (prevTs && prevTs.toDateString() !== curTs.toDateString());
+
           return (
-            <div key={msg.id} style={{ marginBottom: 4, marginTop: isNewSender ? 10 : 0 }}>
-              {!isMe && isNewSender && (
-                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                  <div style={{ width: 24, height: 24, borderRadius: 12, background: "#111", border: "1px solid #1e1e1e", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>
-                    {msg.userAvatar}
-                  </div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "#666" }}>{msg.userName}</div>
+            <div key={msg.id}>
+              {/* 날짜 구분선 */}
+              {showDate && (
+                <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "14px 0 10px" }}>
+                  <div style={{ flex: 1, height: 1, background: "#161616" }} />
+                  <div style={{ fontSize: 11, color: "#333", fontWeight: 600, padding: "2px 10px", background: "#0d0d0d", borderRadius: 10, border: "1px solid #1a1a1a" }}>{getDateLabel(msg.createdAt)}</div>
+                  <div style={{ flex: 1, height: 1, background: "#161616" }} />
                 </div>
               )}
-              <div style={{ display: "flex", flexDirection: isMe ? "row-reverse" : "row", paddingLeft: !isMe ? 30 : 0 }}>
-                <div style={{ maxWidth: "78%", display: "flex", flexDirection: "column", alignItems: isMe ? "flex-end" : "flex-start" }}>
-                  <div style={{ background: isMe ? "#00ff88" : "#141414", color: isMe ? "#000" : "#e0e0e0", borderRadius: isMe ? "16px 16px 4px 16px" : "16px 16px 16px 4px", padding: "8px 12px", fontSize: 13, lineHeight: 1.5, wordBreak: "break-word", border: isMe ? "none" : "1px solid #1e1e1e" }}>
+
+              <div style={{ display: "flex", flexDirection: isMe ? "row-reverse" : "row", alignItems: "flex-end", gap: 6, marginBottom: isLastInGroup ? 8 : 2 }}>
+                {/* 상대방 아바타 - 그룹 마지막 메시지에만 */}
+                {!isMe && (
+                  <div style={{ width: 28, height: 28, borderRadius: 14, background: isLastInGroup ? "#111" : "transparent", border: isLastInGroup ? "1px solid #1e1e1e" : "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0, marginBottom: 0 }}>
+                    {isLastInGroup ? msg.userAvatar : ""}
+                  </div>
+                )}
+
+                <div style={{ maxWidth: "75%", display: "flex", flexDirection: "column", alignItems: isMe ? "flex-end" : "flex-start", gap: 1 }}>
+                  {/* 이름 - 그룹 첫 메시지에만 */}
+                  {!isMe && isNewSender && (
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "#555", marginBottom: 3, paddingLeft: 4 }}>{msg.userName}</div>
+                  )}
+
+                  {/* 말풍선 */}
+                  <div style={{
+                    background: isMe ? "#00ff88" : "#141414",
+                    color: isMe ? "#000" : "#ddd",
+                    borderRadius: isMe
+                      ? (isNewSender ? "18px 4px 18px 18px" : "18px 18px 18px 18px")
+                      : (isNewSender ? "4px 18px 18px 18px" : "18px 18px 18px 18px"),
+                    padding: "9px 13px",
+                    fontSize: 14,
+                    lineHeight: 1.5,
+                    wordBreak: "break-word",
+                    border: isMe ? "none" : "1px solid #1e1e1e",
+                  }}>
                     {msg.text}
                   </div>
-                  <div style={{ fontSize: 10, color: "#2a2a2a", marginTop: 2 }}>{relTime(msg.createdAt)}</div>
+
+                  {/* 시간 - 그룹 마지막에만 */}
+                  {isLastInGroup && (
+                    <div style={{ fontSize: 10, color: "#2e2e2e", marginTop: 2, paddingLeft: isMe ? 0 : 2, paddingRight: isMe ? 2 : 0 }}>{relTime(msg.createdAt)}</div>
+                  )}
                 </div>
               </div>
             </div>
@@ -575,19 +651,24 @@ function ChatTab({ setId, currentUser }) {
         <div ref={bottomRef} />
       </div>
 
-      {/* 입력창 - 채팅 박스 하단에 고정 */}
-      <div style={{ display: "flex", gap: 8, alignItems: "center", padding: "8px 10px", borderTop: "1px solid #111", background: "#060606", flexShrink: 0 }}>
+      {/* 입력창 */}
+      <div style={{ display: "flex", gap: 8, alignItems: "center", padding: "10px 12px", borderTop: "1px solid #111", background: "#060606", flexShrink: 0 }}>
         <input
+          ref={inputRef}
           value={text}
           onChange={e => setText(e.target.value)}
           onKeyDown={e => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), handleSend())}
           placeholder="메시지 입력..."
           maxLength={500}
-          style={{ flex: 1, background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: "10px 14px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 13, outline: "none" }}
+          style={{ flex: 1, background: "#0d0d0d", border: "1px solid #222", borderRadius: 22, padding: "10px 16px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none", transition: "border-color 0.15s" }}
+          onFocus={e => e.target.style.borderColor = "#00ff88"}
+          onBlur={e => e.target.style.borderColor = "#222"}
         />
         <button onClick={handleSend} disabled={!text.trim() || sending}
-          style={{ width: 40, height: 40, borderRadius: 20, background: text.trim() ? "#00ff88" : "#111", border: "none", color: text.trim() ? "#000" : "#333", fontSize: 17, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          ➤
+          style={{ width: 42, height: 42, borderRadius: 21, background: text.trim() ? "#00ff88" : "#111", border: "none", color: text.trim() ? "#000" : "#333", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s" }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
         </button>
       </div>
     </div>
