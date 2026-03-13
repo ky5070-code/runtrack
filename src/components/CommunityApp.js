@@ -754,25 +754,54 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
 }
 
 /* ══ BOTTOM NAV ══ */
-function BottomNav({ onUpload, onHome, onProfile }) {
+function BottomNav({ tab, setTab, onUpload }) {
+  const tabs = [
+    { id: "feed", label: "피드", icon: (active) => (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#00ff88" : "#444"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+    )},
+    { id: "rank", label: "랭킹", icon: (active) => (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#00ff88" : "#444"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+    )},
+    { id: "stats", label: "통계", icon: (active) => (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#00ff88" : "#444"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+    )},
+    { id: "chat", label: "채팅", icon: (active) => (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#00ff88" : "#444"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+    )},
+  ];
+
   return (
-    <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 480, background: "rgba(6,6,6,0.96)", borderTop: "1px solid #161616", paddingBottom: safeBottom, display: "flex", zIndex: 100, backdropFilter: "blur(20px)" }}>
-      {/* 홈 버튼 */}
-      <button onClick={onHome} style={{ flex: 1, padding: "10px 0", border: "none", background: "transparent", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, minHeight: 56 }}>
-        <div style={{ fontSize: 24, color: "#383838" }}>🏠</div>
-        <div style={{ fontSize: 12, color: "#383838" }}>홈</div>
-      </button>
+    <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 480, background: "rgba(6,6,6,0.97)", borderTop: "1px solid #161616", paddingBottom: safeBottom, display: "flex", alignItems: "center", zIndex: 100, backdropFilter: "blur(20px)" }}>
+      {tabs.slice(0, 2).map(t => (
+        <button key={t.id} onClick={() => setTab(t.id)} style={{ flex: 1, padding: "10px 0 8px", border: "none", background: "transparent", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, minHeight: 58 }}>
+          {t.icon(tab === t.id)}
+          <span style={{ fontSize: 11, color: tab === t.id ? "#00ff88" : "#444", fontWeight: tab === t.id ? 700 : 400 }}>{t.label}</span>
+        </button>
+      ))}
 
-      {/* 업로드 버튼 */}
-      <button onClick={onUpload} style={{ flex: 1, padding: "10px 0", border: "none", background: "transparent", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, minHeight: 56 }}>
-        <div style={{ width: 48, height: 48, borderRadius: 24, background: "#00ff88", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, color: "#000", marginTop: -18, boxShadow: "0 0 24px rgba(0,255,136,0.35)", fontWeight: 800 }}>+</div>
-      </button>
+      {/* 중앙 + 버튼 */}
+      <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center", paddingBottom: 4 }}>
+        <button onClick={onUpload} style={{ width: 52, height: 52, borderRadius: 26, background: "#00ff88", border: "none", color: "#000", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 20px rgba(0,255,136,0.4)", marginTop: -10 }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </button>
+      </div>
 
-      {/* 프로필 버튼 */}
-      <button onClick={onProfile} style={{ flex: 1, padding: "10px 0", border: "none", background: "transparent", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, minHeight: 56 }}>
-        <div style={{ fontSize: 24, color: "#383838" }}>👤</div>
-        <div style={{ fontSize: 12, color: "#383838" }}>프로필</div>
-      </button>
+      {tabs.slice(2).map(t => (
+        <button key={t.id} onClick={() => setTab(t.id)} style={{ flex: 1, padding: "10px 0 8px", border: "none", background: "transparent", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, minHeight: 58 }}>
+          {t.icon(tab === t.id)}
+          <span style={{ fontSize: 11, color: tab === t.id ? "#00ff88" : "#444", fontWeight: tab === t.id ? 700 : 400 }}>{t.label}</span>
+        </button>
+      ))}
     </div>
   );
 }
@@ -803,17 +832,28 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
         <div>
           <div style={{ fontSize: 10, color: "#1e1e1e", letterSpacing: 4 }}>RUNTRACK</div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <button onClick={onLeaveSet} style={{ background: "none", border: "none", color: "#333", fontSize: 20, padding: 0, cursor: "pointer" }}>‹</button>
+            <button onClick={onLeaveSet} style={{ background: "none", border: "none", color: "#e0e0e0", fontSize: 26, padding: "0 4px 0 0", cursor: "pointer", lineHeight: 1 }}>‹</button>
             <div style={{ fontSize: 20, fontWeight: 800, color: "#00ff88", letterSpacing: -0.5 }}>{currentSet?.emoji} {currentSet?.name}</div>
           </div>
         </div>
-        <div style={{ position: "relative", cursor: "pointer" }} onClick={() => setShowNotif(true)}>
-          <Avatar user={currentUser} size={40} />
-          {unreadCount > 0 && (
-            <div style={{ position: "absolute", top: -3, right: -3, minWidth: 17, height: 17, borderRadius: 9, background: "#ff3b3b", border: "2px solid #060606", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: "#fff", padding: "0 3px" }}>
-              {unreadCount > 9 ? "9+" : unreadCount}
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {/* 알림 벨 */}
+          <div style={{ position: "relative", cursor: "pointer" }} onClick={() => setShowNotif(true)}>
+            <div style={{ width: 36, height: 36, borderRadius: 18, background: "#0d0d0d", border: "1px solid #1e1e1e", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2" strokeLinecap="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              </svg>
             </div>
-          )}
+            {unreadCount > 0 && (
+              <div style={{ position: "absolute", top: -2, right: -2, minWidth: 16, height: 16, borderRadius: 8, background: "#ff3b3b", border: "2px solid #060606", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800, color: "#fff", padding: "0 3px" }}>
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </div>
+            )}
+          </div>
+          {/* 프로필 아바타 */}
+          <div style={{ cursor: "pointer" }} onClick={() => setShowProfile(true)}>
+            <Avatar user={currentUser} size={36} />
+          </div>
         </div>
       </div>
 
@@ -827,12 +867,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
         ))}
       </div>
 
-      {/* 탭 */}
-      <div style={{ display: "flex", gap: 8, padding: "12px 18px 0", flexShrink: 0 }}>
-        {[["feed", "피드"], ["rank", "랭킹"], ["stats", "통계"], ["chat", "채팅"]].map(([id, label]) => (
-          <button key={id} onClick={() => setTab(id)} style={{ flex: 1, padding: "11px", borderRadius: 12, border: "none", background: tab === id ? "#00ff88" : "#0d0d0d", color: tab === id ? "#000" : "#444", fontFamily: "inherit", fontSize: 15, fontWeight: 700, minHeight: 44 }}>{label}</button>
-        ))}
-      </div>
+
 
       {/* 컨텐츠 */}
       <div style={{ flex: 1, padding: "14px 18px", paddingBottom: `calc(80px + ${safeBottom})`, overflowY: "auto" }}>
@@ -884,7 +919,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
       </div>
 
       {/* 하단 네비게이션 */}
-      <BottomNav onUpload={() => setShowUpload(true)} onHome={onLeaveSet} onProfile={() => setShowProfile(true)} />
+      <BottomNav tab={tab} setTab={setTab} onUpload={() => setShowUpload(true)} />
 
       {/* 모달 */}
       {showUpload && <UploadModal onClose={() => setShowUpload(false)} onPost={createPost} currentUser={currentUser} />}
