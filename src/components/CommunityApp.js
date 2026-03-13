@@ -816,6 +816,16 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
   const [showUpload, setShowUpload] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [confirm, setConfirm] = useState(null);
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 2500);
+  };
+  const showConfirm = (message, onConfirm, confirmLabel, confirmColor) => {
+    setConfirm({ message, onConfirm, confirmLabel, confirmColor });
+  };
 
   const myWeekDist = posts.filter(p => {
     const ts = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt || 0);
@@ -924,18 +934,25 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
       {/* 모달 */}
       {showUpload && <UploadModal onClose={() => setShowUpload(false)} onPost={createPost} currentUser={currentUser} />}
       {showNotif && <NotificationModal notifications={notifications} onClose={() => { setShowNotif(false); markAllRead(); }} onMarkAllRead={markAllRead} />}
+      {toast && <Toast message={toast.message} type={toast.type} />}
+      {confirm && <ConfirmModal message={confirm.message} onConfirm={confirm.onConfirm} onCancel={() => setConfirm(null)} confirmLabel={confirm.confirmLabel} confirmColor={confirm.confirmColor} />}
       {showProfile && <ProfileModal
         currentUser={currentUser} posts={posts}
         currentSet={currentSet} isAdmin={isAdmin}
-        onKick={async (uid, name) => {
-          if (window.confirm(`${name}님을 강퇴할까요?`)) {
+        onKick={(uid, name) => {
+          showConfirm(`${name}님을 강퇴할까요?`, async () => {
+            setConfirm(null);
             await kickMember(currentSet.id, uid);
-          }
+            showToast(`${name}님을 강퇴했어요.`, "warning");
+          }, "강퇴", "#ff4444");
         }}
-        onTransfer={async (uid, name) => {
-          if (window.confirm(`${name}님에게 관리자를 이전할까요?`)) {
+        onTransfer={(uid, name) => {
+          showConfirm(`${name}님에게 관리자 권한을 이전할까요?`, async () => {
+            setConfirm(null);
             await transferAdmin(currentSet.id, uid);
-          }
+            showToast(`${name}님에게 관리자 권한을 이전했어요. 👑`, "success");
+            setShowProfile(false);
+          }, "이전", "#ffaa00");
         }}
         onLeaveSet={async () => {
           try {
@@ -943,13 +960,14 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
             onLeaveSet();
           } catch(e) { alert(e.message); }
         }}
-        onDeleteSet={async () => {
-          if (window.confirm(`"${currentSet.name}" 크루를 삭제할까요?\n게시물이 모두 삭제되고 복구할 수 없어요.`)) {
+        onDeleteSet={() => {
+          showConfirm(`"${currentSet?.name}" 크루를 삭제할까요?\n게시물이 모두 삭제되고 복구할 수 없어요.`, async () => {
+            setConfirm(null);
             try {
               await deleteSet(currentSet.id);
               onLeaveSet();
-            } catch(e) { alert(e.message); }
-          }
+            } catch(e) { showToast(e.message, "error"); }
+          }, "삭제", "#ff4444");
         }}
         onClose={() => setShowProfile(false)}
         onLogout={onLogout} onUpdateProfile={onUpdateProfile} />}
