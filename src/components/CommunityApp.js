@@ -68,7 +68,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showFeedback, setShowFeedback] = useState(true);
+  const [showFeedback, setShowFeedback] = useState(false);
   const myReaction = post[`myReaction_${currentUser?.uid}`];
   const isMyPost = post.userId === currentUser?.uid;
   const canDelete = isMyPost || isAdmin;
@@ -141,16 +141,20 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
         {post.caption && <div style={{ fontSize: 15, color: "#aaa", marginBottom: 12, lineHeight: 1.6 }}>{post.caption}</div>}
 
         {/* AI 코치 피드백 */}
-        {post.aiFeedback && showFeedback && (
-          <div style={{ background: "#060e09", border: "1px solid #1a3028", borderRadius: 12, padding: "12px 14px", marginBottom: 12, position: "relative" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 8 }}>
+        {post.aiFeedback && (
+          <div style={{ marginBottom: 12 }}>
+            <button onClick={() => setShowFeedback(s => !s)} style={{ width: "100%", background: "#060e09", border: "1px solid #1a3028", borderRadius: showFeedback ? "12px 12px 0 0" : 12, padding: "10px 14px", display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontFamily: "inherit" }}>
               <span style={{ fontSize: 13 }}>✨</span>
               <span style={{ fontSize: 12, color: "#00cc66", fontWeight: 700, letterSpacing: 1 }}>AI 코치 피드백</span>
-              <button onClick={() => setShowFeedback(false)} style={{ marginLeft: "auto", background: "none", border: "none", color: "#2a2a2a", fontSize: 16, padding: 0, lineHeight: 1 }}>✕</button>
-            </div>
-            {post.aiFeedback.split("\n").filter(l => l.trim()).map((line, i) => (
-              <div key={i} style={{ fontSize: 14, color: "#7a9e87", lineHeight: 1.8 }}>{line}</div>
-            ))}
+              <span style={{ marginLeft: "auto", fontSize: 12, color: "#1a5c38", transform: showFeedback ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", display: "inline-block" }}>▼</span>
+            </button>
+            {showFeedback && (
+              <div style={{ background: "#060e09", border: "1px solid #1a3028", borderTop: "none", borderRadius: "0 0 12px 12px", padding: "12px 14px" }}>
+                {post.aiFeedback.split("\n").filter(l => l.trim()).map((line, i) => (
+                  <div key={i} style={{ fontSize: 14, color: "#7a9e87", lineHeight: 1.8 }}>{line}</div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -953,7 +957,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
   }).reduce((a, p) => a + (parseFloat(p.dist) || 0), 0);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#060606", color: "#e0e0e0", fontFamily: "'Pretendard', -apple-system, sans-serif", maxWidth: 480, margin: "0 auto", display: "flex", flexDirection: "column" }}>
+    <div style={{ height: tab === "chat" ? "100dvh" : "auto", minHeight: tab === "chat" ? "unset" : "100vh", background: "#060606", color: "#e0e0e0", fontFamily: "'Pretendard', -apple-system, sans-serif", maxWidth: 480, margin: "0 auto", display: "flex", flexDirection: "column", overflow: tab === "chat" ? "hidden" : "visible", position: tab === "chat" ? "fixed" : "relative", inset: tab === "chat" ? "0 auto" : "auto", width: tab === "chat" ? "100%" : "auto" }}>
       <style>{`@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css'); *{font-family:'Pretendard',-apple-system,sans-serif!important}`}</style>
 
 
