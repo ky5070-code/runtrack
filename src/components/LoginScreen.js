@@ -14,9 +14,9 @@ export default function LoginScreen({ onLogin }) {
     <div style={{
       minHeight: "100vh", background: "#060606", display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center", padding: "0 32px",
-      fontFamily: "'Black Han Sans', 'Noto Sans KR', sans-serif", maxWidth: 420, margin: "0 auto",
+      fontFamily: "'Pretendard', -apple-system, sans-serif", maxWidth: 420, margin: "0 auto",
     }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700&display=swap'); @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }`}</style>
+      <style>{`@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css'); @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }`}</style>
 
       {/* 인앱 브라우저 경고 */}
       {inApp && (
@@ -75,7 +75,7 @@ export default function LoginScreen({ onLogin }) {
           background: inApp ? "#111" : "#00ff88",
           border: inApp ? "1px solid #222" : "none",
           borderRadius: 14,
-          fontFamily: "'Black Han Sans', 'Noto Sans KR', sans-serif", fontSize: 17, fontWeight: 800,
+          fontFamily: "'Pretendard', -apple-system, sans-serif", fontSize: 17, fontWeight: 800,
           color: inApp ? "#333" : "#000",
           cursor: inApp ? "not-allowed" : "pointer",
           letterSpacing: 0.5,

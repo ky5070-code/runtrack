@@ -134,8 +134,8 @@ export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
   const [showJoin, setShowJoin] = useState(false);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#060606", color: "#e0e0e0", fontFamily: "'Black Han Sans', 'Noto Sans KR', sans-serif", maxWidth: 480, margin: "0 auto" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700&display=swap'); *{font-family:'Black Han Sans',sans-serif!important}`}</style>
+    <div style={{ minHeight: "100vh", background: "#060606", color: "#e0e0e0", fontFamily: "'Pretendard', -apple-system, sans-serif", maxWidth: 480, margin: "0 auto" }}>
+      <style>{`@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css'); *{font-family:'Pretendard',-apple-system,sans-serif!important}`}</style>
 
 
       {/* 헤더 */}
