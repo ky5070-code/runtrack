@@ -535,53 +535,58 @@ function ChatTab({ setId, currentUser }) {
     setSending(false);
   };
 
-  return (
-    <div>
-      {messages.length === 0 && (
-        <div style={{ textAlign: "center", padding: "50px 0", color: "#2a2a2a" }}>
-          <div style={{ fontSize: 42, marginBottom: 10 }}>💬</div>
-          <div style={{ fontSize: 15 }}>첫 메시지를 보내보세요!</div>
-        </div>
-      )}
+  // GNB(58px) + 주간요약+헤더(약 130px) + 입력창(60px) + 여유
+  const chatH = `calc(100vh - 260px - ${safeBottom})`;
 
-      {messages.map((msg, i) => {
-        const isMe = msg.userId === currentUser?.uid;
-        const isNewSender = i === 0 || messages[i-1]?.userId !== msg.userId;
-        return (
-          <div key={msg.id} style={{ marginBottom: 6, marginTop: isNewSender ? 12 : 0 }}>
-            {!isMe && isNewSender && (
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
-                <div style={{ width: 28, height: 28, borderRadius: 14, background: "#111", border: "1px solid #1e1e1e", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, flexShrink: 0 }}>
-                  {msg.userAvatar}
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: chatH, background: "#060606", borderRadius: 16, border: "1px solid #161616", overflow: "hidden" }}>
+      {/* 메시지 스크롤 영역 */}
+      <div style={{ flex: 1, overflowY: "auto", padding: "10px 12px", WebkitOverflowScrolling: "touch" }}>
+        {messages.length === 0 && (
+          <div style={{ textAlign: "center", padding: "40px 0", color: "#2a2a2a" }}>
+            <div style={{ fontSize: 36, marginBottom: 8 }}>💬</div>
+            <div style={{ fontSize: 14 }}>첫 메시지를 보내보세요!</div>
+          </div>
+        )}
+        {messages.map((msg, i) => {
+          const isMe = msg.userId === currentUser?.uid;
+          const isNewSender = i === 0 || messages[i-1]?.userId !== msg.userId;
+          return (
+            <div key={msg.id} style={{ marginBottom: 4, marginTop: isNewSender ? 10 : 0 }}>
+              {!isMe && isNewSender && (
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                  <div style={{ width: 24, height: 24, borderRadius: 12, background: "#111", border: "1px solid #1e1e1e", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>
+                    {msg.userAvatar}
+                  </div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#666" }}>{msg.userName}</div>
                 </div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#888" }}>{msg.userName}</div>
-              </div>
-            )}
-            <div style={{ display: "flex", flexDirection: isMe ? "row-reverse" : "row", paddingLeft: !isMe ? 36 : 0 }}>
-              <div style={{ maxWidth: "75%", display: "flex", flexDirection: "column", alignItems: isMe ? "flex-end" : "flex-start" }}>
-                <div style={{ background: isMe ? "#00ff88" : "#141414", color: isMe ? "#000" : "#e0e0e0", borderRadius: isMe ? "18px 18px 4px 18px" : "18px 18px 18px 4px", padding: "10px 14px", fontSize: 14, lineHeight: 1.5, wordBreak: "break-word", border: isMe ? "none" : "1px solid #1e1e1e" }}>
-                  {msg.text}
+              )}
+              <div style={{ display: "flex", flexDirection: isMe ? "row-reverse" : "row", paddingLeft: !isMe ? 30 : 0 }}>
+                <div style={{ maxWidth: "78%", display: "flex", flexDirection: "column", alignItems: isMe ? "flex-end" : "flex-start" }}>
+                  <div style={{ background: isMe ? "#00ff88" : "#141414", color: isMe ? "#000" : "#e0e0e0", borderRadius: isMe ? "16px 16px 4px 16px" : "16px 16px 16px 4px", padding: "8px 12px", fontSize: 13, lineHeight: 1.5, wordBreak: "break-word", border: isMe ? "none" : "1px solid #1e1e1e" }}>
+                    {msg.text}
+                  </div>
+                  <div style={{ fontSize: 10, color: "#2a2a2a", marginTop: 2 }}>{relTime(msg.createdAt)}</div>
                 </div>
-                <div style={{ fontSize: 10, color: "#2a2a2a", marginTop: 3 }}>{relTime(msg.createdAt)}</div>
               </div>
             </div>
-          </div>
-        );
-      })}
-      <div ref={bottomRef} />
+          );
+        })}
+        <div ref={bottomRef} />
+      </div>
 
-      {/* 입력창 */}
-      <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 16, position: "sticky", bottom: 80, background: "#060606", paddingTop: 10, borderTop: "1px solid #111" }}>
+      {/* 입력창 - 채팅 박스 하단에 고정 */}
+      <div style={{ display: "flex", gap: 8, alignItems: "center", padding: "8px 10px", borderTop: "1px solid #111", background: "#060606", flexShrink: 0 }}>
         <input
           value={text}
           onChange={e => setText(e.target.value)}
           onKeyDown={e => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), handleSend())}
           placeholder="메시지 입력..."
           maxLength={500}
-          style={{ flex: 1, background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 22, padding: "12px 16px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none" }}
+          style={{ flex: 1, background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: "10px 14px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 13, outline: "none" }}
         />
         <button onClick={handleSend} disabled={!text.trim() || sending}
-          style={{ width: 46, height: 46, borderRadius: 23, background: text.trim() ? "#00ff88" : "#111", border: "none", color: text.trim() ? "#000" : "#333", fontSize: 20, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          style={{ width: 40, height: 40, borderRadius: 20, background: text.trim() ? "#00ff88" : "#111", border: "none", color: text.trim() ? "#000" : "#333", fontSize: 17, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
           ➤
         </button>
       </div>
