@@ -541,9 +541,20 @@ function ChatTab({ setId, currentUser }) {
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
 
+  const scrollToBottom = (smooth = true) => {
+    bottomRef.current?.scrollIntoView({ behavior: smooth ? "smooth" : "auto" });
+  };
+
+  useEffect(() => { scrollToBottom(); }, [messages]);
+
+  // 키보드 올라올 때 자동 스크롤
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const handler = () => scrollToBottom(false);
+    vv.addEventListener("resize", handler);
+    return () => vv.removeEventListener("resize", handler);
+  }, []);
 
   const relTime = (val) => {
     const ts = val?.toDate ? val.toDate() : new Date(val || 0);
@@ -564,8 +575,6 @@ function ChatTab({ setId, currentUser }) {
     inputRef.current?.focus();
   };
 
-  const chatH = `calc(100vh - 250px - ${safeBottom})`;
-
   // 날짜 구분선 표시용
   const getDateLabel = (val) => {
     const ts = val?.toDate ? val.toDate() : new Date(val || 0);
@@ -577,7 +586,7 @@ function ChatTab({ setId, currentUser }) {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: chatH, background: "#080808", borderRadius: 18, overflow: "hidden", border: "1px solid #161616" }}>
+    <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, background: "#080808", overflow: "hidden" }}>
 
       {/* 메시지 스크롤 영역 */}
       <div style={{ flex: 1, overflowY: "auto", padding: "12px 14px 8px", WebkitOverflowScrolling: "touch" }}>
@@ -966,7 +975,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
 
 
       {/* 컨텐츠 */}
-      <div style={{ flex: 1, padding: "14px 18px", paddingBottom: `calc(80px + ${safeBottom})`, overflowY: "auto" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: tab === "chat" ? "0" : "14px 18px", paddingBottom: tab === "chat" ? "0" : `calc(80px + ${safeBottom})`, overflowY: tab === "chat" ? "hidden" : "auto", minHeight: 0 }}>
         {loading && (
           <div style={{ display: "flex", justifyContent: "center", paddingTop: 60 }}>
             <div style={{ width: 34, height: 34, border: "2px solid #00ff88", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
@@ -1006,7 +1015,9 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
         {tab === "rank" && !loading && <LeaderboardTab posts={posts} currentUser={currentUser} />}
 
         {tab === "chat" && (
-          <ChatTab setId={currentSet?.id} currentUser={currentUser} />
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, padding: "0 0", paddingBottom: `calc(58px + ${safeBottom})` }}>
+            <ChatTab setId={currentSet?.id} currentUser={currentUser} />
+          </div>
         )}
 
         {tab === "stats" && !loading && (
@@ -1020,25 +1031,28 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
       {/* 모달 */}
       {showUpload && <UploadModal onClose={() => setShowUpload(false)} onPost={createPost} currentUser={currentUser} />}
       {showNotif && <NotificationModal notifications={notifications} onClose={() => { setShowNotif(false); markAllRead(); }} onMarkAllRead={markAllRead} />}
-      {toast && <Toast message={toast.message} type={toast.type} />}
-      {confirm && <ConfirmModal message={confirm.message} onConfirm={confirm.onConfirm} onCancel={() => setConfirm(null)} confirmLabel={confirm.confirmLabel} confirmColor={confirm.confirmColor} />}
       {showProfile && <ProfileModal
         currentUser={currentUser} posts={posts}
         currentSet={currentSet} isAdmin={isAdmin}
         onKick={(uid, name) => {
-          showConfirm(`${name}님을 강퇴할까요?`, async () => {
-            setConfirm(null);
-            await kickMember(currentSet.id, uid);
-            showToast(`${name}님을 강퇴했어요.`, "warning");
-          }, "강퇴", "#ff4444");
+          setShowProfile(false);
+          setTimeout(() => {
+            showConfirm(`${name}님을 강퇴할까요?`, async () => {
+              setConfirm(null);
+              await kickMember(currentSet.id, uid);
+              showToast(`${name}님을 강퇴했어요.`, "warning");
+            }, "강퇴", "#ff4444");
+          }, 200);
         }}
         onTransfer={(uid, name) => {
-          showConfirm(`${name}님에게 관리자 권한을 이전할까요?`, async () => {
-            setConfirm(null);
-            await transferAdmin(currentSet.id, uid);
-            showToast(`${name}님에게 관리자 권한을 이전했어요. 👑`, "success");
-            setShowProfile(false);
-          }, "이전", "#ffaa00");
+          setShowProfile(false);
+          setTimeout(() => {
+            showConfirm(`${name}님에게 관리자 권한을 이전할까요?`, async () => {
+              setConfirm(null);
+              await transferAdmin(currentSet.id, uid);
+              showToast(`${name}님에게 관리자 권한을 이전했어요. 👑`, "success");
+            }, "이전", "#ffaa00");
+          }, 200);
         }}
         onLeaveSet={async () => {
           try {
@@ -1057,6 +1071,8 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
         }}
         onClose={() => setShowProfile(false)}
         onLogout={onLogout} onUpdateProfile={onUpdateProfile} />}
+      {confirm && <ConfirmModal message={confirm.message} onConfirm={confirm.onConfirm} onCancel={() => setConfirm(null)} confirmLabel={confirm.confirmLabel} confirmColor={confirm.confirmColor} />}
+      {toast && <Toast message={toast.message} type={toast.type} />}
     </div>
   );
 }
