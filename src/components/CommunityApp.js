@@ -88,9 +88,9 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
 
       {/* 이미지 - 최상단 */}
       {post.imageUrl && (
-        <div style={{ height: 200, overflow: "hidden", position: "relative" }}>
-          <img src={post.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.75 }} />
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom,transparent 50%,#0b0b0b)" }} />
+        <div style={{ height: 220, overflow: "hidden", position: "relative" }}>
+          <img src={post.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.5 }} />
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(6,6,6,0.85) 100%)" }} />
           {post.source === "ai" && (
             <div style={{ position: "absolute", top: 10, right: 10, background: "#0d1f14", border: "1px solid #00ff88", borderRadius: 6, padding: "3px 8px", fontSize: 12, color: "#00ff88" }}>📸 AI</div>
           )}
