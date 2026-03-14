@@ -1055,8 +1055,8 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
         </div>
       </div>
 
-      {/* 주간 요약 */}
-      <div style={{ margin: "0 18px", background: "#0a0a0a", border: "1px solid #161616", borderRadius: 16, padding: "12px 16px", display: "flex", position: "sticky", top: 58, zIndex: 49, backdropFilter: "blur(20px)" }}>
+      {/* 주간 요약 - 채팅 탭에서는 숨김 */}
+      <div style={{ margin: "0 18px", background: "#0a0a0a", border: "1px solid #161616", borderRadius: 16, padding: "12px 16px", display: tab === "chat" ? "none" : "flex", position: "sticky", top: 58, zIndex: 49, backdropFilter: "blur(20px)" }}>
         {[[`${myWeekDist.toFixed(1)}km`, "이번 주"], [`${posts.filter(p => p.userId === currentUser?.uid).length}회`, "총 러닝"], [`${calcStreak(posts, currentUser?.uid)}일`, "🔥 스트릭"]].map(([v, l], i) => (
           <div key={l} style={{ flex: 1, borderLeft: i > 0 ? "1px solid #141414" : "none", paddingLeft: i > 0 ? 14 : 0 }}>
             <div style={{ fontSize: 19, fontWeight: 800, color: "#00ff88" }}>{v}</div>
@@ -1068,7 +1068,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
 
 
       {/* 컨텐츠 */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: tab === "chat" ? "0" : "14px 18px", paddingBottom: tab === "chat" ? "0" : `calc(80px + ${safeBottom})`, minHeight: 0 }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: tab === "chat" ? "0" : "14px 18px", paddingBottom: tab === "chat" ? "0" : `calc(80px + ${safeBottom})`, minHeight: 0, overflow: tab === "chat" ? "hidden" : "visible" }}>
         {loading && (
           <div style={{ display: "flex", justifyContent: "center", paddingTop: 60 }}>
             <div style={{ width: 34, height: 34, border: "2px solid #00ff88", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
@@ -1108,7 +1108,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
         {tab === "rank" && !loading && <LeaderboardTab posts={posts} currentUser={currentUser} />}
 
         {tab === "chat" && (
-          <div style={{ height: `calc(100dvh - 170px - ${safeTop} - ${safeBottom})`, display: "flex", flexDirection: "column", minHeight: 0 }}>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, paddingBottom: `calc(58px + ${safeBottom})` }}>
             <ChatTab setId={currentSet?.id} currentUser={currentUser} />
           </div>
         )}
