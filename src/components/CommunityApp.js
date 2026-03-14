@@ -392,14 +392,15 @@ function fmtPace(secPerKm) {
   return `${m}'${String(s).padStart(2,"0")}"`;
 }
 
-function LeaderboardTab({ posts, currentUser }) {
+function LeaderboardTab({ posts, currentUser, isPro }) {
   const [period, setPeriod] = useState("week");
-  const cutoff = period === "week" ? 7 * 86400000 : 30 * 86400000;
   const userMap = {};
   posts.forEach(p => {
     if (!p.author) return;
     const ts = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt || 0);
-    if (Date.now() - ts.getTime() > cutoff) return;
+    const age = Date.now() - ts.getTime();
+    if (period === "week" && age > 7 * 86400000) return;
+    if (period === "month" && age > 30 * 86400000) return;
     if (!userMap[p.userId]) userMap[p.userId] = { user: p.author, dist: 0, runs: 0, totalDuration: 0 };
     userMap[p.userId].dist += parseFloat(p.dist) || 0;
     userMap[p.userId].runs += 1;
@@ -415,9 +416,15 @@ function LeaderboardTab({ posts, currentUser }) {
   return (
     <div>
       <div style={{ display: "flex", gap: 8, marginBottom: 18 }}>
-        {[["week", "이번 주"], ["month", "이번 달"]].map(([v, l]) => (
-          <button key={v} onClick={() => setPeriod(v)} style={{ flex: 1, padding: "11px", borderRadius: 12, border: "none", background: period === v ? "#00ff88" : "#0d0d0d", color: period === v ? "#000" : "#444", fontFamily: "inherit", fontSize: 15, fontWeight: 700, minHeight: 46 }}>{l}</button>
-        ))}
+        {[["week", "이번 주"], ["month", "이번 달"], ["all", "전체"]].map(([v, l]) => {
+          const locked = v === "all" && !isPro;
+          return (
+            <button key={v} onClick={() => !locked && setPeriod(v)}
+              style={{ flex: 1, padding: "11px", borderRadius: 12, border: locked ? "1px solid #1a1a1a" : "none", background: period === v ? "#00ff88" : "#0d0d0d", color: period === v ? "#000" : locked ? "#333" : "#444", fontFamily: "inherit", fontSize: 13, fontWeight: 700, minHeight: 46 }}>
+              {locked ? "🔒 " : ""}{l}
+            </button>
+          );
+        })}
       </div>
 
       {scores.length === 0 && (
@@ -913,38 +920,65 @@ function ScheduleCreateModal({ onClose, onCreate }) {
 }
 
 /* ══ STATS TAB ══ */
-function StatsTab({ posts, currentUser }) {
+function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
   const myPosts = posts.filter(p => p.userId === currentUser?.uid);
+  const [chartView, setChartView] = useState("week"); // week | month | year
+  const [showGoalEdit, setShowGoalEdit] = useState(false);
+  const [goalInput, setGoalInput] = useState("");
 
-  // 최근 8주 데이터
-  const weeks = [];
+  const goal = currentUser?.weeklyGoal || 0;
+
+  // 주간 차트 (8주)
+  const weeklyData = [];
   for (let i = 7; i >= 0; i--) {
     const start = Date.now() - (i + 1) * 7 * 86400000;
     const end = Date.now() - i * 7 * 86400000;
-    const label = i === 0 ? "이번주" : `${i}주전`;
     const dist = myPosts.filter(p => {
       const t = p.createdAt?.toDate ? p.createdAt.toDate().getTime() : new Date(p.createdAt || 0).getTime();
       return t >= start && t < end;
     }).reduce((a, p) => a + (parseFloat(p.dist) || 0), 0);
-    weeks.push({ label, dist });
+    weeklyData.push({ label: i === 0 ? "이번주" : `${i}주전`, dist });
   }
 
-  const maxDist = Math.max(...weeks.map(w => w.dist), 1);
+  // 월별 차트 (12개월) - PRO
+  const monthlyData = [];
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date();
+    d.setMonth(d.getMonth() - i);
+    const y = d.getFullYear(), m = d.getMonth();
+    const dist = myPosts.filter(p => {
+      const t = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt || 0);
+      return t.getFullYear() === y && t.getMonth() === m;
+    }).reduce((a, p) => a + (parseFloat(p.dist) || 0), 0);
+    monthlyData.push({ label: i === 0 ? "이번달" : `${m+1}월`, dist });
+  }
+
+  // 연별 차트 (3년) - PRO
+  const yearlyData = [];
+  for (let i = 2; i >= 0; i--) {
+    const y = new Date().getFullYear() - i;
+    const dist = myPosts.filter(p => {
+      const t = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt || 0);
+      return t.getFullYear() === y;
+    }).reduce((a, p) => a + (parseFloat(p.dist) || 0), 0);
+    yearlyData.push({ label: `${y}`, dist });
+  }
+
+  const chartData = chartView === "week" ? weeklyData : chartView === "month" ? monthlyData : yearlyData;
+  const maxDist = Math.max(...chartData.map(w => w.dist), 1);
   const totalDist = myPosts.reduce((a, p) => a + (parseFloat(p.dist) || 0), 0);
   const totalRuns = myPosts.length;
   const avgDist = totalRuns > 0 ? totalDist / totalRuns : 0;
   const bestDist = myPosts.reduce((a, p) => Math.max(a, parseFloat(p.dist) || 0), 0);
 
-  // 페이스 계산
-  const validPace = myPosts.filter(p => p.pace && p.pace !== "--");
-  const avgPace = validPace.length > 0
-    ? validPace[validPace.length > 5 ? validPace.length - 5 : 0]?.pace || "--"
-    : "--";
+  // 이번 주 거리 (목표 대비)
+  const thisWeekDist = weeklyData[7]?.dist || 0;
+  const goalPct = goal > 0 ? Math.min((thisWeekDist / goal) * 100, 100) : 0;
 
   return (
     <div>
       {/* 요약 카드 */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
         {[
           [`${totalDist.toFixed(1)}km`, "총 누적 거리", "🏃"],
           [`${totalRuns}회`, "총 러닝 횟수", "📅"],
@@ -959,29 +993,93 @@ function StatsTab({ posts, currentUser }) {
         ))}
       </div>
 
-      {/* 주간 거리 바 차트 */}
-      <div style={{ background: "#080808", border: "1px solid #161616", borderRadius: 16, padding: "18px 16px", marginBottom: 16 }}>
-        <div style={{ fontSize: 13, color: "#333", letterSpacing: 2, marginBottom: 16 }}>주간 러닝 거리</div>
-        <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 100 }}>
-          {weeks.map((w, i) => {
-            const h = maxDist > 0 ? Math.max((w.dist / maxDist) * 90, w.dist > 0 ? 6 : 0) : 0;
-            const isThis = i === 7;
+      {/* 주간 목표 - PRO */}
+      {isPro ? (
+        <div style={{ background: "#080808", border: "1px solid #161616", borderRadius: 16, padding: "16px", marginBottom: 16 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+            <div style={{ fontSize: 13, color: "#444", letterSpacing: 1 }}>🎯 이번 주 목표</div>
+            <button onClick={() => { setGoalInput(goal || ""); setShowGoalEdit(true); }}
+              style={{ fontSize: 12, color: "#00ff88", background: "none", border: "1px solid #1a3028", borderRadius: 8, padding: "3px 10px", fontFamily: "inherit" }}>
+              {goal > 0 ? "수정" : "설정하기"}
+            </button>
+          </div>
+          {goal > 0 ? (
+            <>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                <span style={{ fontSize: 20, fontWeight: 800, color: "#00ff88" }}>{thisWeekDist.toFixed(1)}km</span>
+                <span style={{ fontSize: 14, color: "#333" }}>/ {goal}km</span>
+              </div>
+              <div style={{ background: "#111", borderRadius: 8, height: 10, overflow: "hidden" }}>
+                <div style={{ width: `${goalPct}%`, height: "100%", background: goalPct >= 100 ? "#00ff88" : "linear-gradient(90deg,#00aa55,#00ff88)", borderRadius: 8, transition: "width 0.5s" }} />
+              </div>
+              <div style={{ fontSize: 12, color: goalPct >= 100 ? "#00ff88" : "#444", marginTop: 6, textAlign: "right" }}>
+                {goalPct >= 100 ? "🎉 목표 달성!" : `${(goal - thisWeekDist).toFixed(1)}km 남음`}
+              </div>
+            </>
+          ) : (
+            <div style={{ fontSize: 13, color: "#2a2a2a", textAlign: "center", padding: "8px 0" }}>주간 목표를 설정해보세요!</div>
+          )}
+        </div>
+      ) : (
+        <div style={{ background: "#080808", border: "1px solid #1a1a1a", borderRadius: 16, padding: "16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ fontSize: 24 }}>🔒</div>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#333" }}>🎯 주간 목표 설정</div>
+            <div style={{ fontSize: 12, color: "#2a2a2a", marginTop: 2 }}>PRO 회원 전용 기능이에요</div>
+          </div>
+        </div>
+      )}
+
+      {/* 차트 뷰 토글 */}
+      <div style={{ background: "#080808", border: "1px solid #161616", borderRadius: 16, padding: "16px", marginBottom: 16 }}>
+        <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
+          {[["week", "주간"], ["month", "월별 " + (!isPro ? "🔒" : "")], ["year", "연별 " + (!isPro ? "🔒" : "")]].map(([v, l]) => {
+            const locked = v !== "week" && !isPro;
             return (
-              <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-                {w.dist > 0 && <div style={{ fontSize: 10, color: isThis ? "#00ff88" : "#444" }}>{w.dist.toFixed(1)}</div>}
-                <div style={{ width: "100%", height: h, background: isThis ? "#00ff88" : "#1a3020", borderRadius: "4px 4px 0 0", minHeight: h > 0 ? 4 : 0, transition: "height 0.3s" }} />
-                <div style={{ fontSize: 10, color: isThis ? "#00ff88" : "#2a2a2a", textAlign: "center" }}>{w.label}</div>
+              <button key={v} onClick={() => !locked && setChartView(v)}
+                style={{ flex: 1, padding: "8px", borderRadius: 10, border: "none", background: chartView === v ? "#00ff88" : "#111", color: chartView === v ? "#000" : locked ? "#2a2a2a" : "#555", fontFamily: "inherit", fontSize: 13, fontWeight: 700 }}>
+                {l}
+              </button>
+            );
+          })}
+        </div>
+        <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 100 }}>
+          {chartData.map((w, i) => {
+            const isLast = i === chartData.length - 1;
+            const h = maxDist > 0 ? Math.max((w.dist / maxDist) * 88, w.dist > 0 ? 5 : 0) : 0;
+            return (
+              <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                {w.dist > 0 && <div style={{ fontSize: 9, color: isLast ? "#00ff88" : "#444" }}>{w.dist.toFixed(1)}</div>}
+                <div style={{ width: "100%", height: h, background: isLast ? "#00ff88" : "#1a3020", borderRadius: "3px 3px 0 0", minHeight: h > 0 ? 4 : 0 }} />
+                <div style={{ fontSize: 9, color: isLast ? "#00ff88" : "#2a2a2a", textAlign: "center", wordBreak: "keep-all" }}>{w.label}</div>
               </div>
             );
           })}
         </div>
       </div>
 
-      {/* 최근 기록 */}
       {myPosts.length === 0 && (
-        <div style={{ textAlign: "center", padding: "40px 0", color: "#2a2a2a" }}>
+        <div style={{ textAlign: "center", padding: "30px 0", color: "#2a2a2a" }}>
           <div style={{ fontSize: 42, marginBottom: 10 }}>📊</div>
           <div style={{ fontSize: 15 }}>러닝 기록을 추가하면 통계가 보여요!</div>
+        </div>
+      )}
+
+      {/* 목표 설정 모달 */}
+      {showGoalEdit && (
+        <div onClick={() => setShowGoalEdit(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 32px" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 320, background: "#111", borderRadius: 20, padding: "24px 20px", border: "1px solid #222" }}>
+            <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 16 }}>🎯 주간 목표 설정</div>
+            <div style={{ fontSize: 13, color: "#444", marginBottom: 8 }}>목표 거리 (km/주)</div>
+            <input type="number" value={goalInput} onChange={e => setGoalInput(e.target.value)}
+              placeholder="예: 20" min="1" max="300"
+              style={{ width: "100%", background: "#0a0a0a", border: "1px solid #222", borderRadius: 10, padding: "12px 14px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 16, outline: "none", boxSizing: "border-box", marginBottom: 16 }} />
+            <div style={{ display: "flex", gap: 10 }}>
+              <button onClick={() => setShowGoalEdit(false)} style={{ flex: 1, padding: "13px", borderRadius: 12, border: "1px solid #222", background: "transparent", color: "#555", fontFamily: "inherit", fontSize: 15, fontWeight: 700 }}>취소</button>
+              <button onClick={async () => { await onUpdateProfile({ weeklyGoal: parseFloat(goalInput) || 0 }); setShowGoalEdit(false); }}
+                style={{ flex: 1, padding: "13px", borderRadius: 12, border: "none", background: "#00ff88", color: "#000", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>저장</button>
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -1341,7 +1439,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
           </>
         )}
 
-        {tab === "rank" && !loading && <LeaderboardTab posts={posts} currentUser={currentUser} />}
+        {tab === "rank" && !loading && <LeaderboardTab posts={posts} currentUser={currentUser} isPro={isPro} />}
 
         {tab === "chat" && (
           <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, paddingBottom: `calc(58px + ${safeBottom})` }}>
@@ -1350,7 +1448,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
         )}
 
         {tab === "stats" && !loading && (
-          <StatsTab posts={posts} currentUser={currentUser} />
+          <StatsTab posts={posts} currentUser={currentUser} isPro={isPro} onUpdateProfile={onUpdateProfile} />
         )}
       </div>
 
