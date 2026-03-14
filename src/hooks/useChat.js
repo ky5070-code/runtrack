@@ -1,7 +1,7 @@
 // src/hooks/useChat.js
 import { useState, useEffect } from "react";
 import {
-  collection, addDoc, doc, query, where,
+  collection, addDoc, doc, getDoc, updateDoc, query, where,
   orderBy, limit, onSnapshot, serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
@@ -70,7 +70,7 @@ export function useChat(setId) {
 
   const joinSchedule = async (msgId, currentUser, leave = false) => {
     const ref = doc(db, "chats", msgId);
-    const snap = await import("firebase/firestore").then(m => m.getDoc(ref));
+    const snap = await getDoc(ref);
     const data = snap.data();
     const participants = data.schedule?.participants || [];
     let updated;
@@ -80,12 +80,12 @@ export function useChat(setId) {
       if (participants.find(p => p.uid === currentUser.uid)) return;
       updated = [...participants, { uid: currentUser.uid, name: currentUser.name, avatar: currentUser.avatar || "🏃" }];
     }
-    await import("firebase/firestore").then(m => m.updateDoc(ref, { "schedule.participants": updated }));
+    await updateDoc(ref, { "schedule.participants": updated });
   };
 
   const closeSchedule = async (msgId) => {
     const ref = doc(db, "chats", msgId);
-    await import("firebase/firestore").then(m => m.updateDoc(ref, { "schedule.closed": true }));
+    await updateDoc(ref, { "schedule.closed": true });
   };
 
   return { messages, loading, sendMessage, sendSchedule, joinSchedule, closeSchedule };
