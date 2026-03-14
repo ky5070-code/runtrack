@@ -5,15 +5,16 @@ import {
   query, where, orderBy, limit, onSnapshot,
   serverTimestamp, getDoc, arrayUnion,
 } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import { db, storage } from "../lib/firebase";
+import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 
-// 이미지를 base64로 변환 + 리사이즈 (Firestore 저장용)
-const resizeAndEncode = (file) => new Promise((resolve, reject) => {
+// 이미지 리사이즈 후 Blob 반환 (Firebase Storage 업로드용)
+const resizeToBlob = (file) => new Promise((resolve, reject) => {
   const img = new Image();
   const url = URL.createObjectURL(file);
   img.onload = () => {
-    const MAX_W = 1200; // 가로 최대
-    const MAX_H = 2400; // 세로 긴 스크린샷 허용
+    const MAX_W = 1200;
+    const MAX_H = 2400;
     let w = img.width, h = img.height;
     const ratio = w / h;
     if (w > MAX_W) { w = MAX_W; h = Math.round(w / ratio); }
@@ -22,13 +23,33 @@ const resizeAndEncode = (file) => new Promise((resolve, reject) => {
     canvas.width = w; canvas.height = h;
     canvas.getContext("2d").drawImage(img, 0, 0, w, h);
     URL.revokeObjectURL(url);
-    // 파일 크기 줄이되 품질 유지 (AI 인식용)
+    canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("Blob 변환 실패")), "image/jpeg", 0.85);
+  };
+  img.onerror = reject;
+  img.src = url;
+});
+
+// AI 분석용 base64 추출 (Storage 업로드와 별개)
+const resizeToBase64 = (file) => new Promise((resolve, reject) => {
+  const img = new Image();
+  const url = URL.createObjectURL(file);
+  img.onload = () => {
+    const MAX_W = 1200; const MAX_H = 2400;
+    let w = img.width, h = img.height;
+    const ratio = w / h;
+    if (w > MAX_W) { w = MAX_W; h = Math.round(w / ratio); }
+    if (h > MAX_H) { h = MAX_H; w = Math.round(h * ratio); }
+    const canvas = document.createElement("canvas");
+    canvas.width = w; canvas.height = h;
+    canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+    URL.revokeObjectURL(url);
     resolve(canvas.toDataURL("image/jpeg", 0.85));
   };
   img.onerror = reject;
   img.src = url;
 });
 
+export { resizeToBase64 };
 export function usePosts(currentUser, setId) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -64,7 +85,7 @@ export function usePosts(currentUser, setId) {
     return unsub;
   }, [setId]);
 
-  // 게시글 생성 - 이미지는 base64로 Firestore에 저장
+  // 게시글 생성 - 이미지는 Firebase Storage에 업로드
   const createPost = async ({ dist, duration, pace, calories, date, caption, imageFile, source, appName, aiFeedback }) => {
     if (!setId) return;
     if (!currentUser) return;
@@ -72,9 +93,13 @@ export function usePosts(currentUser, setId) {
     let imageUrl = null;
     if (imageFile) {
       try {
-        imageUrl = await resizeAndEncode(imageFile);
+        const blob = await resizeToBlob(imageFile);
+        const filename = `posts/${currentUser.uid}/${Date.now()}.jpg`;
+        const storageRef = ref(storage, filename);
+        await uploadBytes(storageRef, blob, { contentType: "image/jpeg" });
+        imageUrl = await getDownloadURL(storageRef);
       } catch (e) {
-        console.warn("이미지 변환 실패, 이미지 없이 저장:", e);
+        console.warn("이미지 업로드 실패, 이미지 없이 저장:", e);
       }
     }
 
@@ -138,13 +163,18 @@ export function usePosts(currentUser, setId) {
     });
   };
 
-  // 게시글 삭제 (본인 또는 세트 관리자)
+  // 게시글 삭제 (본인 또는 세트 관리자) - Storage 이미지도 함께 삭제
   const deletePost = async (postId, isAdmin = false) => {
     if (!currentUser) return;
     const postRef = doc(db, "posts", postId);
     const snap = await getDoc(postRef);
     if (!snap.exists()) return;
     if (!isAdmin && snap.data().userId !== currentUser.uid) return;
+    // Storage 이미지 삭제 (URL이 firebasestorage 도메인인 경우만)
+    const imageUrl = snap.data().imageUrl;
+    if (imageUrl && imageUrl.includes("firebasestorage")) {
+      try { await deleteObject(ref(storage, imageUrl)); } catch(e) {}
+    }
     await deleteDoc(postRef);
   };
 

@@ -1,6 +1,6 @@
 // src/components/CommunityApp.js
 import React, { useState, useRef, useEffect } from "react";
-import { usePosts } from "../hooks/usePosts";
+import { usePosts, resizeToBase64 } from "../hooks/usePosts";
 import { useNotifications } from "../hooks/useNotifications";
 import { useSets } from "../hooks/useSets";
 import { useChat } from "../hooks/useChat";
@@ -224,6 +224,7 @@ function UploadModal({ onClose, onPost, currentUser, isPro }) {
     setPreviewUrl(URL.createObjectURL(f));
     setStep("analyzing");
     const reader = new FileReader();
+    // Storage 업로드용이 아닌 AI 분석용 base64 별도 추출
     reader.onload = async (e) => {
       const b64 = e.target.result.split(",")[1];
       try {
