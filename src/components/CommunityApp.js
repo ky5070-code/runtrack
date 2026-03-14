@@ -558,12 +558,12 @@ function NotificationModal({ notifications, onClose, onMarkAllRead }) {
 
 /* ══ CHAT TAB ══ */
 function ChatTab({ setId, currentUser }) {
-  const { messages, sendMessage } = useChat(setId);
+  const { messages, sendMessage, sendSchedule, joinSchedule, closeSchedule } = useChat(setId);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
-
   const containerRef = useRef(null);
   const [chatHeight, setChatHeight] = useState(null);
 
@@ -614,6 +614,11 @@ function ChatTab({ setId, currentUser }) {
     inputRef.current?.focus();
   };
 
+  const handleCreateSchedule = async (schedule) => {
+    await sendSchedule(schedule, currentUser);
+    setShowScheduleModal(false);
+  };
+
   // 날짜 구분선 표시용
   const getDateLabel = (val) => {
     const ts = val?.toDate ? val.toDate() : new Date(val || 0);
@@ -646,6 +651,81 @@ function ChatTab({ setId, currentUser }) {
           const curTs = msg.createdAt?.toDate ? msg.createdAt.toDate() : new Date(msg.createdAt || 0);
           const showDate = i === 0 || (prevTs && prevTs.toDateString() !== curTs.toDateString());
 
+          // 일정 카드 렌더링
+          if (msg.type === "schedule") {
+            const sc = msg.schedule || {};
+            const participants = sc.participants || [];
+            const isJoined = participants.find(p => p.uid === currentUser?.uid);
+            const isFull = sc.maxMembers > 0 && participants.length >= sc.maxMembers;
+            const isOwner = msg.userId === currentUser?.uid;
+            const isExpired = sc.date && new Date(sc.date + "T" + (sc.time || "23:59")) < new Date();
+            return (
+              <div key={msg.id}>
+                {showDate && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "14px 0 10px" }}>
+                    <div style={{ flex: 1, height: 1, background: "#161616" }} />
+                    <div style={{ fontSize: 11, color: "#333", fontWeight: 600, padding: "2px 10px", background: "#0d0d0d", borderRadius: 10, border: "1px solid #1a1a1a" }}>{getDateLabel(msg.createdAt)}</div>
+                    <div style={{ flex: 1, height: 1, background: "#161616" }} />
+                  </div>
+                )}
+                <div style={{ margin: "8px 0", padding: "0 4px" }}>
+                  <div style={{ background: "#0d0d0d", border: "1px solid #1a3028", borderRadius: 16, overflow: "hidden" }}>
+                    {/* 카드 헤더 */}
+                    <div style={{ background: "linear-gradient(135deg,#0a1f14,#061209)", padding: "12px 14px 10px", borderBottom: "1px solid #1a2a1a" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                        <span style={{ fontSize: 18 }}>🏃</span>
+                        <span style={{ fontSize: 15, fontWeight: 800, color: "#e0e0e0" }}>{sc.title || "같이 러닝"}</span>
+                        {(sc.closed || isExpired) && <span style={{ marginLeft: "auto", fontSize: 11, background: "#1a1a1a", color: "#555", borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>마감</span>}
+                        {!(sc.closed || isExpired) && isFull && <span style={{ marginLeft: "auto", fontSize: 11, background: "#1a1000", color: "#ffaa00", borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>인원 마감</span>}
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#666" }}>
+                          <span>📅</span><span>{sc.date} {sc.time && sc.time}</span>
+                        </div>
+                        {sc.place && <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#666" }}>
+                          <span>📍</span><span>{sc.place}</span>
+                        </div>}
+                      </div>
+                    </div>
+                    {/* 참여자 */}
+                    <div style={{ padding: "10px 14px" }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                        <div style={{ fontSize: 12, color: "#444" }}>
+                          참여자 {participants.length}{sc.maxMembers > 0 ? `/${sc.maxMembers}명` : "명"}
+                        </div>
+                        {isOwner && !sc.closed && !isExpired && (
+                          <button onClick={() => closeSchedule(msg.id)} style={{ fontSize: 11, color: "#ff4444", background: "none", border: "1px solid #3d1010", borderRadius: 6, padding: "2px 8px", fontFamily: "inherit" }}>마감하기</button>
+                        )}
+                      </div>
+                      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
+                        {participants.map(p => (
+                          <div key={p.uid} style={{ display: "flex", alignItems: "center", gap: 4, background: "#111", borderRadius: 20, padding: "3px 8px 3px 4px", border: "1px solid #1e1e1e" }}>
+                            <span style={{ fontSize: 14 }}>{p.avatar}</span>
+                            <span style={{ fontSize: 12, color: "#888" }}>{p.name}</span>
+                          </div>
+                        ))}
+                        {participants.length === 0 && <span style={{ fontSize: 12, color: "#333" }}>아직 참여자가 없어요</span>}
+                      </div>
+                      {!(sc.closed || isExpired) && (
+                        <button
+                          onClick={() => joinSchedule(msg.id, currentUser, !!isJoined)}
+                          disabled={!isJoined && isFull}
+                          style={{ width: "100%", padding: "10px", borderRadius: 10, border: "none", fontFamily: "inherit", fontSize: 14, fontWeight: 700,
+                            background: isJoined ? "#111" : "#00ff88",
+                            color: isJoined ? "#555" : "#000",
+                            border: isJoined ? "1px solid #222" : "none",
+                          }}>
+                          {isJoined ? "참여 취소" : isFull ? "인원 마감" : "참여하기"}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 10, color: "#2e2e2e", marginTop: 4, paddingLeft: 4 }}>{msg.userName} · {relTime(msg.createdAt)}</div>
+                </div>
+              </div>
+            );
+          }
+
           return (
             <div key={msg.id}>
               {/* 날짜 구분선 */}
@@ -658,36 +738,24 @@ function ChatTab({ setId, currentUser }) {
               )}
 
               <div style={{ display: "flex", flexDirection: isMe ? "row-reverse" : "row", alignItems: "flex-end", gap: 6, marginBottom: isLastInGroup ? 8 : 2 }}>
-                {/* 상대방 아바타 - 그룹 마지막 메시지에만 */}
                 {!isMe && (
-                  <div style={{ width: 28, height: 28, borderRadius: 14, background: isLastInGroup ? "#111" : "transparent", border: isLastInGroup ? "1px solid #1e1e1e" : "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0, marginBottom: 0 }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 14, background: isLastInGroup ? "#111" : "transparent", border: isLastInGroup ? "1px solid #1e1e1e" : "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>
                     {isLastInGroup ? msg.userAvatar : ""}
                   </div>
                 )}
-
                 <div style={{ maxWidth: "75%", display: "flex", flexDirection: "column", alignItems: isMe ? "flex-end" : "flex-start", gap: 1 }}>
-                  {/* 이름 - 그룹 첫 메시지에만 */}
                   {!isMe && isNewSender && (
                     <div style={{ fontSize: 11, fontWeight: 700, color: "#555", marginBottom: 3, paddingLeft: 4 }}>{msg.userName}</div>
                   )}
-
-                  {/* 말풍선 */}
                   <div style={{
                     background: isMe ? "#00ff88" : "#141414",
                     color: isMe ? "#000" : "#ddd",
-                    borderRadius: isMe
-                      ? (isNewSender ? "18px 4px 18px 18px" : "18px 18px 18px 18px")
-                      : (isNewSender ? "4px 18px 18px 18px" : "18px 18px 18px 18px"),
-                    padding: "9px 13px",
-                    fontSize: 14,
-                    lineHeight: 1.5,
-                    wordBreak: "break-word",
+                    borderRadius: isMe ? (isNewSender ? "18px 4px 18px 18px" : "18px 18px 18px 18px") : (isNewSender ? "4px 18px 18px 18px" : "18px 18px 18px 18px"),
+                    padding: "9px 13px", fontSize: 14, lineHeight: 1.5, wordBreak: "break-word",
                     border: isMe ? "none" : "1px solid #1e1e1e",
                   }}>
                     {msg.text}
                   </div>
-
-                  {/* 시간 - 그룹 마지막에만 */}
                   {isLastInGroup && (
                     <div style={{ fontSize: 10, color: "#2e2e2e", marginTop: 2, paddingLeft: isMe ? 0 : 2, paddingRight: isMe ? 2 : 0 }}>{relTime(msg.createdAt)}</div>
                   )}
@@ -701,6 +769,10 @@ function ChatTab({ setId, currentUser }) {
 
       {/* 입력창 */}
       <div style={{ display: "flex", gap: 8, alignItems: "center", padding: "10px 12px", borderTop: "1px solid #111", background: "#060606", flexShrink: 0 }}>
+        <button onClick={() => setShowScheduleModal(true)}
+          style={{ width: 42, height: 42, borderRadius: 21, background: "#0d0d0d", border: "1px solid #1a3028", color: "#00cc66", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
+          📅
+        </button>
         <input
           ref={inputRef}
           value={text}
@@ -718,6 +790,75 @@ function ChatTab({ setId, currentUser }) {
             <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
           </svg>
         </button>
+      </div>
+
+      {/* 일정 생성 모달 */}
+      {showScheduleModal && <ScheduleCreateModal onClose={() => setShowScheduleModal(false)} onCreate={handleCreateSchedule} />}
+    </div>
+  );
+}
+
+/* ══ SCHEDULE CREATE MODAL ══ */
+function ScheduleCreateModal({ onClose, onCreate }) {
+  const today = new Date().toISOString().slice(0, 10);
+  const [title, setTitle] = useState("");
+  const [date, setDate] = useState(today);
+  const [time, setTime] = useState("07:00");
+  const [place, setPlace] = useState("");
+  const [maxMembers, setMaxMembers] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleCreate = async () => {
+    if (!title.trim() || !date) return;
+    setLoading(true);
+    await onCreate({ title: title.trim(), date, time, place: place.trim(), maxMembers: parseInt(maxMembers) || 0 });
+    setLoading(false);
+  };
+
+  const labelStyle = { fontSize: 12, color: "#444", letterSpacing: 1, marginBottom: 6 };
+  const inputStyle = { width: "100%", background: "#0a0a0a", border: "1px solid #1e1e1e", borderRadius: 10, padding: "11px 14px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box" };
+
+  return (
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", zIndex: 300, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+      <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, background: "#0d0d0d", borderRadius: "22px 22px 0 0", border: "1px solid #1a1a1a", padding: "20px 20px", paddingBottom: `calc(24px + ${safeBottom})` }}>
+        <div style={{ width: 40, height: 4, background: "#222", borderRadius: 2, margin: "0 auto 18px" }} />
+        <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
+          <span>🏃</span> 같이 러닝 일정 만들기
+        </div>
+
+        <div style={{ marginBottom: 14 }}>
+          <div style={labelStyle}>일정 제목</div>
+          <input value={title} onChange={e => setTitle(e.target.value)} placeholder="예) 한강 야간 러닝" style={inputStyle} />
+        </div>
+
+        <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+          <div style={{ flex: 1 }}>
+            <div style={labelStyle}>날짜</div>
+            <input type="date" value={date} onChange={e => setDate(e.target.value)} style={inputStyle} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={labelStyle}>시간</div>
+            <input type="time" value={time} onChange={e => setTime(e.target.value)} style={inputStyle} />
+          </div>
+        </div>
+
+        <div style={{ marginBottom: 14 }}>
+          <div style={labelStyle}>장소</div>
+          <input value={place} onChange={e => setPlace(e.target.value)} placeholder="예) 잠실 한강공원 주차장" style={inputStyle} />
+        </div>
+
+        <div style={{ marginBottom: 22 }}>
+          <div style={labelStyle}>최대 인원 (0 = 제한 없음)</div>
+          <input type="number" value={maxMembers} onChange={e => setMaxMembers(e.target.value)} placeholder="0" min="0" max="99" style={inputStyle} />
+        </div>
+
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={onClose} style={{ flex: 1, padding: "14px", borderRadius: 12, border: "1px solid #222", background: "transparent", color: "#555", fontFamily: "inherit", fontSize: 15, fontWeight: 700 }}>취소</button>
+          <button onClick={handleCreate} disabled={!title.trim() || !date || loading}
+            style={{ flex: 2, padding: "14px", borderRadius: 12, border: "none", background: title.trim() && date ? "#00ff88" : "#111", color: title.trim() && date ? "#000" : "#333", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>
+            {loading ? "생성 중..." : "일정 만들기"}
+          </button>
+        </div>
       </div>
     </div>
   );

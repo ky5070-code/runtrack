@@ -1,7 +1,7 @@
 // src/hooks/useChat.js
 import { useState, useEffect } from "react";
 import {
-  collection, addDoc, query, where,
+  collection, addDoc, doc, query, where,
   orderBy, limit, onSnapshot, serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
@@ -39,7 +39,7 @@ export function useChat(setId) {
   const sendMessage = async (text, currentUser) => {
     if (!setId || !text.trim() || !currentUser) return;
     await addDoc(collection(db, "chats"), {
-      setId,
+      setId, type: "text",
       text: text.trim(),
       userId: currentUser.uid,
       userName: currentUser.name,
@@ -48,5 +48,45 @@ export function useChat(setId) {
     });
   };
 
-  return { messages, loading, sendMessage };
+  const sendSchedule = async (schedule, currentUser) => {
+    if (!setId || !currentUser) return;
+    await addDoc(collection(db, "chats"), {
+      setId, type: "schedule",
+      userId: currentUser.uid,
+      userName: currentUser.name,
+      userAvatar: currentUser.avatar || "🏃",
+      schedule: {
+        title: schedule.title,
+        date: schedule.date,
+        time: schedule.time,
+        place: schedule.place,
+        maxMembers: schedule.maxMembers || 0,
+        participants: [{ uid: currentUser.uid, name: currentUser.name, avatar: currentUser.avatar || "🏃" }],
+        closed: false,
+      },
+      createdAt: serverTimestamp(),
+    });
+  };
+
+  const joinSchedule = async (msgId, currentUser, leave = false) => {
+    const ref = doc(db, "chats", msgId);
+    const snap = await import("firebase/firestore").then(m => m.getDoc(ref));
+    const data = snap.data();
+    const participants = data.schedule?.participants || [];
+    let updated;
+    if (leave) {
+      updated = participants.filter(p => p.uid !== currentUser.uid);
+    } else {
+      if (participants.find(p => p.uid === currentUser.uid)) return;
+      updated = [...participants, { uid: currentUser.uid, name: currentUser.name, avatar: currentUser.avatar || "🏃" }];
+    }
+    await import("firebase/firestore").then(m => m.updateDoc(ref, { "schedule.participants": updated }));
+  };
+
+  const closeSchedule = async (msgId) => {
+    const ref = doc(db, "chats", msgId);
+    await import("firebase/firestore").then(m => m.updateDoc(ref, { "schedule.closed": true }));
+  };
+
+  return { messages, loading, sendMessage, sendSchedule, joinSchedule, closeSchedule };
 }
