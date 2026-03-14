@@ -21,9 +21,17 @@ export async function analyzeRunImage(base64Data, mediaType) {
           { type: "image", source: { type: "base64", media_type: mediaType, data: base64Data } },
           {
             type: "text",
-            text: `This is a running app screenshot. Extract stats and return ONLY valid JSON (no markdown):
-{"distance":<km number>,"duration":<seconds number>,"pace":<"M'SS\\"" string>,"calories":<number>,"date":<"YYYY-MM-DD" or null>,"appName":<string or null>,"confidence":<"high"|"medium"|"low">,"error":<null or "not_running">}
-Convert all distances to km and durations to seconds. If not a running image: {"error":"not_running"}`,
+            text: `Analyze this running workout screenshot (Garmin, Nike Run Club, Apple Watch, Strava, etc).
+
+Return ONLY a raw JSON object, no markdown, no explanation:
+{"distance":<km decimal>,"duration":<total seconds int>,"pace":<"M'SS\\"">,"calories":<total kcal int>,"date":<"YYYY-MM-DD" or null>,"appName":<app name or null>,"confidence":<"high"|"medium"|"low">,"error":<null or "not_running">}
+
+RULES:
+- distance: "러닝 거리" / "Distance" / km value. Miles → km (×1.609)
+- duration: "총 시간" / "Elapsed Time" / "Duration". HH:MM:SS or MM:SS → seconds
+- pace: "평균 페이스" / "Avg Pace" → format M'SS" e.g. 7'25"
+- calories: "총 칼로리" / "Total Calories" — prefer total over active
+- If not a running record: {"error":"not_running"}`,
           },
         ],
       }],
