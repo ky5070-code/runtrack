@@ -112,8 +112,8 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
 
         {/* 이미지 - 이름 아래 */}
         {post.imageUrl && (
-          <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 12, lineHeight: 0 }}>
-            <img src={post.imageUrl} alt="" style={{ width: "100%", display: "block", objectFit: "cover", maxHeight: 220 }} />
+          <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 12, lineHeight: 0, height: 220 }}>
+            <img src={post.imageUrl} alt="" style={{ width: "100%", height: "100%", display: "block", objectFit: "cover" }} />
           </div>
         )}
 
@@ -1290,12 +1290,14 @@ function MonthlyAIReport({ myPosts }) {
         })
       });
       const data = await res.json();
-      setReport(data.content?.[0]?.text || "리포트 생성 실패");
+      const text = data.content?.[0]?.text || "리포트 생성 실패";
+      setReport(text);
+      setGenerated(true);
     } catch(e) {
       setReport("리포트 생성 중 오류가 발생했어요.");
+      setGenerated(true);
     }
     setLoading(false);
-    setGenerated(true);
   };
 
   return (
