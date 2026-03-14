@@ -81,7 +81,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
   };
 
   return (
-    <div style={{ background: isMyPost ? "#0a0f0a" : "#0b0b0b", border: isMyPost ? "1.5px solid #00cc55" : "1px solid #181818", borderRadius: 18, overflow: "hidden", marginBottom: 12, boxShadow: isMyPost ? "0 2px 20px rgba(0,255,136,0.08)" : "none" }}>
+    <div style={{ background: isMyPost ? "#0a0f0a" : "#0b0b0b", border: isMyPost ? "1.5px solid #00cc55" : "1px solid #181818", borderRadius: 18, overflow: "hidden", marginBottom: 12, boxShadow: isMyPost ? "0 2px 20px rgba(0,255,136,0.08)" : "none", isolation: "isolate" }}>
 
       {/* 상단 컬러 바 */}
       <div style={{ height: 3, background: isMyPost ? "#00ff88" : post.source === "ai" ? "linear-gradient(90deg,#00ff88,#009944)" : "#1e1e1e" }} />
@@ -113,7 +113,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
         {/* 이미지 - 이름 아래 */}
         {post.imageUrl && (
           <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 12, lineHeight: 0 }}>
-            <img src={post.imageUrl} alt="" style={{ width: "100%", display: "block", maxHeight: 240, objectFit: "cover" }} />
+            <img src={post.imageUrl} alt="" style={{ width: "100%", display: "block", objectFit: "cover", maxHeight: 220 }} />
           </div>
         )}
 
@@ -1026,7 +1026,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
 
 
       {/* 헤더 */}
-      <div style={{ padding: `calc(14px + ${safeTop}) 18px 10px`, display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 50, background: "#060606", backdropFilter: "blur(20px)" }}>
+      <div style={{ padding: "14px 18px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 50, background: "#060606", backdropFilter: "blur(20px)" }}>
         <div>
           <div style={{ fontSize: 10, color: "#1e1e1e", letterSpacing: 4 }}>RUNTRACK</div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
