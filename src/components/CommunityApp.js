@@ -1722,7 +1722,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
 
 
       {/* 컨텐츠 */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: tab === "chat" ? "0" : "14px 18px", paddingBottom: tab === "chat" ? "0" : `calc(80px + ${safeBottom})`, minHeight: 0, overflow: tab === "chat" ? "hidden" : "visible" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: tab === "chat" ? "0" : "14px 18px", paddingBottom: tab === "chat" ? "0" : `calc(80px + ${safeBottom})`, minHeight: 0, overflowY: tab === "chat" ? "hidden" : "auto", WebkitOverflowScrolling: "touch" }}>
         {loading && (
           <div style={{ display: "flex", justifyContent: "center", paddingTop: 60 }}>
             <div style={{ width: 34, height: 34, border: "2px solid #00ff88", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
