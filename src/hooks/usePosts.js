@@ -12,17 +12,18 @@ const resizeAndEncode = (file) => new Promise((resolve, reject) => {
   const img = new Image();
   const url = URL.createObjectURL(file);
   img.onload = () => {
-    const MAX = 800;
+    const MAX_W = 1200; // 가로 최대
+    const MAX_H = 2400; // 세로 긴 스크린샷 허용
     let w = img.width, h = img.height;
-    if (w > MAX || h > MAX) {
-      if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
-      else { w = Math.round(w * MAX / h); h = MAX; }
-    }
+    const ratio = w / h;
+    if (w > MAX_W) { w = MAX_W; h = Math.round(w / ratio); }
+    if (h > MAX_H) { h = MAX_H; w = Math.round(h * ratio); }
     const canvas = document.createElement("canvas");
     canvas.width = w; canvas.height = h;
     canvas.getContext("2d").drawImage(img, 0, 0, w, h);
     URL.revokeObjectURL(url);
-    resolve(canvas.toDataURL("image/jpeg", 0.7));
+    // 파일 크기 줄이되 품질 유지 (AI 인식용)
+    resolve(canvas.toDataURL("image/jpeg", 0.85));
   };
   img.onerror = reject;
   img.src = url;
