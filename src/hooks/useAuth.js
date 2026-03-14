@@ -82,24 +82,26 @@ export function useAuth() {
   };
 
   const redeemCoupon = async (code) => {
-    console.log("[쿠폰] 시작, user:", user?.uid, "code:", code);
     if (!user) throw new Error("로그인이 필요해요.");
     const code_upper = code.trim().toUpperCase();
-    console.log("[쿠폰] 조회 코드:", code_upper);
     try {
       const q = query(collection(db, "coupons"), where("code", "==", code_upper));
       const snap = await getDocs(q);
-      console.log("[쿠폰] 결과 수:", snap.size, "empty:", snap.empty);
       if (snap.empty) throw new Error("유효하지 않은 코드예요.");
       const couponDoc = snap.docs[0];
-      console.log("[쿠폰] 데이터:", couponDoc.data());
-      if (couponDoc.data().used === true) throw new Error("이미 사용된 코드예요.");
-      await updateDoc(couponDoc.ref, { used: true, usedBy: user.uid, usedAt: serverTimestamp() });
-      console.log("[쿠폰] updateDoc 완료");
+      const data = couponDoc.data();
+      const usedCount = data.usedCount || 0;
+      const maxUses = data.maxUses ?? 1;
+      const usedBy = data.usedBy || [];
+      if (usedBy.includes(user.uid)) throw new Error("이미 사용한 코드예요.");
+      if (usedCount >= maxUses) throw new Error("사용 횟수가 초과된 코드예요.");
+      await updateDoc(couponDoc.ref, {
+        usedCount: usedCount + 1,
+        usedBy: [...usedBy, user.uid],
+        lastUsedAt: serverTimestamp(),
+      });
       await updateUserProfile({ isPro: true, proActivatedAt: new Date().toISOString() });
-      console.log("[쿠폰] PRO 업그레이드 완료");
     } catch(e) {
-      console.error("[쿠폰] 오류:", e.code, e.message);
       throw e;
     }
   };
