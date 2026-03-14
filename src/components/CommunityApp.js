@@ -492,7 +492,7 @@ function calcStreak(posts, userId) {
 }
 
 /* ══ NOTIFICATION MODAL ══ */
-function NotificationModal({ notifications, onClose, onMarkAllRead }) {
+function NotificationModal({ notifications, onClose, onMarkAllRead, schedules = [] }) {
   const relTime = (val) => {
     const ts = val?.toDate ? val.toDate() : new Date(val || 0);
     const d = Date.now() - ts.getTime();
@@ -502,6 +502,25 @@ function NotificationModal({ notifications, onClose, onMarkAllRead }) {
     if (d < 86400000) return `${Math.floor(d / 3600000)}시간 전`;
     return `${Math.floor(d / 86400000)}일 전`;
   };
+
+  const getDday = (dateStr, timeStr) => {
+    const target = new Date(dateStr + "T" + (timeStr || "00:00"));
+    const today = new Date(); today.setHours(0,0,0,0);
+    const diff = Math.ceil((target - today) / 86400000);
+    if (diff < 0) return null; // 지난 일정 제외
+    if (diff === 0) return "D-Day";
+    return `D-${diff}`;
+  };
+
+  // 아직 안 지난 일정만, 날짜순 정렬
+  const upcomingSchedules = schedules
+    .filter(s => {
+      const sc = s.schedule || {};
+      if (!sc.date) return false;
+      const target = new Date(sc.date + "T" + (sc.time || "23:59"));
+      return target >= new Date() && !sc.closed;
+    })
+    .sort((a, b) => new Date(a.schedule.date + "T" + (a.schedule.time || "00:00")) - new Date(b.schedule.date + "T" + (b.schedule.time || "00:00")));
 
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.92)", zIndex: 200, display: "flex", alignItems: "flex-end" }}>
@@ -517,7 +536,36 @@ function NotificationModal({ notifications, onClose, onMarkAllRead }) {
           </div>
         </div>
 
-        {notifications.length === 0 && (
+        {/* D-day 일정 섹션 */}
+        {upcomingSchedules.length > 0 && (
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 12, color: "#333", letterSpacing: 2, marginBottom: 10 }}>📅 예정된 러닝</div>
+            {upcomingSchedules.map(s => {
+              const sc = s.schedule;
+              const dday = getDday(sc.date, sc.time);
+              const ddayColor = dday === "D-Day" ? "#ff6b6b" : dday === "D-1" ? "#ffaa00" : "#00ff88";
+              return (
+                <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: "#080f08", border: "1px solid #1a3028", borderRadius: 14, marginBottom: 8 }}>
+                  <div style={{ width: 46, height: 46, borderRadius: 12, background: "#0a1a0a", border: `1.5px solid ${ddayColor}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <div style={{ fontSize: 11, fontWeight: 900, color: ddayColor, letterSpacing: -0.5 }}>{dday}</div>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "#e0e0e0", marginBottom: 3 }}>{sc.title}</div>
+                    <div style={{ fontSize: 12, color: "#555", display: "flex", gap: 8 }}>
+                      <span>{sc.date} {sc.time}</span>
+                      {sc.place && <span>· {sc.place}</span>}
+                    </div>
+                    <div style={{ fontSize: 12, color: "#2e2e2e", marginTop: 2 }}>
+                      참여 {(sc.participants || []).length}{sc.maxMembers > 0 ? `/${sc.maxMembers}명` : "명"}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {notifications.length === 0 && upcomingSchedules.length === 0 && (
           <div style={{ textAlign: "center", padding: "40px 0", color: "#2a2a2a" }}>
             <div style={{ fontSize: 42, marginBottom: 10 }}>🔔</div>
             <div style={{ fontSize: 15 }}>아직 알림이 없어요</div>
@@ -1320,7 +1368,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
 
       {/* 모달 */}
       {showUpload && <UploadModal onClose={() => setShowUpload(false)} onPost={createPost} currentUser={currentUser} isPro={isPro} />}
-      {showNotif && <NotificationModal notifications={notifications} onClose={() => { setShowNotif(false); markAllRead(); }} onMarkAllRead={markAllRead} />}
+      {showNotif && <NotificationModal notifications={notifications} onClose={() => { setShowNotif(false); markAllRead(); }} onMarkAllRead={markAllRead} schedules={chatMessages.filter(m => m.type === "schedule")} />}
       {showProfile && <ProfileModal
         currentUser={currentUser} posts={posts}
         currentSet={currentSet} isAdmin={isAdmin}
