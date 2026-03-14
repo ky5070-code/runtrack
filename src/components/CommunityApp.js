@@ -919,6 +919,26 @@ function ScheduleCreateModal({ onClose, onCreate }) {
   );
 }
 
+/* ══ BADGE SYSTEM ══ */
+const BADGES = [
+  { id: "first_run",   emoji: "🎉", name: "첫 발걸음",    desc: "첫 번째 러닝 기록",          check: (p,d) => p.length >= 1 },
+  { id: "run_10",      emoji: "🔟", name: "10회 러너",    desc: "10번 러닝 기록",              check: (p,d) => p.length >= 10 },
+  { id: "run_30",      emoji: "💪", name: "30회 러너",    desc: "30번 러닝 기록",              check: (p,d) => p.length >= 30 },
+  { id: "dist_10",     emoji: "🏅", name: "10km 클럽",    desc: "누적 10km 달성",             check: (p,d) => d >= 10 },
+  { id: "dist_50",     emoji: "🥈", name: "50km 클럽",    desc: "누적 50km 달성",             check: (p,d) => d >= 50 },
+  { id: "dist_100",    emoji: "🥇", name: "100km 클럽",   desc: "누적 100km 달성",            check: (p,d) => d >= 100 },
+  { id: "dist_500",    emoji: "🏆", name: "500km 레전드", desc: "누적 500km 달성",            check: (p,d) => d >= 500 },
+  { id: "streak_7",    emoji: "🔥", name: "7일 스트릭",   desc: "7일 연속 러닝",              check: (p,d,s) => s >= 7 },
+  { id: "streak_30",   emoji: "⚡", name: "30일 스트릭",  desc: "30일 연속 러닝",             check: (p,d,s) => s >= 30 },
+  { id: "single_10",   emoji: "🚀", name: "10K 완주",     desc: "한 번에 10km 이상 완주",     check: (p) => p.some(r => parseFloat(r.dist) >= 10) },
+  { id: "single_21",   emoji: "🦅", name: "하프 마라톤",  desc: "한 번에 21km 이상 완주",     check: (p) => p.some(r => parseFloat(r.dist) >= 21) },
+  { id: "early_bird",  emoji: "🌅", name: "얼리버드",     desc: "오전 6시 이전 러닝 3회",     check: (p) => p.filter(r => { const h = r.createdAt?.toDate ? r.createdAt.toDate().getHours() : new Date(r.createdAt||0).getHours(); return h < 6; }).length >= 3 },
+];
+
+function calcBadges(myPosts, totalDist, streak) {
+  return BADGES.filter(b => b.check(myPosts, totalDist, streak));
+}
+
 /* ══ STATS TAB ══ */
 function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
   const myPosts = posts.filter(p => p.userId === currentUser?.uid);
@@ -1058,6 +1078,146 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
         </div>
       </div>
 
+      {/* 🏅 배지/업적 */}
+      <div style={{ background: "#080808", border: "1px solid #161616", borderRadius: 16, padding: "16px", marginBottom: 16 }}>
+        <div style={{ fontSize: 13, color: "#444", letterSpacing: 1, marginBottom: 12 }}>🏅 업적 배지</div>
+        {(() => {
+          const streak = calcStreak(posts, currentUser?.uid);
+          const earned = calcBadges(myPosts, totalDist, streak);
+          const locked = BADGES.filter(b => !earned.find(e => e.id === b.id));
+          return (
+            <>
+              {earned.length === 0 && <div style={{ fontSize: 13, color: "#2a2a2a", textAlign: "center", padding: "8px 0" }}>아직 획득한 배지가 없어요. 달려보세요!</div>}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: locked.length > 0 ? 10 : 0 }}>
+                {earned.map(b => (
+                  <div key={b.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, background: "#0a1a0a", border: "1px solid #1a3028", borderRadius: 12, padding: "10px 12px", minWidth: 72 }}>
+                    <span style={{ fontSize: 26 }}>{b.emoji}</span>
+                    <span style={{ fontSize: 11, color: "#00ff88", fontWeight: 700, textAlign: "center" }}>{b.name}</span>
+                    <span style={{ fontSize: 10, color: "#2e2e2e", textAlign: "center" }}>{b.desc}</span>
+                  </div>
+                ))}
+              </div>
+              {locked.length > 0 && (
+                <div style={{ fontSize: 11, color: "#222", marginBottom: 6 }}>미획득 ({locked.length})</div>
+              )}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {locked.map(b => (
+                  <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 6, background: "#0a0a0a", border: "1px solid #161616", borderRadius: 10, padding: "6px 10px", opacity: 0.5 }}>
+                    <span style={{ fontSize: 16, filter: "grayscale(1)" }}>{b.emoji}</span>
+                    <span style={{ fontSize: 11, color: "#333" }}>{b.desc}</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          );
+        })()}
+      </div>
+
+      {/* 🎽 페이스존 분석 */}
+      {isPro ? (() => {
+        const paceRuns = myPosts.filter(p => p.pace && p.pace !== "--");
+        const zones = [
+          { name: "쉬움",   color: "#4fc3f7", range: [0, 6],   desc: "6'00" 이상" },
+          { name: "적당",   color: "#00ff88", range: [5, 6],   desc: "5'00"~6'00"" },
+          { name: "빠름",   color: "#ffaa00", range: [4, 5],   desc: "4'00"~5'00"" },
+          { name: "전력",   color: "#ff4444", range: [0, 4],   desc: "4'00" 미만" },
+        ];
+        const toSec = pace => { const [m,s] = pace.replace('"','').split("'").map(Number); return (m||0)*60+(s||0); };
+        const counts = zones.map(z => ({
+          ...z,
+          count: paceRuns.filter(p => {
+            const s = toSec(p.pace);
+            if (z.name === "쉬움") return s >= 360;
+            if (z.name === "적당") return s >= 300 && s < 360;
+            if (z.name === "빠름") return s >= 240 && s < 300;
+            return s < 240;
+          }).length
+        }));
+        const total = paceRuns.length || 1;
+        return (
+          <div style={{ background: "#080808", border: "1px solid #161616", borderRadius: 16, padding: "16px", marginBottom: 16 }}>
+            <div style={{ fontSize: 13, color: "#444", letterSpacing: 1, marginBottom: 12 }}>🎽 페이스 존 분석</div>
+            {paceRuns.length === 0
+              ? <div style={{ fontSize: 13, color: "#2a2a2a", textAlign: "center", padding: "8px 0" }}>페이스 데이터가 있는 기록이 필요해요</div>
+              : counts.map(z => (
+                <div key={z.name} style={{ marginBottom: 10 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                    <span style={{ fontSize: 13, color: "#888" }}>{z.name} <span style={{ fontSize: 11, color: "#444" }}>{z.desc}</span></span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: z.color }}>{z.count}회 ({Math.round(z.count/total*100)}%)</span>
+                  </div>
+                  <div style={{ background: "#111", borderRadius: 6, height: 8, overflow: "hidden" }}>
+                    <div style={{ width: `${z.count/total*100}%`, height: "100%", background: z.color, borderRadius: 6, transition: "width 0.5s" }} />
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        );
+      })() : (
+        <div style={{ background: "#080808", border: "1px solid #1a1a1a", borderRadius: 16, padding: "16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ fontSize: 24 }}>🔒</div>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#333" }}>🎽 페이스 존 분석</div>
+            <div style={{ fontSize: 12, color: "#2a2a2a", marginTop: 2 }}>PRO 회원 전용 기능이에요</div>
+          </div>
+        </div>
+      )}
+
+      {/* 👥 크루 비교 */}
+      {isPro ? (() => {
+        const crewPosts = posts;
+        const crewDist = crewPosts.reduce((a,p) => a + (parseFloat(p.dist)||0), 0);
+        const crewRuns = crewPosts.length;
+        const crewAvg = crewRuns > 0 ? crewDist / crewRuns : 0;
+        const myRuns = myPosts.length;
+        const myAvg = myRuns > 0 ? totalDist / myRuns : 0;
+        const metrics = [
+          { label: "총 거리", me: `${totalDist.toFixed(1)}km`, crew: `${(crewDist/Math.max(1, [...new Set(crewPosts.map(p=>p.userId))].length)).toFixed(1)}km`, unit: "크루 평균" },
+          { label: "러닝 횟수", me: `${myRuns}회`, crew: `${Math.round(crewRuns/Math.max(1, [...new Set(crewPosts.map(p=>p.userId))].length))}회`, unit: "크루 평균" },
+          { label: "평균 거리", me: `${myAvg.toFixed(1)}km`, crew: `${crewAvg.toFixed(1)}km`, unit: "크루 평균" },
+        ];
+        return (
+          <div style={{ background: "#080808", border: "1px solid #161616", borderRadius: 16, padding: "16px", marginBottom: 16 }}>
+            <div style={{ fontSize: 13, color: "#444", letterSpacing: 1, marginBottom: 12 }}>👥 크루 비교</div>
+            {metrics.map(m => (
+              <div key={m.label} style={{ display: "flex", alignItems: "center", marginBottom: 10 }}>
+                <div style={{ width: 70, fontSize: 12, color: "#444" }}>{m.label}</div>
+                <div style={{ flex: 1, display: "flex", gap: 6, alignItems: "center" }}>
+                  <div style={{ flex: 1, background: "#0a1a0a", border: "1px solid #1a3028", borderRadius: 8, padding: "6px 10px", textAlign: "center" }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "#00ff88" }}>{m.me}</div>
+                    <div style={{ fontSize: 10, color: "#2e2e2e" }}>나</div>
+                  </div>
+                  <div style={{ fontSize: 12, color: "#222" }}>vs</div>
+                  <div style={{ flex: 1, background: "#0a0a0a", border: "1px solid #1a1a1a", borderRadius: 8, padding: "6px 10px", textAlign: "center" }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "#555" }}>{m.crew}</div>
+                    <div style={{ fontSize: 10, color: "#2a2a2a" }}>{m.unit}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      })() : (
+        <div style={{ background: "#080808", border: "1px solid #1a1a1a", borderRadius: 16, padding: "16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ fontSize: 24 }}>🔒</div>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#333" }}>👥 크루 비교</div>
+            <div style={{ fontSize: 12, color: "#2a2a2a", marginTop: 2 }}>PRO 회원 전용 기능이에요</div>
+          </div>
+        </div>
+      )}
+
+      {/* 🤖 월간 AI 리포트 */}
+      {isPro ? <MonthlyAIReport myPosts={myPosts} /> : (
+        <div style={{ background: "#080808", border: "1px solid #1a1a1a", borderRadius: 16, padding: "16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ fontSize: 24 }}>🔒</div>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#333" }}>🤖 월간 AI 리포트</div>
+            <div style={{ fontSize: 12, color: "#2a2a2a", marginTop: 2 }}>PRO 회원 전용 기능이에요</div>
+          </div>
+        </div>
+      )}
+
       {myPosts.length === 0 && (
         <div style={{ textAlign: "center", padding: "30px 0", color: "#2a2a2a" }}>
           <div style={{ fontSize: 42, marginBottom: 10 }}>📊</div>
@@ -1080,6 +1240,86 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
                 style={{ flex: 1, padding: "13px", borderRadius: 12, border: "none", background: "#00ff88", color: "#000", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>저장</button>
             </div>
           </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ══ MONTHLY AI REPORT ══ */
+function MonthlyAIReport({ myPosts }) {
+  const [report, setReport] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [generated, setGenerated] = useState(false);
+
+  const thisMonth = new Date();
+  const monthPosts = myPosts.filter(p => {
+    const t = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt || 0);
+    return t.getFullYear() === thisMonth.getFullYear() && t.getMonth() === thisMonth.getMonth();
+  });
+
+  const generateReport = async () => {
+    if (monthPosts.length === 0) return;
+    setLoading(true);
+    const totalDist = monthPosts.reduce((a,p) => a+(parseFloat(p.dist)||0), 0);
+    const totalRuns = monthPosts.length;
+    const avgDist = totalDist / totalRuns;
+    const bestDist = Math.max(...monthPosts.map(p => parseFloat(p.dist)||0));
+    const paces = monthPosts.filter(p => p.pace && p.pace !== "--").map(p => p.pace);
+
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-api-key": process.env.REACT_APP_ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 500,
+          messages: [{ role: "user", content: `이번 달 러닝 기록을 분석해줘:
+- 총 ${totalRuns}회 러닝
+- 누적 거리: ${totalDist.toFixed(1)}km
+- 평균 거리: ${avgDist.toFixed(1)}km
+- 최장 거리: ${bestDist.toFixed(1)}km
+- 페이스 목록: ${paces.slice(0,5).join(", ") || "없음"}
+
+아래 형식으로 한국어로 간결하게 작성해줘 (각 항목 1~2줄):
+1️⃣ 이번 달 총평 (칭찬+평가)
+2️⃣ 잘한 점
+3️⃣ 개선할 점
+4️⃣ 다음 달 목표 제안` }]
+        })
+      });
+      const data = await res.json();
+      setReport(data.content?.[0]?.text || "리포트 생성 실패");
+    } catch(e) {
+      setReport("리포트 생성 중 오류가 발생했어요.");
+    }
+    setLoading(false);
+    setGenerated(true);
+  };
+
+  return (
+    <div style={{ background: "#080808", border: "1px solid #161616", borderRadius: 16, padding: "16px", marginBottom: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+        <div style={{ fontSize: 13, color: "#444", letterSpacing: 1 }}>🤖 월간 AI 리포트</div>
+        <div style={{ fontSize: 11, color: "#2a2a2a" }}>{thisMonth.getMonth()+1}월</div>
+      </div>
+      {monthPosts.length === 0 ? (
+        <div style={{ fontSize: 13, color: "#2a2a2a", textAlign: "center", padding: "8px 0" }}>이번 달 러닝 기록이 없어요</div>
+      ) : !generated ? (
+        <button onClick={generateReport} disabled={loading}
+          style={{ width: "100%", padding: "12px", borderRadius: 12, border: "none", background: loading ? "#111" : "#00ff88", color: loading ? "#555" : "#000", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>
+          {loading ? "🤖 분석 중..." : `✨ 이번 달 리포트 생성 (${monthPosts.length}회 기록)`}
+        </button>
+      ) : (
+        <div>
+          {report?.split("
+").filter(l => l.trim()).map((line, i) => (
+            <div key={i} style={{ fontSize: 14, color: "#aaa", lineHeight: 1.8, marginBottom: 4 }}>{line}</div>
+          ))}
+          <button onClick={() => { setReport(null); setGenerated(false); }}
+            style={{ marginTop: 10, fontSize: 12, color: "#444", background: "none", border: "1px solid #222", borderRadius: 8, padding: "4px 12px", fontFamily: "inherit" }}>
+            다시 생성
+          </button>
         </div>
       )}
     </div>
@@ -1300,6 +1540,33 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
   const { kickMember, transferAdmin, leaveSet, addNotice, deleteNotice, getInviteLink, deleteSet } = useSets(currentUser);
   const isAdmin = currentSet?.adminId === currentUser?.uid;
   const isPro = currentUser?.isPro === true;
+
+  // 푸시 알림 권한 요청 (PRO 유저만)
+  useEffect(() => {
+    if (!isPro) return;
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  }, [isPro]);
+
+  // 주간 목표 달성 알림
+  const prevGoalPct = useRef(0);
+  useEffect(() => {
+    if (!isPro || !currentUser?.weeklyGoal) return;
+    const goal = currentUser.weeklyGoal;
+    const thisWeekDist = posts.filter(p => {
+      if (p.userId !== currentUser?.uid) return false;
+      const ts = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt||0);
+      return Date.now() - ts.getTime() < 7 * 86400000;
+    }).reduce((a,p) => a+(parseFloat(p.dist)||0), 0);
+    const pct = (thisWeekDist / goal) * 100;
+    if (prevGoalPct.current < 100 && pct >= 100) {
+      if (Notification.permission === "granted") {
+        new Notification("🎉 주간 목표 달성!", { body: `${thisWeekDist.toFixed(1)}km 완주! 이번 주 목표를 달성했어요!`, icon: "/icon-192.png" });
+      }
+    }
+    prevGoalPct.current = pct;
+  }, [posts]);
 
   // 새 채팅 카운트 - 채팅 탭 아닐 때 새 메시지 감지
   const { messages: chatMessages } = useChat(currentSet?.id);
