@@ -1118,10 +1118,10 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
       {isPro ? (() => {
         const paceRuns = myPosts.filter(p => p.pace && p.pace !== "--");
         const zones = [
-          { name: "쉬움",   color: "#4fc3f7", range: [0, 6],   desc: "6'00" 이상" },
-          { name: "적당",   color: "#00ff88", range: [5, 6],   desc: "5'00"~6'00"" },
-          { name: "빠름",   color: "#ffaa00", range: [4, 5],   desc: "4'00"~5'00"" },
-          { name: "전력",   color: "#ff4444", range: [0, 4],   desc: "4'00" 미만" },
+          { name: "쉬움",   color: "#4fc3f7", range: [0, 6],   desc: "6분00초 이상" },
+          { name: "적당",   color: "#00ff88", range: [5, 6],   desc: "5분~6분" },
+          { name: "빠름",   color: "#ffaa00", range: [4, 5],   desc: "4분~5분" },
+          { name: "전력",   color: "#ff4444", range: [0, 4],   desc: "4분 미만" },
         ];
         const toSec = pace => { const [m,s] = pace.replace('"','').split("'").map(Number); return (m||0)*60+(s||0); };
         const counts = zones.map(z => ({
@@ -1337,9 +1337,38 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
   const [couponCode, setCouponCode] = useState("");
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponMsg, setCouponMsg] = useState(null);
+  const [payPlan, setPayPlan] = useState("yearly");
+  const [payLoading, setPayLoading] = useState(false);
   const AVATARS_LIST = ["🏃", "⚡", "🔥", "🌊", "💨", "🦅", "🐆", "🎯", "🚀", "💎", "🏅", "🌟"];
 
   const saveProfile = async () => { await onUpdateProfile({ name, bio, avatar: selectedAvatar }); setEditMode(false); };
+
+  const handlePayment = async () => {
+    setPayLoading(true);
+    const amount = payPlan === "yearly" ? 29900 : 3900;
+    const orderId = `RUNTRACK-${Date.now()}-${Math.random().toString(36).slice(2,8).toUpperCase()}`;
+    const orderName = payPlan === "yearly" ? "RUNTRACK PRO 연간" : "RUNTRACK PRO 월간";
+
+    // 토스페이먼츠 SDK 로드
+    const clientKey = process.env.REACT_APP_TOSS_CLIENT_KEY || "test_ck_placeholder";
+    try {
+      const { loadTossPayments } = await import("@tosspayments/tosspayments-sdk");
+      const toss = await loadTossPayments(clientKey);
+      await toss.requestPayment({
+        method: "CARD",
+        amount: { currency: "KRW", value: amount },
+        orderId,
+        orderName,
+        successUrl: `${window.location.origin}/payment/success`,
+        failUrl: `${window.location.origin}/payment/fail`,
+        customerEmail: currentUser?.email || "",
+        customerName: currentUser?.name || "러너",
+      });
+    } catch(e) {
+      if (e.code !== "USER_CANCEL") alert("결제 오류: " + e.message);
+    }
+    setPayLoading(false);
+  };
 
   const handleRedeem = async () => {
     if (!couponCode.trim()) return;
@@ -1401,27 +1430,50 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
                 <div>
                   <div style={{ fontSize: 15, fontWeight: 800, color: "#e0e0e0", marginBottom: 3 }}>PRO로 업그레이드</div>
-                  <div style={{ fontSize: 12, color: "#333" }}>AI 코치 피드백 · 무제한 업로드</div>
+                  <div style={{ fontSize: 12, color: "#333" }}>AI 코치 · 무제한 업로드 · 상세 통계</div>
                 </div>
                 <span style={{ background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 8, padding: "3px 10px", fontSize: 12, fontWeight: 800, color: "#555" }}>FREE</span>
               </div>
+
+              {/* 결제 플랜 선택 */}
+              <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+                {[
+                  { type: "monthly", label: "월간", price: "3,900원", sub: "월마다 갱신" },
+                  { type: "yearly",  label: "연간", price: "29,900원", sub: "월 2,491원 · 36% 할인", badge: "BEST" },
+                ].map(p => (
+                  <button key={p.type} onClick={() => setPayPlan(p.type)}
+                    style={{ flex: 1, padding: "12px 8px", borderRadius: 14, border: payPlan === p.type ? "1.5px solid #00ff88" : "1px solid #222", background: payPlan === p.type ? "#0a1a0a" : "#0a0a0a", textAlign: "center", position: "relative" }}>
+                    {p.badge && <div style={{ position: "absolute", top: -8, right: 6, background: "#00ff88", color: "#000", fontSize: 10, fontWeight: 900, borderRadius: 6, padding: "2px 6px" }}>{p.badge}</div>}
+                    <div style={{ fontSize: 13, color: payPlan === p.type ? "#00ff88" : "#555", fontWeight: 700 }}>{p.label}</div>
+                    <div style={{ fontSize: 16, fontWeight: 900, color: payPlan === p.type ? "#e0e0e0" : "#444", marginTop: 3 }}>{p.price}</div>
+                    <div style={{ fontSize: 11, color: "#333", marginTop: 2 }}>{p.sub}</div>
+                  </button>
+                ))}
+              </div>
+
+              <button onClick={handlePayment} disabled={payLoading}
+                style={{ width: "100%", padding: "14px", borderRadius: 12, border: "none", background: "#00ff88", color: "#000", fontFamily: "inherit", fontSize: 16, fontWeight: 800, marginBottom: 12 }}>
+                {payLoading ? "결제 준비 중..." : `💳 ${payPlan === "yearly" ? "29,900원" : "3,900원"} 결제하기`}
+              </button>
+
+              {/* 구분선 */}
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                <div style={{ flex: 1, height: 1, background: "#1a1a1a" }} />
+                <div style={{ fontSize: 11, color: "#2a2a2a" }}>또는 쿠폰 코드</div>
+                <div style={{ flex: 1, height: 1, background: "#1a1a1a" }} />
+              </div>
+
               <div style={{ display: "flex", gap: 8 }}>
-                <input
-                  value={couponCode}
-                  onChange={e => setCouponCode(e.target.value.toUpperCase())}
+                <input value={couponCode} onChange={e => setCouponCode(e.target.value.toUpperCase())}
                   onKeyDown={e => e.key === "Enter" && handleRedeem()}
-                  placeholder="쿠폰 코드 입력"
-                  maxLength={20}
-                  style={{ flex: 1, background: "#060606", border: "1px solid #222", borderRadius: 10, padding: "10px 12px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none", letterSpacing: 2 }}
-                />
+                  placeholder="쿠폰 코드 입력" maxLength={20}
+                  style={{ flex: 1, background: "#060606", border: "1px solid #222", borderRadius: 10, padding: "10px 12px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none", letterSpacing: 2 }} />
                 <button onClick={handleRedeem} disabled={!couponCode.trim() || couponLoading}
                   style={{ padding: "10px 16px", borderRadius: 10, background: couponCode.trim() ? "#00ff88" : "#111", border: "none", color: couponCode.trim() ? "#000" : "#333", fontFamily: "inherit", fontSize: 14, fontWeight: 800, flexShrink: 0 }}>
                   {couponLoading ? "..." : "적용"}
                 </button>
               </div>
-              {couponMsg && (
-                <div style={{ marginTop: 8, fontSize: 13, color: couponMsg.ok ? "#00ff88" : "#ff4444", fontWeight: 600 }}>{couponMsg.text}</div>
-              )}
+              {couponMsg && <div style={{ marginTop: 8, fontSize: 13, color: couponMsg.ok ? "#00ff88" : "#ff4444", fontWeight: 600 }}>{couponMsg.text}</div>}
             </>
           )}
         </div>
