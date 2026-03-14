@@ -1306,10 +1306,15 @@ function MonthlyAIReport({ myPosts }) {
       </div>
       {monthPosts.length === 0 ? (
         <div style={{ fontSize: 13, color: "#2a2a2a", textAlign: "center", padding: "8px 0" }}>이번 달 러닝 기록이 없어요</div>
+      ) : loading ? (
+        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0" }}>
+          <div style={{ width: 18, height: 18, border: "2px solid #00ff88", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
+          <div style={{ fontSize: 14, color: "#444" }}>AI가 분석 중이에요...</div>
+        </div>
       ) : !generated ? (
-        <button onClick={generateReport} disabled={loading}
-          style={{ width: "100%", padding: "12px", borderRadius: 12, border: "none", background: loading ? "#111" : "#00ff88", color: loading ? "#555" : "#000", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>
-          {loading ? "🤖 분석 중..." : `✨ 이번 달 리포트 생성 (${monthPosts.length}회 기록)`}
+        <button onClick={generateReport}
+          style={{ width: "100%", padding: "12px", borderRadius: 12, border: "none", background: "#00ff88", color: "#000", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>
+          이번 달 리포트 생성 ({monthPosts.length}회 기록)
         </button>
       ) : (
         <div>
