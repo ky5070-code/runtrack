@@ -37,7 +37,11 @@ Convert all distances to km and durations to seconds. If not a running image: {"
 
   const data = await res.json();
   const text = data.content?.map((c) => c.text || "").join("") || "";
-  return JSON.parse(text.replace(/```json|```/g, "").trim());
+  // JSON 블록 추출 - ```json ... ``` 또는 { ... } 찾기
+  const cleaned = text.replace(/```json|```/g, "").trim();
+  const match = cleaned.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error("AI 응답에서 JSON을 찾을 수 없어요.");
+  return JSON.parse(match[0]);
 }
 
 export async function generateRunFeedback({ distance, duration, pace, calories }) {
