@@ -941,7 +941,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
 }
 
 /* ══ BOTTOM NAV ══ */
-function BottomNav({ tab, setTab, onUpload, newFeedCount = 0 }) {
+function BottomNav({ tab, setTab, onUpload, newFeedCount = 0, newChatCount = 0 }) {
   const tabs = [
     { id: "feed", label: "피드", icon: (active) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#00ff88" : "#444"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -992,7 +992,14 @@ function BottomNav({ tab, setTab, onUpload, newFeedCount = 0 }) {
 
       {tabs.slice(2).map(t => (
         <button key={t.id} onClick={() => setTab(t.id)} style={{ flex: 1, padding: "10px 0 8px", border: "none", background: "transparent", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, minHeight: 58 }}>
-          {t.icon(tab === t.id)}
+          <div style={{ position: "relative" }}>
+            {t.icon(tab === t.id)}
+            {t.id === "chat" && newChatCount > 0 && (
+              <div style={{ position: "absolute", top: -4, right: -6, minWidth: 16, height: 16, borderRadius: 8, background: "#ff3b3b", border: "2px solid #060606", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800, color: "#fff", padding: "0 3px" }}>
+                {newChatCount > 9 ? "9+" : newChatCount}
+              </div>
+            )}
+          </div>
           <span style={{ fontSize: 11, color: tab === t.id ? "#00ff88" : "#444", fontWeight: tab === t.id ? 700 : 400 }}>{t.label}</span>
         </button>
       ))}
@@ -1006,6 +1013,21 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
   const { kickMember, transferAdmin, leaveSet, addNotice, deleteNotice, getInviteLink, deleteSet } = useSets(currentUser);
   const isAdmin = currentSet?.adminId === currentUser?.uid;
   const isPro = currentUser?.isPro === true;
+
+  // 새 채팅 카운트 - 채팅 탭 아닐 때 새 메시지 감지
+  const { messages: chatMessages } = useChat(currentSet?.id);
+  useEffect(() => {
+    if (chatMessages.length === 0) return;
+    if (prevChatLen.current === 0) { prevChatLen.current = chatMessages.length; return; }
+    const diff = chatMessages.length - prevChatLen.current;
+    if (diff > 0 && tab !== "chat") {
+      // 내가 보낸 메시지는 카운트 제외
+      const newMsgs = chatMessages.slice(-diff);
+      const othersCount = newMsgs.filter(m => m.userId !== currentUser?.uid).length;
+      if (othersCount > 0) setNewChatCount(c => c + othersCount);
+    }
+    prevChatLen.current = chatMessages.length;
+  }, [chatMessages.length]);
 
   // 새 피드 카운트 - 피드 탭 아닐 때 새 게시물 감지
   const prevPostsLen = useRef(0);
@@ -1024,6 +1046,8 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
   const { notifications, unreadCount, createNotification, markAllRead } = useNotifications(currentUser);
   const [tab, setTab] = useState("feed");
   const [newFeedCount, setNewFeedCount] = useState(0);
+  const [newChatCount, setNewChatCount] = useState(0);
+  const prevChatLen = useRef(0);
   const [showUpload, setShowUpload] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
@@ -1142,7 +1166,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
       </div>
 
       {/* 하단 네비게이션 */}
-      <BottomNav tab={tab} setTab={(t) => { setTab(t); if (t === "feed") setNewFeedCount(0); }} newFeedCount={newFeedCount} onUpload={() => {
+      <BottomNav tab={tab} setTab={(t) => { setTab(t); if (t === "feed") setNewFeedCount(0); if (t === "chat") setNewChatCount(0); }} newFeedCount={newFeedCount} newChatCount={newChatCount} onUpload={() => {
         if (!isPro) {
           const count = getMyMonthlyPostCount();
           if (count >= FREE_MONTHLY_LIMIT) {
