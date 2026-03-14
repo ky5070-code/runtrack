@@ -941,7 +941,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
 }
 
 /* ══ BOTTOM NAV ══ */
-function BottomNav({ tab, setTab, onUpload }) {
+function BottomNav({ tab, setTab, onUpload, newFeedCount = 0 }) {
   const tabs = [
     { id: "feed", label: "피드", icon: (active) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#00ff88" : "#444"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -969,7 +969,14 @@ function BottomNav({ tab, setTab, onUpload }) {
     <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 480, background: "rgba(6,6,6,0.97)", borderTop: "1px solid #161616", paddingBottom: safeBottom, display: "flex", alignItems: "center", zIndex: 100, backdropFilter: "blur(20px)" }}>
       {tabs.slice(0, 2).map(t => (
         <button key={t.id} onClick={() => setTab(t.id)} style={{ flex: 1, padding: "10px 0 8px", border: "none", background: "transparent", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, minHeight: 58 }}>
-          {t.icon(tab === t.id)}
+          <div style={{ position: "relative" }}>
+            {t.icon(tab === t.id)}
+            {t.id === "feed" && newFeedCount > 0 && (
+              <div style={{ position: "absolute", top: -4, right: -6, minWidth: 16, height: 16, borderRadius: 8, background: "#ff3b3b", border: "2px solid #060606", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800, color: "#fff", padding: "0 3px" }}>
+                {newFeedCount > 9 ? "9+" : newFeedCount}
+              </div>
+            )}
+          </div>
           <span style={{ fontSize: 11, color: tab === t.id ? "#00ff88" : "#444", fontWeight: tab === t.id ? 700 : 400 }}>{t.label}</span>
         </button>
       ))}
@@ -999,8 +1006,24 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
   const { kickMember, transferAdmin, leaveSet, addNotice, deleteNotice, getInviteLink, deleteSet } = useSets(currentUser);
   const isAdmin = currentSet?.adminId === currentUser?.uid;
   const isPro = currentUser?.isPro === true;
+
+  // 새 피드 카운트 - 피드 탭 아닐 때 새 게시물 감지
+  const prevPostsLen = useRef(0);
+  useEffect(() => {
+    if (posts.length === 0) return;
+    if (prevPostsLen.current === 0) {
+      prevPostsLen.current = posts.length;
+      return;
+    }
+    const diff = posts.length - prevPostsLen.current;
+    if (diff > 0 && tab !== "feed") {
+      setNewFeedCount(c => c + diff);
+    }
+    prevPostsLen.current = posts.length;
+  }, [posts.length]);
   const { notifications, unreadCount, createNotification, markAllRead } = useNotifications(currentUser);
   const [tab, setTab] = useState("feed");
+  const [newFeedCount, setNewFeedCount] = useState(0);
   const [showUpload, setShowUpload] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
@@ -1119,7 +1142,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
       </div>
 
       {/* 하단 네비게이션 */}
-      <BottomNav tab={tab} setTab={setTab} onUpload={() => {
+      <BottomNav tab={tab} setTab={(t) => { setTab(t); if (t === "feed") setNewFeedCount(0); }} newFeedCount={newFeedCount} onUpload={() => {
         if (!isPro) {
           const count = getMyMonthlyPostCount();
           if (count >= FREE_MONTHLY_LIMIT) {
