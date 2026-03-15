@@ -134,12 +134,12 @@ export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
   const [showJoin, setShowJoin] = useState(false);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#060606", color: "#e0e0e0", fontFamily: "'Pretendard', -apple-system, sans-serif", maxWidth: 480, margin: "0 auto" }}>
+    <div style={{ height: "100%", overflowY: "auto", WebkitOverflowScrolling: "touch", background: "#060606", color: "#e0e0e0", fontFamily: "'Pretendard', -apple-system, sans-serif", maxWidth: 480, width: "100%", margin: "0 auto" }}>
       <style>{`@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css'); *{font-family:'Pretendard',-apple-system,sans-serif!important}`}</style>
 
 
       {/* 헤더 */}
-      <div style={{ padding: "calc(14px + env(safe-area-inset-top, 0px)) 20px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ padding: "14px 20px 0", paddingTop: "calc(14px + env(safe-area-inset-top, 0px))", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: 10, color: "#1e1e1e", letterSpacing: 4 }}>RUNTRACK</div>
           <div style={{ fontSize: 24, fontWeight: 800, color: "#00ff88", letterSpacing: -0.5 }}>HOME</div>
