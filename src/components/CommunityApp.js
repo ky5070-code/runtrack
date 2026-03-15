@@ -1313,8 +1313,7 @@ function MonthlyAIReport({ myPosts }) {
         </button>
       ) : (
         <div>
-          {report?.split("
-").filter(l => l.trim()).map((line, i) => (
+          {report?.split("\n").filter(l => l.trim()).map((line, i) => (
             <div key={i} style={{ fontSize: 14, color: "#aaa", lineHeight: 1.8, marginBottom: 4 }}>{line}</div>
           ))}
           <button onClick={() => { setReport(null); setGenerated(false); }}
