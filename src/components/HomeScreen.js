@@ -139,7 +139,7 @@ export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
 
 
       {/* 헤더 */}
-      <div style={{ padding: "14px 20px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ padding: "calc(14px + env(safe-area-inset-top, 0px)) 20px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: 10, color: "#1e1e1e", letterSpacing: 4 }}>RUNTRACK</div>
           <div style={{ fontSize: 24, fontWeight: 800, color: "#00ff88", letterSpacing: -0.5 }}>HOME</div>
