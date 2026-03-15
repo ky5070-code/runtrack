@@ -81,7 +81,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
   };
 
   return (
-    <div style={{ background: isMyPost ? "#0a0f0a" : "#0b0b0b", border: isMyPost ? "1.5px solid #00cc55" : "1px solid #181818", borderRadius: 18, overflow: "hidden", marginBottom: 12, boxShadow: isMyPost ? "0 2px 20px rgba(0,255,136,0.08)" : "none", isolation: "isolate" }}>
+    <div style={{ background: isMyPost ? "#0a0f0a" : "#0b0b0b", border: isMyPost ? "1.5px solid #00cc55" : "1px solid #181818", borderRadius: 18, marginBottom: 12, boxShadow: isMyPost ? "0 2px 20px rgba(0,255,136,0.08)" : "none" }}>
 
       {/* 상단 컬러 바 */}
       <div style={{ height: 3, background: isMyPost ? "#00ff88" : post.source === "ai" ? "linear-gradient(90deg,#00ff88,#009944)" : "#1e1e1e" }} />
@@ -112,7 +112,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
 
         {/* 이미지 - 이름 아래 */}
         {post.imageUrl && (
-          <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 12, height: 220 }}>
+          <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 12, height: 220, flexShrink: 0 }}>
             <img src={post.imageUrl} alt="" style={{ width: "100%", height: "100%", display: "block", objectFit: "cover" }} />
           </div>
         )}
