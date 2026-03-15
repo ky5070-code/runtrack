@@ -1727,7 +1727,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
 
 
       {/* 컨텐츠 */}
-      <div style={{ flex: 1, overflowY: tab === "chat" ? "hidden" : "scroll", WebkitOverflowScrolling: "touch", display: "flex", flexDirection: "column", padding: tab === "chat" ? "0" : "0 18px", paddingBottom: tab === "chat" ? "0" : `calc(80px + ${safeBottom})`, minHeight: 0, overscrollBehavior: "contain" }}>
+      <div style={{ flex: 1, overflowY: tab === "chat" ? "hidden" : "auto", WebkitOverflowScrolling: "touch", display: "flex", flexDirection: "column", padding: tab === "chat" ? "0" : "12px 18px", paddingBottom: tab === "chat" ? "0" : `calc(80px + ${safeBottom})`, minHeight: 0 }}>
         {loading && (
           <div style={{ display: "flex", justifyContent: "center", paddingTop: 60 }}>
             <div style={{ width: 34, height: 34, border: "2px solid #00ff88", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
