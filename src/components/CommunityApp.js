@@ -110,10 +110,10 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
           )}
         </div>
 
-        {/* 이미지 - 이름 아래, 최대 200px로 제한 */}
-        {post.imageUrl && (
+        {/* 이미지 제거 - Storage URL만 표시 */}
+        {post.imageUrl && post.imageUrl.includes("firebasestorage") && (
           <div style={{ borderRadius: 12, marginBottom: 12, width: "100%", height: "200px", overflow: "hidden", flexShrink: 0 }}>
-            <img src={post.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block" }} />
+            <img src={post.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block" }} />
           </div>
         )}
 
