@@ -113,7 +113,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
         {/* 이미지 - 이름 아래 */}
         {post.imageUrl && (
           <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 12, lineHeight: 0 }}>
-            <img src={post.imageUrl} alt="" style={{ width: "100%", display: "block", objectFit: "cover", maxHeight: 240 }} />
+            <img src={post.imageUrl} alt="" style={{ width: "100%", display: "block", objectFit: "cover", maxHeight: 220 }} />
           </div>
         )}
 
@@ -1290,14 +1290,12 @@ function MonthlyAIReport({ myPosts }) {
         })
       });
       const data = await res.json();
-      const text = data.content?.[0]?.text || "리포트 생성 실패";
-      setReport(text);
-      setGenerated(true);
+      setReport(data.content?.[0]?.text || "리포트 생성 실패");
     } catch(e) {
       setReport("리포트 생성 중 오류가 발생했어요.");
-      setGenerated(true);
     }
     setLoading(false);
+    setGenerated(true);
   };
 
   return (
@@ -1308,18 +1306,15 @@ function MonthlyAIReport({ myPosts }) {
       </div>
       {monthPosts.length === 0 ? (
         <div style={{ fontSize: 13, color: "#2a2a2a", textAlign: "center", padding: "8px 0" }}>이번 달 러닝 기록이 없어요</div>
-      ) : loading ? (
-        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0" }}>
-          <div style={{ width: 18, height: 18, border: "2px solid #00ff88", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
-          <div style={{ fontSize: 14, color: "#444" }}>AI가 분석 중이에요...</div>
-        </div>
       ) : !generated ? (
-        <button onClick={generateReport}
-          style={{ width: "100%", padding: "12px", borderRadius: 12, border: "none", background: "#00ff88", color: "#000", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>
-          이번 달 리포트 생성 ({monthPosts.length}회 기록)
+        <button onClick={generateReport} disabled={loading}
+          style={{ width: "100%", padding: "12px", borderRadius: 12, border: "none", background: loading ? "#111" : "#00ff88", color: loading ? "#555" : "#000", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>
+          {loading ? "🤖 분석 중..." : `✨ 이번 달 리포트 생성 (${monthPosts.length}회 기록)`}
         </button>
       ) : (
         <div>
+          {report?.split("
+").filter(l => l.trim()).map((line, i) => (
             <div key={i} style={{ fontSize: 14, color: "#aaa", lineHeight: 1.8, marginBottom: 4 }}>{line}</div>
           ))}
           <button onClick={() => { setReport(null); setGenerated(false); }}
@@ -1680,12 +1675,12 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
   }).reduce((a, p) => a + (parseFloat(p.dist) || 0), 0);
 
   return (
-    <div style={{ height: "100%", background: "#060606", color: "#e0e0e0", fontFamily: "'Pretendard', -apple-system, sans-serif", maxWidth: 480, width: "100%", margin: "0 auto", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+    <div style={{ minHeight: "100dvh", background: "#060606", color: "#e0e0e0", fontFamily: "'Pretendard', -apple-system, sans-serif", maxWidth: 480, margin: "0 auto", display: "flex", flexDirection: "column" }}>
       <style>{`@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css'); *{font-family:'Pretendard',-apple-system,sans-serif!important}`}</style>
 
 
       {/* 헤더 */}
-      <div style={{ padding: `calc(14px + ${safeTop}) 18px 10px`, display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, background: "#060606", zIndex: 50 }}>
+      <div style={{ padding: "14px 18px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 50, background: "#060606", backdropFilter: "blur(20px)" }}>
         <div>
           <div style={{ fontSize: 10, color: "#1e1e1e", letterSpacing: 4 }}>RUNTRACK</div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -1715,7 +1710,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
       </div>
 
       {/* 주간 요약 - 채팅 탭에서는 숨김 */}
-      <div style={{ margin: "0 18px 12px", background: "#0a0a0a", border: "1px solid #161616", borderRadius: 16, padding: "12px 16px", display: tab === "chat" ? "none" : "flex", flexShrink: 0 }}>
+      <div style={{ margin: "0 18px", background: "#0a0a0a", border: "1px solid #161616", borderRadius: 16, padding: "12px 16px", display: tab === "chat" ? "none" : "flex", position: "sticky", top: 58, zIndex: 49, backdropFilter: "blur(20px)" }}>
         {[[`${myWeekDist.toFixed(1)}km`, "이번 주"], [`${posts.filter(p => p.userId === currentUser?.uid).length}회`, "총 러닝"], [`${calcStreak(posts, currentUser?.uid)}일`, "🔥 스트릭"]].map(([v, l], i) => (
           <div key={l} style={{ flex: 1, borderLeft: i > 0 ? "1px solid #141414" : "none", paddingLeft: i > 0 ? 14 : 0 }}>
             <div style={{ fontSize: 19, fontWeight: 800, color: "#00ff88" }}>{v}</div>
@@ -1727,7 +1722,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
 
 
       {/* 컨텐츠 */}
-      <div style={{ flex: 1, overflowY: tab === "chat" ? "hidden" : "auto", WebkitOverflowScrolling: "touch", display: "flex", flexDirection: "column", padding: tab === "chat" ? "0" : "12px 18px", paddingBottom: tab === "chat" ? "0" : `calc(80px + ${safeBottom})`, minHeight: 0 }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: tab === "chat" ? "0" : "14px 18px", paddingBottom: tab === "chat" ? "0" : `calc(80px + ${safeBottom})`, minHeight: 0, overflow: tab === "chat" ? "hidden" : "visible" }}>
         {loading && (
           <div style={{ display: "flex", justifyContent: "center", paddingTop: 60 }}>
             <div style={{ width: 34, height: 34, border: "2px solid #00ff88", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
