@@ -1678,7 +1678,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
 
 
       {/* 헤더 */}
-      <div style={{ padding: `calc(14px + ${safeTop}) 18px 10px`, display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, background: "#060606", zIndex: 50 }}>
+      <div style={{ padding: `calc(14px + ${safeTop}) 18px 10px`, display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, background: "#060606", zIndex: 50, flexShrink: 0 }}>
         <div>
           <div style={{ fontSize: 10, color: "#1e1e1e", letterSpacing: 4 }}>RUNTRACK</div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -1708,7 +1708,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
       </div>
 
       {/* 주간 요약 - 채팅 탭에서는 숨김 */}
-      <div style={{ margin: "0 18px 12px", background: "#0a0a0a", border: "1px solid #161616", borderRadius: 16, padding: "12px 16px", display: tab === "chat" ? "none" : "flex", flexShrink: 0 }}>
+      <div style={{ margin: "0 18px 12px", background: "#0a0a0a", border: "1px solid #161616", borderRadius: 16, padding: "12px 16px", display: tab === "chat" ? "none" : "flex", position: "sticky", top: 58, zIndex: 49, flexShrink: 0 }}>
         {[[`${myWeekDist.toFixed(1)}km`, "이번 주"], [`${posts.filter(p => p.userId === currentUser?.uid).length}회`, "총 러닝"], [`${calcStreak(posts, currentUser?.uid)}일`, "🔥 스트릭"]].map(([v, l], i) => (
           <div key={l} style={{ flex: 1, borderLeft: i > 0 ? "1px solid #141414" : "none", paddingLeft: i > 0 ? 14 : 0 }}>
             <div style={{ fontSize: 19, fontWeight: 800, color: "#00ff88" }}>{v}</div>
