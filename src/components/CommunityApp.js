@@ -27,6 +27,17 @@ const safeBottom = "env(safe-area-inset-bottom, 0px)";
 const safeTop = "env(safe-area-inset-top, 0px)";
 const FREE_MONTHLY_LIMIT = 5;
 
+const getThisWeekStart = () => {
+  const now = new Date();
+  const day = now.getDay(); // 0=일, 1=월 ... 6=토
+  const diff = (day === 0 ? -6 : 1 - day); // 월요일 기준
+  const mon = new Date(now);
+  mon.setDate(now.getDate() + diff);
+  mon.setHours(0, 0, 0, 0);
+  return mon.getTime();
+};
+
+
 /* ══ TOAST & CONFIRM ══ */
 function Toast({ message, type }) {
   const bg = type === "success" ? "#00ff88" : type === "error" ? "#ff4444" : "#ffaa00";
@@ -400,7 +411,7 @@ function LeaderboardTab({ posts, currentUser, isPro }) {
     if (!p.author) return;
     const ts = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt || 0);
     const age = Date.now() - ts.getTime();
-    if (period === "week" && age > 7 * 86400000) return;
+    if (period === "week" && ts.getTime() < getThisWeekStart()) return;
     if (period === "month" && age > 30 * 86400000) return;
     if (!userMap[p.userId]) userMap[p.userId] = { user: p.author, dist: 0, runs: 0, totalDuration: 0 };
     userMap[p.userId].dist += parseFloat(p.dist) || 0;
@@ -952,11 +963,11 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
   // 주간 차트 (8주)
   const weeklyData = [];
   for (let i = 7; i >= 0; i--) {
-    const start = Date.now() - (i + 1) * 7 * 86400000;
-    const end = Date.now() - i * 7 * 86400000;
+    const weekStart = getThisWeekStart() - i * 7 * 86400000;
+    const weekEnd = weekStart + 7 * 86400000;
     const dist = myPosts.filter(p => {
       const t = p.createdAt?.toDate ? p.createdAt.toDate().getTime() : new Date(p.createdAt || 0).getTime();
-      return t >= start && t < end;
+      return t >= weekStart && t < weekEnd;
     }).reduce((a, p) => a + (parseFloat(p.dist) || 0), 0);
     weeklyData.push({ label: i === 0 ? "이번주" : `${i}주전`, dist });
   }
@@ -1609,7 +1620,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
     const thisWeekDist = posts.filter(p => {
       if (p.userId !== currentUser?.uid) return false;
       const ts = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt||0);
-      return Date.now() - ts.getTime() < 7 * 86400000;
+      return ts.getTime() >= getThisWeekStart();
     }).reduce((a,p) => a+(parseFloat(p.dist)||0), 0);
     const pct = (thisWeekDist / goal) * 100;
     if (prevGoalPct.current < 100 && pct >= 100) {
@@ -1670,7 +1681,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
 
   const myWeekDist = posts.filter(p => {
     const ts = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt || 0);
-    return p.userId === currentUser?.uid && Date.now() - ts.getTime() < 7 * 86400000;
+    return p.userId === currentUser?.uid && ts.getTime() >= getThisWeekStart();
   }).reduce((a, p) => a + (parseFloat(p.dist) || 0), 0);
 
   return (
