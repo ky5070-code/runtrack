@@ -128,7 +128,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
           </div>
         )}
 
-        <div style={{ background: isMyPost ? "#080f08" : "#070707", border: isMyPost ? "1px solid #1a3020" : "1px solid #141414", borderRadius: 14, padding: "12px 14px", marginBottom: 12, display: "flex" }}>
+        <div style={{ background: "#070707", border: "1px solid #141414", borderRadius: 14, padding: "12px 14px", marginBottom: 12, display: "flex" }}>
           {[[Number(post.dist).toFixed(2) + "km", "거리", true], [fmtTime(post.duration), "시간", false], [post.pace || "--", "페이스", false], [post.calories || "--", "칼로리", false]].map(([v, l, accent], i) => (
             <div key={l} style={{ flex: 1, borderLeft: i > 0 ? "1px solid #141414" : "none", paddingLeft: i > 0 ? 10 : 0 }}>
               <div style={{ fontSize: 11, color: "#2e2e2e", marginBottom: 3 }}>{l}</div>
