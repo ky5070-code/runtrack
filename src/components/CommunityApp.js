@@ -1523,22 +1523,22 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
 function BottomNav({ tab, setTab, onUpload, newFeedCount = 0, newChatCount = 0 }) {
   const tabs = [
     { id: "feed", label: "피드", icon: (active) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#00ff88" : "#444"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#00ff88" : "#888"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
       </svg>
     )},
     { id: "rank", label: "랭킹", icon: (active) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#00ff88" : "#444"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#00ff88" : "#888"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
       </svg>
     )},
     { id: "stats", label: "통계", icon: (active) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#00ff88" : "#444"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#00ff88" : "#888"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
       </svg>
     )},
     { id: "chat", label: "채팅", icon: (active) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#00ff88" : "#444"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#00ff88" : "#888"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
       </svg>
     )},
@@ -1556,7 +1556,7 @@ function BottomNav({ tab, setTab, onUpload, newFeedCount = 0, newChatCount = 0 }
               </div>
             )}
           </div>
-          <span style={{ fontSize: 11, color: tab === t.id ? "#00ff88" : "#444", fontWeight: tab === t.id ? 700 : 400 }}>{t.label}</span>
+          <span style={{ fontSize: 11, color: tab === t.id ? "#00ff88" : "#888", fontWeight: tab === t.id ? 700 : 500 }}>{t.label}</span>
         </button>
       ))}
 
@@ -1579,7 +1579,7 @@ function BottomNav({ tab, setTab, onUpload, newFeedCount = 0, newChatCount = 0 }
               </div>
             )}
           </div>
-          <span style={{ fontSize: 11, color: tab === t.id ? "#00ff88" : "#444", fontWeight: tab === t.id ? 700 : 400 }}>{t.label}</span>
+          <span style={{ fontSize: 11, color: tab === t.id ? "#00ff88" : "#888", fontWeight: tab === t.id ? 700 : 500 }}>{t.label}</span>
         </button>
       ))}
     </div>
