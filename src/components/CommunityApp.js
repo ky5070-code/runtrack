@@ -640,26 +640,13 @@ function ChatTab({ setId, currentUser }) {
 
   useEffect(() => { scrollToBottom(); }, [messages]);
 
-  // visualViewport로 키보드 높이 반영해 채팅 영역 동적 조정
+  // visualViewport로 키보드 올라올 때 스크롤만 처리
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
-
-    const update = () => {
-      // 뷰포트 높이 - GNB 높이(58px) - safe area
-      const gnbH = 58;
-      const safeB = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--safe-bottom") || "0") || 0;
-      setChatHeight(vv.height - gnbH);
-      scrollToBottom(false);
-    };
-
-    update();
+    const update = () => scrollToBottom(false);
     vv.addEventListener("resize", update);
-    vv.addEventListener("scroll", update);
-    return () => {
-      vv.removeEventListener("resize", update);
-      vv.removeEventListener("scroll", update);
-    };
+    return () => vv.removeEventListener("resize", update);
   }, []);
 
   const relTime = (val) => {
@@ -835,9 +822,9 @@ function ChatTab({ setId, currentUser }) {
       </div>
 
       {/* 입력창 */}
-      <div style={{ display: "flex", gap: 8, alignItems: "center", padding: "10px 12px", borderTop: "1px solid #111", background: "#060606", flexShrink: 0 }}>
+      <div style={{ display: "flex", gap: 6, alignItems: "center", padding: "8px 10px", borderTop: "1px solid #111", background: "#060606", flexShrink: 0, minHeight: 60 }}>
         <button onClick={() => setShowScheduleModal(true)}
-          style={{ width: 42, height: 42, borderRadius: 21, background: "#0d0d0d", border: "1px solid #1a3028", color: "#00cc66", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
+          style={{ width: 36, height: 36, borderRadius: 18, background: "#0d0d0d", border: "1px solid #1a3028", color: "#00cc66", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>
           📅
         </button>
         <input
@@ -847,13 +834,13 @@ function ChatTab({ setId, currentUser }) {
           onKeyDown={e => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), handleSend())}
           placeholder="메시지 입력..."
           maxLength={500}
-          style={{ flex: 1, background: "#0d0d0d", border: "1px solid #222", borderRadius: 22, padding: "10px 16px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none", transition: "border-color 0.15s" }}
+          style={{ flex: 1, minWidth: 0, background: "#0d0d0d", border: "1px solid #222", borderRadius: 22, padding: "10px 14px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none", transition: "border-color 0.15s" }}
           onFocus={e => e.target.style.borderColor = "#00ff88"}
           onBlur={e => e.target.style.borderColor = "#222"}
         />
         <button onClick={handleSend} disabled={!text.trim() || sending}
-          style={{ width: 42, height: 42, borderRadius: 21, background: text.trim() ? "#00ff88" : "#111", border: "none", color: text.trim() ? "#000" : "#333", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s" }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          style={{ width: 36, height: 36, borderRadius: 18, background: text.trim() ? "#00ff88" : "#111", border: "none", color: text.trim() ? "#000" : "#333", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s" }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
           </svg>
         </button>
