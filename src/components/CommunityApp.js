@@ -112,9 +112,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
 
         {/* 이미지 - 이름 아래 */}
         {post.imageUrl && (
-          <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 12, height: 220 }}>
-            <img src={post.imageUrl} alt="" style={{ width: "100%", height: "100%", display: "block", objectFit: "cover" }} />
-          </div>
+          <img src={post.imageUrl} alt="" style={{ width: "100%", display: "block", borderRadius: 12, marginBottom: 12, maxHeight: 200, objectFit: "cover", objectPosition: "center" }} />
         )}
 
         {/* 삭제 확인 */}
