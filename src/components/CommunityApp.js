@@ -1343,8 +1343,8 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
   const handlePayment = async () => {
     setPayLoading(true);
     const amount = payPlan === "yearly" ? 29900 : 3900;
-    const orderId = `RUNTRACK-${Date.now()}-${Math.random().toString(36).slice(2,8).toUpperCase()}`;
-    const orderName = payPlan === "yearly" ? "RUNTRACK PRO 연간" : "RUNTRACK PRO 월간";
+    const orderId = `RUNCREW-${Date.now()}-${Math.random().toString(36).slice(2,8).toUpperCase()}`;
+    const orderName = payPlan === "yearly" ? "RUNCREW PRO 연간" : "RUNCREW PRO 월간";
 
     // 토스페이먼츠 SDK 로드
     const clientKey = process.env.REACT_APP_TOSS_CLIENT_KEY || "test_ck_placeholder";
@@ -1679,7 +1679,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
       {/* 헤더 */}
       <div style={{ padding: "14px 18px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 50, background: "#060606", backdropFilter: "blur(20px)" }}>
         <div>
-          <div style={{ fontSize: 10, color: "#1e1e1e", letterSpacing: 4 }}>RUNTRACK</div>
+          <div style={{ fontSize: 10, color: "#1e1e1e", letterSpacing: 4 }}>RUNCREW</div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <button onClick={onLeaveSet} style={{ background: "none", border: "none", color: "#e0e0e0", fontSize: 26, padding: "0 4px 0 0", cursor: "pointer", lineHeight: 1 }}>‹</button>
             <div style={{ fontSize: 20, fontWeight: 800, color: "#00ff88", letterSpacing: -0.5 }}>{currentSet?.emoji} {currentSet?.name}</div>

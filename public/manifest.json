@@ -1,6 +1,6 @@
 {
-  "short_name": "RUNTRACK",
-  "name": "RUNTRACK - AI 러닝 커뮤니티",
+  "short_name": "RUNCREW",
+  "name": "RUNCREW - AI 러닝 커뮤니티",
   "description": "AI가 러닝 기록을 자동 분석하는 커뮤니티 앱",
   "icons": [
     { "src": "icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any maskable" },
