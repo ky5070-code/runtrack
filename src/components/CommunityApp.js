@@ -111,7 +111,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
         </div>
 
         {/* 이미지 - 이름 아래 */}
-        {post.imageUrl && (
+        {post.imageUrl && !post.imageUrl.startsWith("gs://") && (
           <img src={post.imageUrl} alt="" style={{ width: "100%", display: "block", borderRadius: 12, marginBottom: 12, height: "auto", maxHeight: "180px", objectFit: "cover" }} />
         )}
 

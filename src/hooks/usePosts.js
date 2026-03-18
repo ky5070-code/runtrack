@@ -96,8 +96,8 @@ export function usePosts(currentUser, setId) {
         const blob = await resizeToBlob(imageFile);
         const filename = `posts/${currentUser.uid}/${Date.now()}.jpg`;
         const storageRef = ref(storage, filename);
-        await uploadBytes(storageRef, blob, { contentType: "image/jpeg" });
-        imageUrl = await getDownloadURL(storageRef);
+        const snapshot = await uploadBytes(storageRef, blob, { contentType: "image/jpeg" });
+        imageUrl = await getDownloadURL(snapshot.ref);
       } catch (e) {
         console.warn("이미지 업로드 실패, 이미지 없이 저장:", e);
       }
