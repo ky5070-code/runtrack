@@ -194,6 +194,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
               <Avatar user={currentUser} size={30} />
               <input value={commentText} onChange={e => setCommentText(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && submitComment()}
+                onFocus={e => setTimeout(() => e.target.scrollIntoView({ behavior: "smooth", block: "center" }), 300)}
                 placeholder="댓글 달기..."
                 style={{ flex: 1, background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: "8px 14px", color: "#ccc", fontFamily: "inherit", fontSize: 15, outline: "none" }} />
               <button onClick={submitComment} style={{ width: 38, height: 38, borderRadius: 19, background: commentText ? "#00ff88" : "#111", border: "none", color: commentText ? "#000" : "#333", fontSize: 18, fontWeight: 800 }}>↑</button>
