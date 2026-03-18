@@ -81,10 +81,10 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
   };
 
   return (
-    <div style={{ background: isMyPost ? "#0a0f0a" : "#0b0b0b", border: isMyPost ? "1.5px solid #00cc55" : "1px solid #181818", borderRadius: 18, marginBottom: 12, boxShadow: isMyPost ? "0 2px 20px rgba(0,255,136,0.08)" : "none" }}>
+    <div style={{ background: isMyPost ? "#0a0f0a" : "#0b0b0b", border: isMyPost ? "1.5px solid #00cc55" : "1px solid #181818", borderRadius: 18, overflow: "hidden", marginBottom: 12, boxShadow: isMyPost ? "0 2px 20px rgba(0,255,136,0.08)" : "none", isolation: "isolate" }}>
 
-      {/* 상단 컬러 바 - 남의 게시물만 */}
-      {!isMyPost && <div style={{ height: 3, background: post.source === "ai" ? "linear-gradient(90deg,#00ff88,#009944)" : "#1e1e1e" }} />}
+      {/* 상단 컬러 바 */}
+      <div style={{ height: 3, background: isMyPost ? "#00ff88" : post.source === "ai" ? "linear-gradient(90deg,#00ff88,#009944)" : "#1e1e1e" }} />
 
       <div style={{ padding: "14px 14px 12px" }}>
         {/* 이름/아바타 */}
@@ -111,8 +111,10 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
         </div>
 
         {/* 이미지 - 이름 아래 */}
-        {post.imageUrl && !post.imageUrl.startsWith("gs://") && (
-          <img src={post.imageUrl} alt="" style={{ width: "100%", display: "block", borderRadius: 12, marginBottom: 12, height: "auto", maxHeight: "180px", objectFit: "cover" }} />
+        {post.imageUrl && (
+          <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 12, lineHeight: 0 }}>
+            <img src={post.imageUrl} alt="" style={{ width: "100%", display: "block", objectFit: "cover", maxHeight: 220 }} />
+          </div>
         )}
 
         {/* 삭제 확인 */}
@@ -498,7 +500,7 @@ function calcStreak(posts, userId) {
 }
 
 /* ══ NOTIFICATION MODAL ══ */
-function NotificationModal({ notifications, onClose, onMarkAllRead, schedules = [] }) {
+function NotificationModal({ notifications, onClose, onMarkAllRead, onDelete, schedules = [] }) {
   const relTime = (val) => {
     const ts = val?.toDate ? val.toDate() : new Date(val || 0);
     const d = Date.now() - ts.getTime();
@@ -578,32 +580,42 @@ function NotificationModal({ notifications, onClose, onMarkAllRead, schedules = 
           </div>
         )}
 
-        {notifications.map(n => (
-          <div key={n.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: n.read ? "#080808" : "#0a1a0f", border: `1px solid ${n.read ? "#111" : "#1a3d28"}`, borderRadius: 14, marginBottom: 8 }}>
-            <div style={{ width: 42, height: 42, borderRadius: 21, background: "#111", border: "1.5px solid #1e1e1e", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0, position: "relative" }}>
-              {n.fromUserAvatar || "🏃"}
-              <div style={{ position: "absolute", bottom: -2, right: -2, width: 18, height: 18, borderRadius: 9, background: "#0d0d0d", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13 }}>
-                {n.type === "reaction" ? n.emoji : "💬"}
+        {notifications.map(n => {
+          const typeIcon = n.type === "reaction" ? n.emoji : n.type === "feed" ? "🏃" : n.type === "chat" ? "💬" : "💬";
+          const typeText = n.type === "reaction" ? ` 님이 ${n.emoji} 반응했어요`
+            : n.type === "comment" ? " 님이 댓글을 달았어요"
+            : n.type === "feed" ? " 님이 새 러닝을 공유했어요"
+            : " 님이 메시지를 보냈어요";
+          return (
+            <div key={n.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: n.read ? "#080808" : "#0a1a0f", border: `1px solid ${n.read ? "#111" : "#1a3d28"}`, borderRadius: 14, marginBottom: 8 }}>
+              <div style={{ width: 42, height: 42, borderRadius: 21, background: "#111", border: "1.5px solid #1e1e1e", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0, position: "relative" }}>
+                {n.fromUserAvatar || "🏃"}
+                <div style={{ position: "absolute", bottom: -2, right: -2, width: 18, height: 18, borderRadius: 9, background: "#0d0d0d", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13 }}>
+                  {typeIcon}
+                </div>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 15, lineHeight: 1.5 }}>
+                  <span style={{ fontWeight: 700, color: n.read ? "#aaa" : "#e0e0e0" }}>{n.fromUserName}</span>
+                  <span style={{ color: "#555" }}>{typeText}</span>
+                </div>
+                {(n.type === "comment" || n.type === "chat") && n.commentText && (
+                  <div style={{ fontSize: 13, color: "#444", marginTop: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>"{n.commentText}"</div>
+                )}
+                {n.postDist && (
+                  <div style={{ fontSize: 12, color: "#2a2a2a", marginTop: 2 }}>{Number(n.postDist).toFixed(2)}km 기록</div>
+                )}
+                <div style={{ fontSize: 12, color: "#2a2a2a", marginTop: 2 }}>{relTime(n.createdAt)}</div>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+                {!n.read && <div style={{ width: 7, height: 7, borderRadius: 4, background: "#00ff88" }} />}
+                {onDelete && (
+                  <button onClick={() => onDelete(n.id)} style={{ background: "none", border: "none", color: "#333", fontSize: 18, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 14, cursor: "pointer" }}>✕</button>
+                )}
               </div>
             </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 15, lineHeight: 1.5 }}>
-                <span style={{ fontWeight: 700, color: n.read ? "#aaa" : "#e0e0e0" }}>{n.fromUserName}</span>
-                <span style={{ color: "#555" }}>
-                  {n.type === "reaction" ? ` 님이 ${n.emoji} 반응했어요` : " 님이 댓글을 달았어요"}
-                </span>
-              </div>
-              {n.type === "comment" && n.commentText && (
-                <div style={{ fontSize: 13, color: "#444", marginTop: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>"{n.commentText}"</div>
-              )}
-              {n.postDist && (
-                <div style={{ fontSize: 12, color: "#2a2a2a", marginTop: 2 }}>{Number(n.postDist).toFixed(2)}km 기록</div>
-              )}
-            </div>
-            <div style={{ fontSize: 12, color: "#2a2a2a", flexShrink: 0 }}>{relTime(n.createdAt)}</div>
-            {!n.read && <div style={{ width: 7, height: 7, borderRadius: 4, background: "#00ff88", flexShrink: 0 }} />}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -1175,21 +1187,16 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
 
       {/* 👥 크루 비교 */}
       {isPro ? (() => {
-        // 나를 제외한 크루원 게시물만
-        const otherPosts = posts.filter(p => p.userId !== currentUser?.uid);
-        const otherUsers = [...new Set(otherPosts.map(p => p.userId))];
-        const otherCount = Math.max(1, otherUsers.length);
-        const otherDist = otherPosts.reduce((a,p) => a + (parseFloat(p.dist)||0), 0);
-        const otherRuns = otherPosts.length;
-        const otherAvgDist = otherDist / otherCount;
-        const otherAvgRuns = otherRuns / otherCount;
-        const otherAvgPerRun = otherRuns > 0 ? otherDist / otherRuns : 0;
+        const crewPosts = posts;
+        const crewDist = crewPosts.reduce((a,p) => a + (parseFloat(p.dist)||0), 0);
+        const crewRuns = crewPosts.length;
+        const crewAvg = crewRuns > 0 ? crewDist / crewRuns : 0;
         const myRuns = myPosts.length;
         const myAvg = myRuns > 0 ? totalDist / myRuns : 0;
         const metrics = [
-          { label: "총 거리", me: `${totalDist.toFixed(1)}km`, crew: `${otherAvgDist.toFixed(1)}km`, unit: "크루원 평균" },
-          { label: "러닝 횟수", me: `${myRuns}회`, crew: `${Math.round(otherAvgRuns)}회`, unit: "크루원 평균" },
-          { label: "평균 거리", me: `${myAvg.toFixed(1)}km`, crew: `${otherAvgPerRun.toFixed(1)}km`, unit: "크루원 평균" },
+          { label: "총 거리", me: `${totalDist.toFixed(1)}km`, crew: `${(crewDist/Math.max(1, [...new Set(crewPosts.map(p=>p.userId))].length)).toFixed(1)}km`, unit: "크루 평균" },
+          { label: "러닝 횟수", me: `${myRuns}회`, crew: `${Math.round(crewRuns/Math.max(1, [...new Set(crewPosts.map(p=>p.userId))].length))}회`, unit: "크루 평균" },
+          { label: "평균 거리", me: `${myAvg.toFixed(1)}km`, crew: `${crewAvg.toFixed(1)}km`, unit: "크루 평균" },
         ];
         return (
           <div style={{ background: "#080808", border: "1px solid #161616", borderRadius: 16, padding: "16px", marginBottom: 16 }}>
@@ -1670,7 +1677,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
     }
     prevPostsLen.current = posts.length;
   }, [posts.length]);
-  const { notifications, unreadCount, createNotification, markAllRead } = useNotifications(currentUser);
+  const { notifications, unreadCount, createNotification, createFeedNotification, createChatNotification, deleteNotification, markAllRead } = useNotifications(currentUser);
   const [tab, setTab] = useState("feed");
   const [newFeedCount, setNewFeedCount] = useState(0);
   const [newChatCount, setNewChatCount] = useState(0);
@@ -1819,8 +1826,17 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
       }} />
 
       {/* 모달 */}
-      {showUpload && <UploadModal onClose={() => setShowUpload(false)} onPost={createPost} currentUser={currentUser} isPro={isPro} />}
-      {showNotif && <NotificationModal notifications={notifications} onClose={() => { setShowNotif(false); markAllRead(); }} onMarkAllRead={markAllRead} schedules={chatMessages.filter(m => m.type === "schedule")} />}
+      {showUpload && <UploadModal onClose={() => setShowUpload(false)} onPost={async (data) => {
+        await createPost(data);
+        // 크루원들에게 피드 알림
+        const members = currentSet?.memberIds || [];
+        members.forEach(uid => {
+          if (uid !== currentUser?.uid) {
+            createFeedNotification({ toUserId: uid, fromUser: currentUser, postId: null, postDist: data.dist });
+          }
+        });
+      }} currentUser={currentUser} isPro={isPro} />}
+      {showNotif && <NotificationModal notifications={notifications} onClose={() => { setShowNotif(false); markAllRead(); }} onMarkAllRead={markAllRead} onDelete={deleteNotification} schedules={chatMessages.filter(m => m.type === "schedule")} />}
       {showProfile && <ProfileModal
         currentUser={currentUser} posts={posts}
         currentSet={currentSet} isAdmin={isAdmin}

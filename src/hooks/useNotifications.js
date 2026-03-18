@@ -62,5 +62,48 @@ export function useNotifications(currentUser) {
     await batch.commit();
   };
 
-  return { notifications, unreadCount, createNotification, markAllRead };
+  // 알림 삭제
+  const deleteNotification = async (notifId) => {
+    await import("firebase/firestore").then(({ deleteDoc, doc: _doc }) => 
+      deleteDoc(_doc(db, "notifications", notifId))
+    );
+  };
+
+  // 새 피드 게시물 알림
+  const createFeedNotification = async ({ toUserId, fromUser, postId, postDist }) => {
+    if (!toUserId || toUserId === fromUser.uid) return;
+    await addDoc(collection(db, "notifications"), {
+      toUserId,
+      fromUserId: fromUser.uid,
+      fromUserName: fromUser.name,
+      fromUserAvatar: fromUser.avatar || "🏃",
+      type: "feed",
+      postId,
+      postDist,
+      emoji: null,
+      commentText: null,
+      read: false,
+      createdAt: serverTimestamp(),
+    });
+  };
+
+  // 새 채팅 알림
+  const createChatNotification = async ({ toUserId, fromUser, text }) => {
+    if (!toUserId || toUserId === fromUser.uid) return;
+    await addDoc(collection(db, "notifications"), {
+      toUserId,
+      fromUserId: fromUser.uid,
+      fromUserName: fromUser.name,
+      fromUserAvatar: fromUser.avatar || "🏃",
+      type: "chat",
+      postId: null,
+      postDist: null,
+      emoji: null,
+      commentText: text || null,
+      read: false,
+      createdAt: serverTimestamp(),
+    });
+  };
+
+  return { notifications, unreadCount, createNotification, createFeedNotification, createChatNotification, deleteNotification, markAllRead };
 }
