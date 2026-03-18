@@ -134,14 +134,14 @@ export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
   const [showJoin, setShowJoin] = useState(false);
 
   return (
-    <div style={{ height: "100%", overflowY: "auto", WebkitOverflowScrolling: "touch", background: "#060606", color: "#e0e0e0", fontFamily: "'Pretendard', -apple-system, sans-serif", maxWidth: 480, width: "100%", margin: "0 auto" }}>
+    <div style={{ minHeight: "100vh", background: "#060606", color: "#e0e0e0", fontFamily: "'Pretendard', -apple-system, sans-serif", maxWidth: 480, margin: "0 auto" }}>
       <style>{`@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css'); *{font-family:'Pretendard',-apple-system,sans-serif!important}`}</style>
 
 
       {/* 헤더 */}
-      <div style={{ padding: "14px 20px 0", paddingTop: "calc(14px + env(safe-area-inset-top, 0px))", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ padding: "14px 20px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
-          <div style={{ fontSize: 10, color: "#1e1e1e", letterSpacing: 4 }}>RUNCREW</div>
+          <div style={{ fontSize: 10, color: "#1e1e1e", letterSpacing: 4 }}>RUNTRACK</div>
           <div style={{ fontSize: 24, fontWeight: 800, color: "#00ff88", letterSpacing: -0.5 }}>HOME</div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -201,7 +201,11 @@ export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
               <button onClick={e => {
                 e.stopPropagation();
                 const link = getInviteLink(set.id);
-                navigator.clipboard.writeText(link).then(() => alert("초대 링크가 복사됐어요! 🔗"));
+                if (navigator.share) {
+                  navigator.share({ title: `${set.name} 러닝 크루`, text: `${set.name}에서 같이 달려요! 🏃`, url: link });
+                } else {
+                  navigator.clipboard.writeText(link).then(() => alert("초대 링크가 복사됐어요! 🔗"));
+                }
               }} style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 8, padding: "6px 10px", color: "#555", fontFamily: "inherit", fontSize: 13, minHeight: 32 }}>🔗</button>
               <div style={{ color: "#2a2a2a", fontSize: 20 }}>›</div>
             </div>

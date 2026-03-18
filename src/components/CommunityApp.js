@@ -27,17 +27,6 @@ const safeBottom = "env(safe-area-inset-bottom, 0px)";
 const safeTop = "env(safe-area-inset-top, 0px)";
 const FREE_MONTHLY_LIMIT = 5;
 
-const getThisWeekStart = () => {
-  const now = new Date();
-  const day = now.getDay(); // 0=일, 1=월 ... 6=토
-  const diff = (day === 0 ? -6 : 1 - day); // 월요일 기준
-  const mon = new Date(now);
-  mon.setDate(now.getDate() + diff);
-  mon.setHours(0, 0, 0, 0);
-  return mon.getTime();
-};
-
-
 /* ══ TOAST & CONFIRM ══ */
 function Toast({ message, type }) {
   const bg = type === "success" ? "#00ff88" : type === "error" ? "#ff4444" : "#ffaa00";
@@ -92,10 +81,10 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
   };
 
   return (
-    <div style={{ background: isMyPost ? "#0a0f0a" : "#0b0b0b", border: isMyPost ? "1.5px solid #00cc55" : "1px solid #181818", borderRadius: 18, marginBottom: 12, boxShadow: isMyPost ? "0 2px 20px rgba(0,255,136,0.08)" : "none" }}>
+    <div style={{ background: isMyPost ? "#0a0f0a" : "#0b0b0b", border: isMyPost ? "1.5px solid #00cc55" : "1px solid #181818", borderRadius: 18, overflow: "hidden", marginBottom: 12, boxShadow: isMyPost ? "0 2px 20px rgba(0,255,136,0.08)" : "none", isolation: "isolate" }}>
 
-      {/* 상단 컬러 바 - 남의 게시물만 */}
-      {!isMyPost && <div style={{ height: 3, background: post.source === "ai" ? "linear-gradient(90deg,#00ff88,#009944)" : "#1e1e1e" }} />}
+      {/* 상단 컬러 바 */}
+      <div style={{ height: 3, background: isMyPost ? "#00ff88" : post.source === "ai" ? "linear-gradient(90deg,#00ff88,#009944)" : "#1e1e1e" }} />
 
       <div style={{ padding: "14px 14px 12px" }}>
         {/* 이름/아바타 */}
@@ -123,8 +112,8 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
 
         {/* 이미지 - 이름 아래 */}
         {post.imageUrl && (
-          <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 12, height: 220, flexShrink: 0 }}>
-            <img src={post.imageUrl} alt="" style={{ width: "100%", height: "100%", display: "block", objectFit: "cover" }} />
+          <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 12, lineHeight: 0 }}>
+            <img src={post.imageUrl} alt="" style={{ width: "100%", display: "block", objectFit: "cover", maxHeight: 220 }} />
           </div>
         )}
 
@@ -139,7 +128,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
           </div>
         )}
 
-        <div style={{ background: "#070707", border: "1px solid #141414", borderRadius: 14, padding: "12px 14px", marginBottom: 12, display: "flex" }}>
+        <div style={{ background: isMyPost ? "#080f08" : "#070707", border: isMyPost ? "1px solid #1a3020" : "1px solid #141414", borderRadius: 14, padding: "12px 14px", marginBottom: 12, display: "flex" }}>
           {[[Number(post.dist).toFixed(2) + "km", "거리", true], [fmtTime(post.duration), "시간", false], [post.pace || "--", "페이스", false], [post.calories || "--", "칼로리", false]].map(([v, l, accent], i) => (
             <div key={l} style={{ flex: 1, borderLeft: i > 0 ? "1px solid #141414" : "none", paddingLeft: i > 0 ? 10 : 0 }}>
               <div style={{ fontSize: 11, color: "#2e2e2e", marginBottom: 3 }}>{l}</div>
@@ -411,7 +400,7 @@ function LeaderboardTab({ posts, currentUser, isPro }) {
     if (!p.author) return;
     const ts = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt || 0);
     const age = Date.now() - ts.getTime();
-    if (period === "week" && ts.getTime() < getThisWeekStart()) return;
+    if (period === "week" && age > 7 * 86400000) return;
     if (period === "month" && age > 30 * 86400000) return;
     if (!userMap[p.userId]) userMap[p.userId] = { user: p.author, dist: 0, runs: 0, totalDuration: 0 };
     userMap[p.userId].dist += parseFloat(p.dist) || 0;
@@ -640,13 +629,26 @@ function ChatTab({ setId, currentUser }) {
 
   useEffect(() => { scrollToBottom(); }, [messages]);
 
-  // visualViewport로 키보드 올라올 때 스크롤만 처리
+  // visualViewport로 키보드 높이 반영해 채팅 영역 동적 조정
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
-    const update = () => scrollToBottom(false);
+
+    const update = () => {
+      // 뷰포트 높이 - GNB 높이(58px) - safe area
+      const gnbH = 58;
+      const safeB = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--safe-bottom") || "0") || 0;
+      setChatHeight(vv.height - gnbH);
+      scrollToBottom(false);
+    };
+
+    update();
     vv.addEventListener("resize", update);
-    return () => vv.removeEventListener("resize", update);
+    vv.addEventListener("scroll", update);
+    return () => {
+      vv.removeEventListener("resize", update);
+      vv.removeEventListener("scroll", update);
+    };
   }, []);
 
   const relTime = (val) => {
@@ -689,9 +691,20 @@ function ChatTab({ setId, currentUser }) {
       {/* 메시지 스크롤 영역 */}
       <div style={{ flex: 1, overflowY: "auto", padding: "12px 14px 8px", WebkitOverflowScrolling: "touch" }}>
         {messages.length === 0 && (
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", color: "#2a2a2a", gap: 8 }}>
-            <div style={{ fontSize: 34 }}>💬</div>
-            <div style={{ fontSize: 13 }}>첫 메시지를 보내보세요!</div>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", color: "#2a2a2a", gap: 12, padding: "0 32px" }}>
+            <div style={{ fontSize: 48 }}>💬</div>
+            <div style={{ fontSize: 16, fontWeight: 800, color: "#333" }}>대화를 시작해보세요!</div>
+            <div style={{ fontSize: 13, color: "#2a2a2a", textAlign: "center", lineHeight: 1.8 }}>크루원들과 러닝 일정을 잡고<br />기록을 공유해보세요</div>
+            <button onClick={() => {
+              const link = getInviteLink(currentSet?.id);
+              if (navigator.share) {
+                navigator.share({ title: `${currentSet?.name} 러닝 크루`, text: `${currentSet?.name}에서 같이 달려요! 🏃`, url: link });
+              } else {
+                navigator.clipboard.writeText(link).then(() => showToast("초대 링크가 복사됐어요! 🔗", "success"));
+              }
+            }} style={{ background: "#0d1f14", border: "1px solid #1a3d28", borderRadius: 14, padding: "11px 22px", color: "#00ff88", fontFamily: "inherit", fontSize: 14, fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 8, marginTop: 4 }}>
+              🔗 크루원 초대하기
+            </button>
           </div>
         )}
 
@@ -822,9 +835,9 @@ function ChatTab({ setId, currentUser }) {
       </div>
 
       {/* 입력창 */}
-      <div style={{ display: "flex", gap: 6, alignItems: "center", padding: "8px 10px", borderTop: "1px solid #111", background: "#060606", flexShrink: 0, minHeight: 60 }}>
+      <div style={{ display: "flex", gap: 8, alignItems: "center", padding: "10px 12px", borderTop: "1px solid #111", background: "#060606", flexShrink: 0 }}>
         <button onClick={() => setShowScheduleModal(true)}
-          style={{ width: 36, height: 36, borderRadius: 18, background: "#0d0d0d", border: "1px solid #1a3028", color: "#00cc66", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>
+          style={{ width: 42, height: 42, borderRadius: 21, background: "#0d0d0d", border: "1px solid #1a3028", color: "#00cc66", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
           📅
         </button>
         <input
@@ -834,13 +847,13 @@ function ChatTab({ setId, currentUser }) {
           onKeyDown={e => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), handleSend())}
           placeholder="메시지 입력..."
           maxLength={500}
-          style={{ flex: 1, minWidth: 0, background: "#0d0d0d", border: "1px solid #222", borderRadius: 22, padding: "10px 14px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none", transition: "border-color 0.15s" }}
+          style={{ flex: 1, background: "#0d0d0d", border: "1px solid #222", borderRadius: 22, padding: "10px 16px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none", transition: "border-color 0.15s" }}
           onFocus={e => e.target.style.borderColor = "#00ff88"}
           onBlur={e => e.target.style.borderColor = "#222"}
         />
         <button onClick={handleSend} disabled={!text.trim() || sending}
-          style={{ width: 36, height: 36, borderRadius: 18, background: text.trim() ? "#00ff88" : "#111", border: "none", color: text.trim() ? "#000" : "#333", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s" }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          style={{ width: 42, height: 42, borderRadius: 21, background: text.trim() ? "#00ff88" : "#111", border: "none", color: text.trim() ? "#000" : "#333", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s" }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
           </svg>
         </button>
@@ -950,11 +963,11 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
   // 주간 차트 (8주)
   const weeklyData = [];
   for (let i = 7; i >= 0; i--) {
-    const weekStart = getThisWeekStart() - i * 7 * 86400000;
-    const weekEnd = weekStart + 7 * 86400000;
+    const start = Date.now() - (i + 1) * 7 * 86400000;
+    const end = Date.now() - i * 7 * 86400000;
     const dist = myPosts.filter(p => {
       const t = p.createdAt?.toDate ? p.createdAt.toDate().getTime() : new Date(p.createdAt || 0).getTime();
-      return t >= weekStart && t < weekEnd;
+      return t >= start && t < end;
     }).reduce((a, p) => a + (parseFloat(p.dist) || 0), 0);
     weeklyData.push({ label: i === 0 ? "이번주" : `${i}주전`, dist });
   }
@@ -1288,12 +1301,14 @@ function MonthlyAIReport({ myPosts }) {
         })
       });
       const data = await res.json();
-      setReport(data.content?.[0]?.text || "리포트 생성 실패");
+      const text = data.content?.[0]?.text || "리포트 생성 실패";
+      setReport(text);
+      setGenerated(true);
     } catch(e) {
       setReport("리포트 생성 중 오류가 발생했어요.");
+      setGenerated(true);
     }
     setLoading(false);
-    setGenerated(true);
   };
 
   return (
@@ -1304,14 +1319,19 @@ function MonthlyAIReport({ myPosts }) {
       </div>
       {monthPosts.length === 0 ? (
         <div style={{ fontSize: 13, color: "#2a2a2a", textAlign: "center", padding: "8px 0" }}>이번 달 러닝 기록이 없어요</div>
+      ) : loading ? (
+        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0" }}>
+          <div style={{ width: 18, height: 18, border: "2px solid #00ff88", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
+          <div style={{ fontSize: 14, color: "#444" }}>🤖 AI가 분석 중이에요...</div>
+        </div>
       ) : !generated ? (
-        <button onClick={generateReport} disabled={loading}
-          style={{ width: "100%", padding: "12px", borderRadius: 12, border: "none", background: loading ? "#111" : "#00ff88", color: loading ? "#555" : "#000", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>
-          {loading ? "🤖 분석 중..." : `✨ 이번 달 리포트 생성 (${monthPosts.length}회 기록)`}
+        <button onClick={generateReport}
+          style={{ width: "100%", padding: "12px", borderRadius: 12, border: "none", background: "#00ff88", color: "#000", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>
+          ✨ 이번 달 리포트 생성 ({monthPosts.length}회 기록)
         </button>
       ) : (
         <div>
-          {report?.split("\n").filter(l => l.trim()).map((line, i) => (
+          {(report || "").split("\n").filter(l => l.trim()).map((line, i) => (
             <div key={i} style={{ fontSize: 14, color: "#aaa", lineHeight: 1.8, marginBottom: 4 }}>{line}</div>
           ))}
           <button onClick={() => { setReport(null); setGenerated(false); }}
@@ -1343,8 +1363,8 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
   const handlePayment = async () => {
     setPayLoading(true);
     const amount = payPlan === "yearly" ? 29900 : 3900;
-    const orderId = `RUNCREW-${Date.now()}-${Math.random().toString(36).slice(2,8).toUpperCase()}`;
-    const orderName = payPlan === "yearly" ? "RUNCREW PRO 연간" : "RUNCREW PRO 월간";
+    const orderId = `RUNTRACK-${Date.now()}-${Math.random().toString(36).slice(2,8).toUpperCase()}`;
+    const orderName = payPlan === "yearly" ? "RUNTRACK PRO 연간" : "RUNTRACK PRO 월간";
 
     // 토스페이먼츠 SDK 로드
     const clientKey = process.env.REACT_APP_TOSS_CLIENT_KEY || "test_ck_placeholder";
@@ -1607,7 +1627,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
     const thisWeekDist = posts.filter(p => {
       if (p.userId !== currentUser?.uid) return false;
       const ts = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt||0);
-      return ts.getTime() >= getThisWeekStart();
+      return Date.now() - ts.getTime() < 7 * 86400000;
     }).reduce((a,p) => a+(parseFloat(p.dist)||0), 0);
     const pct = (thisWeekDist / goal) * 100;
     if (prevGoalPct.current < 100 && pct >= 100) {
@@ -1668,18 +1688,18 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
 
   const myWeekDist = posts.filter(p => {
     const ts = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt || 0);
-    return p.userId === currentUser?.uid && ts.getTime() >= getThisWeekStart();
+    return p.userId === currentUser?.uid && Date.now() - ts.getTime() < 7 * 86400000;
   }).reduce((a, p) => a + (parseFloat(p.dist) || 0), 0);
 
   return (
-    <div style={{ minHeight: "100dvh", background: "#060606", color: "#e0e0e0", fontFamily: "'Pretendard', -apple-system, sans-serif", maxWidth: 480, margin: "0 auto", display: "flex", flexDirection: "column" }}>
+    <div style={{ height: "100dvh", background: "#060606", color: "#e0e0e0", fontFamily: "'Pretendard', -apple-system, sans-serif", maxWidth: 480, margin: "0 auto", display: "flex", flexDirection: "column", overflow: "hidden", position: "fixed", inset: "0 auto", width: "100%" }}>
       <style>{`@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css'); *{font-family:'Pretendard',-apple-system,sans-serif!important}`}</style>
 
 
       {/* 헤더 */}
-      <div style={{ padding: "14px 18px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 50, background: "#060606", backdropFilter: "blur(20px)" }}>
+      <div style={{ padding: `calc(14px + ${safeTop}) 18px 10px`, display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, background: "#060606", zIndex: 50 }}>
         <div>
-          <div style={{ fontSize: 10, color: "#1e1e1e", letterSpacing: 4 }}>RUNCREW</div>
+          <div style={{ fontSize: 10, color: "#1e1e1e", letterSpacing: 4 }}>RUNTRACK</div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <button onClick={onLeaveSet} style={{ background: "none", border: "none", color: "#e0e0e0", fontSize: 26, padding: "0 4px 0 0", cursor: "pointer", lineHeight: 1 }}>‹</button>
             <div style={{ fontSize: 20, fontWeight: 800, color: "#00ff88", letterSpacing: -0.5 }}>{currentSet?.emoji} {currentSet?.name}</div>
@@ -1707,7 +1727,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
       </div>
 
       {/* 주간 요약 - 채팅 탭에서는 숨김 */}
-      <div style={{ margin: "0 18px", background: "#0a0a0a", border: "1px solid #161616", borderRadius: 16, padding: "12px 16px", display: tab === "chat" ? "none" : "flex", position: "sticky", top: 58, zIndex: 49, backdropFilter: "blur(20px)" }}>
+      <div style={{ margin: "0 18px 12px", background: "#0a0a0a", border: "1px solid #161616", borderRadius: 16, padding: "12px 16px", display: tab === "chat" ? "none" : "flex", flexShrink: 0 }}>
         {[[`${myWeekDist.toFixed(1)}km`, "이번 주"], [`${posts.filter(p => p.userId === currentUser?.uid).length}회`, "총 러닝"], [`${calcStreak(posts, currentUser?.uid)}일`, "🔥 스트릭"]].map(([v, l], i) => (
           <div key={l} style={{ flex: 1, borderLeft: i > 0 ? "1px solid #141414" : "none", paddingLeft: i > 0 ? 14 : 0 }}>
             <div style={{ fontSize: 19, fontWeight: 800, color: "#00ff88" }}>{v}</div>
@@ -1719,7 +1739,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
 
 
       {/* 컨텐츠 */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: tab === "chat" ? "0" : "14px 18px", paddingBottom: tab === "chat" ? "0" : `calc(80px + ${safeBottom})`, minHeight: 0, overflow: tab === "chat" ? "hidden" : "visible" }}>
+      <div style={{ flex: 1, overflowY: tab === "chat" ? "hidden" : "auto", WebkitOverflowScrolling: "touch", display: "flex", flexDirection: "column", padding: tab === "chat" ? "0" : "0 18px", paddingBottom: tab === "chat" ? "0" : `calc(80px + ${safeBottom})`, minHeight: 0 }}>
         {loading && (
           <div style={{ display: "flex", justifyContent: "center", paddingTop: 60 }}>
             <div style={{ width: 34, height: 34, border: "2px solid #00ff88", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
@@ -1730,9 +1750,23 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
         {tab === "feed" && !loading && (
           <>
             {posts.length === 0 && (
-              <div style={{ textAlign: "center", padding: "60px 0", color: "#2a2a2a" }}>
-                <div style={{ fontSize: 50, marginBottom: 14 }}>🏃</div>
-                <div style={{ fontSize: 16, lineHeight: 1.8 }}>첫 번째 러닝을 공유해보세요!<br />아래 + 버튼을 눌러보세요</div>
+              <div style={{ textAlign: "center", padding: "50px 0 40px", color: "#2a2a2a" }}>
+                <div style={{ fontSize: 60, marginBottom: 16 }}>🏃</div>
+                <div style={{ fontSize: 18, fontWeight: 800, color: "#333", marginBottom: 10 }}>아직 기록이 없어요</div>
+                <div style={{ fontSize: 14, color: "#2a2a2a", lineHeight: 1.9, marginBottom: 28 }}>
+                  아래 <span style={{ color: "#00ff88", fontWeight: 800 }}>+</span> 버튼으로 러닝 기록을 올리거나<br />
+                  크루원을 초대해서 같이 달려보세요!
+                </div>
+                <button onClick={() => {
+                  const link = getInviteLink(currentSet?.id);
+                  if (navigator.share) {
+                    navigator.share({ title: `${currentSet?.name} 러닝 크루`, text: `${currentSet?.name}에서 같이 달려요! 🏃`, url: link });
+                  } else {
+                    navigator.clipboard.writeText(link).then(() => showToast("초대 링크가 복사됐어요! 🔗", "success"));
+                  }
+                }} style={{ background: "#0d1f14", border: "1px solid #1a3d28", borderRadius: 14, padding: "13px 24px", color: "#00ff88", fontFamily: "inherit", fontSize: 15, fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 8 }}>
+                  🔗 크루원 초대하기
+                </button>
               </div>
             )}
             {posts.map(post => (
