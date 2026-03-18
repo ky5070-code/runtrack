@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import {
   collection, query, where, limit,
-  onSnapshot, addDoc, updateDoc, doc, serverTimestamp, writeBatch, getDocs
+  onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, writeBatch, getDocs
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
@@ -64,9 +64,7 @@ export function useNotifications(currentUser) {
 
   // 알림 삭제
   const deleteNotification = async (notifId) => {
-    await import("firebase/firestore").then(({ deleteDoc, doc: _doc }) => 
-      deleteDoc(_doc(db, "notifications", notifId))
-    );
+    await deleteDoc(doc(db, "notifications", notifId));
   };
 
   // 새 피드 게시물 알림
