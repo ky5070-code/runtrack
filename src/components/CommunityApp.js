@@ -67,6 +67,7 @@ const Avatar = ({ user, size = 38 }) => (
 function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = false }) {
   const author = post.author || {};
   const [showComments, setShowComments] = useState(false);
+  const [showCommentInput, setShowCommentInput] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -81,10 +82,10 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
   };
 
   return (
-    <div style={{ background: isMyPost ? "#0a0f0a" : "#0b0b0b", border: isMyPost ? "1.5px solid #00cc55" : "1px solid #181818", borderRadius: 18, marginBottom: 12, boxShadow: isMyPost ? "0 2px 20px rgba(0,255,136,0.08)" : "none" }}>
+    <div style={{ background: isMyPost ? "#0a0f0a" : "#0b0b0b", border: isMyPost ? "1.5px solid #00cc55" : "1px solid #181818", borderRadius: 18, overflow: "hidden", marginBottom: 12, boxShadow: isMyPost ? "0 2px 20px rgba(0,255,136,0.08)" : "none", isolation: "isolate" }}>
 
-      {/* 상단 컬러 바 - 남의 게시물만 */}
-      {!isMyPost && <div style={{ height: 3, background: post.source === "ai" ? "linear-gradient(90deg,#00ff88,#009944)" : "#1e1e1e" }} />}
+      {/* 상단 컬러 바 */}
+      <div style={{ height: 3, background: isMyPost ? "#00ff88" : post.source === "ai" ? "linear-gradient(90deg,#00ff88,#009944)" : "#1e1e1e" }} />
 
       <div style={{ padding: "14px 14px 12px" }}>
         {/* 이름/아바타 */}
@@ -190,21 +191,28 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
                 </div>
               </div>
             ))}
-            <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
-              <Avatar user={currentUser} size={30} />
-              <input value={commentText} onChange={e => setCommentText(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && submitComment()}
-                placeholder="댓글 달기..."
-                style={{ flex: 1, background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: "8px 14px", color: "#ccc", fontFamily: "inherit", fontSize: 15, outline: "none" }}
-                onFocus={e => {
-                  const el = e.target;
-                  setTimeout(() => {
-                    el.scrollIntoView({ behavior: "smooth", block: "nearest" });
-                    window.scrollTo(0, 0);
-                  }, 400);
-                }}
-              />
-              <button onClick={submitComment} style={{ width: 38, height: 38, borderRadius: 19, background: commentText ? "#00ff88" : "#111", border: "none", color: commentText ? "#000" : "#333", fontSize: 18, fontWeight: 800 }}>↑</button>
+            {/* 댓글 달기 버튼 - 모달로 */}
+            <button onClick={() => setShowCommentInput(true)}
+              style={{ width: "100%", marginTop: 6, padding: "10px", borderRadius: 12, border: "1px dashed #222", background: "transparent", color: "#444", fontFamily: "inherit", fontSize: 14, textAlign: "left" }}>
+              💬 댓글 달기...
+            </button>
+          </div>
+        )}
+
+        {/* 댓글 입력 모달 */}
+        {showCommentInput && (
+          <div onClick={() => setShowCommentInput(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", zIndex: 400, display: "flex", alignItems: "flex-end" }}>
+            <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "#111", borderRadius: "20px 20px 0 0", padding: "20px 16px", paddingBottom: "calc(20px + env(safe-area-inset-bottom, 0px))" }}>
+              <div style={{ fontSize: 14, color: "#444", marginBottom: 12 }}>댓글 달기</div>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <Avatar user={currentUser} size={32} />
+                <input autoFocus value={commentText} onChange={e => setCommentText(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && (submitComment(), setShowCommentInput(false))}
+                  placeholder="댓글을 입력하세요..."
+                  style={{ flex: 1, background: "#0d0d0d", border: "1px solid #222", borderRadius: 20, padding: "10px 16px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 15, outline: "none" }} />
+                <button onClick={() => { submitComment(); setShowCommentInput(false); }}
+                  style={{ width: 40, height: 40, borderRadius: 20, background: commentText.trim() ? "#00ff88" : "#111", border: "none", color: commentText.trim() ? "#000" : "#333", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>↑</button>
+              </div>
             </div>
           </div>
         )}
