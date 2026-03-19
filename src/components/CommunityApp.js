@@ -64,7 +64,7 @@ const Avatar = ({ user, size = 38 }) => (
 );
 
 /* ══ POST CARD ══ */
-function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = false }) {
+function PostCard({ post, currentUser, onReact, onComment, onDelete, onDeleteComment, isAdmin = false }) {
   const author = post.author || {};
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
