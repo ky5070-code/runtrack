@@ -1784,6 +1784,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
             )}
             {posts.map(post => (
               <PostCard key={post.id} post={post} currentUser={currentUser} isAdmin={isAdmin}
+                onDeleteComment={(postId, commentId) => deleteComment(postId, commentId)}
                 onReact={async (id, e) => {
                   await toggleReaction(id, e, currentUser?.uid);
                   const p = posts.find(p => p.id === id);

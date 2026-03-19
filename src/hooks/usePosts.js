@@ -178,5 +178,14 @@ export function usePosts(currentUser, setId) {
     await deleteDoc(postRef);
   };
 
-  return { posts, loading, createPost, toggleReaction, addComment, deletePost, getMyMonthlyPostCount };
+  // 댓글 삭제
+  const deleteComment = async (postId, commentId) => {
+    const postRef = doc(db, "posts", postId);
+    const snap = await getDoc(postRef);
+    if (!snap.exists()) return;
+    const comments = (snap.data().comments || []).filter(c => c.id !== commentId);
+    await updateDoc(postRef, { comments });
+  };
+
+  return { posts, loading, createPost, toggleReaction, addComment, deleteComment, deletePost, getMyMonthlyPostCount };
 }
