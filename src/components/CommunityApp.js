@@ -1716,7 +1716,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
       {/* 헤더 */}
       <div style={{ padding: `calc(14px + ${safeTop}) 18px 10px`, display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, background: "#060606", zIndex: 50 }}>
         <div>
-          <div style={{ fontSize: 10, color: "#1e1e1e", letterSpacing: 4 }}>RUNCREW</div>
+          <div style={{ fontSize: 10, color: "#333", letterSpacing: 4 }}>RUNCREW</div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <button onClick={onLeaveSet} style={{ background: "none", border: "none", color: "#e0e0e0", fontSize: 26, padding: "0 4px 0 0", cursor: "pointer", lineHeight: 1 }}>‹</button>
             <div style={{ fontSize: 20, fontWeight: 800, color: "#00ff88", letterSpacing: -0.5 }}>{currentSet?.emoji} {currentSet?.name}</div>
