@@ -179,8 +179,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
           </button>
         </div>
 
-        {/* 댓글 목록 - 댓글 있을 때만 표시 */}
-        {(post.comments || []).length > 0 && (
+        {showComments && (
           <div style={{ borderTop: "1px solid #111", paddingTop: 12, marginTop: 10 }}>
             {(post.comments || []).map(c => (
               <div key={c.id} style={{ display: "flex", gap: 8, marginBottom: 10 }}>
@@ -191,23 +190,13 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
                 </div>
               </div>
             ))}
-          </div>
-        )}
-
-        {/* 댓글 입력 모달 */}
-        {showComments && (
-          <div onClick={() => setShowComments(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", zIndex: 400, display: "flex", alignItems: "flex-end" }}>
-            <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "#111", borderRadius: "20px 20px 0 0", padding: "20px 16px", paddingBottom: "calc(20px + env(safe-area-inset-bottom, 0px))" }}>
-              <div style={{ fontSize: 14, color: "#444", marginBottom: 12 }}>댓글 달기</div>
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <Avatar user={currentUser} size={32} />
-                <input autoFocus value={commentText} onChange={e => setCommentText(e.target.value)}
-                  onKeyDown={e => e.key === "Enter" && (submitComment(), setShowComments(false))}
-                  placeholder="댓글을 입력하세요..."
-                  style={{ flex: 1, background: "#0d0d0d", border: "1px solid #222", borderRadius: 20, padding: "10px 16px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 15, outline: "none" }} />
-                <button onClick={() => { submitComment(); setShowComments(false); }}
-                  style={{ width: 40, height: 40, borderRadius: 20, background: commentText.trim() ? "#00ff88" : "#111", border: "none", color: commentText.trim() ? "#000" : "#333", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>↑</button>
-              </div>
+            <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+              <Avatar user={currentUser} size={30} />
+              <input value={commentText} onChange={e => setCommentText(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && submitComment()}
+                placeholder="댓글 달기..."
+                style={{ flex: 1, background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: "8px 14px", color: "#ccc", fontFamily: "inherit", fontSize: 15, outline: "none" }} />
+              <button onClick={submitComment} style={{ width: 38, height: 38, borderRadius: 19, background: commentText ? "#00ff88" : "#111", border: "none", color: commentText ? "#000" : "#333", fontSize: 18, fontWeight: 800 }}>↑</button>
             </div>
           </div>
         )}
