@@ -642,26 +642,13 @@ function ChatTab({ setId, currentUser }) {
 
   useEffect(() => { scrollToBottom(); }, [messages]);
 
-  // visualViewport로 키보드 높이 반영해 채팅 영역 동적 조정
+  // 키보드 올라올 때 스크롤만 처리
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
-
-    const update = () => {
-      // 뷰포트 높이 - GNB 높이(58px) - safe area
-      const gnbH = 58;
-      const safeB = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--safe-bottom") || "0") || 0;
-      setChatHeight(vv.height - gnbH);
-      scrollToBottom(false);
-    };
-
-    update();
+    const update = () => scrollToBottom(false);
     vv.addEventListener("resize", update);
-    vv.addEventListener("scroll", update);
-    return () => {
-      vv.removeEventListener("resize", update);
-      vv.removeEventListener("scroll", update);
-    };
+    return () => vv.removeEventListener("resize", update);
   }, []);
 
   const relTime = (val) => {
@@ -699,7 +686,7 @@ function ChatTab({ setId, currentUser }) {
   };
 
   return (
-    <div ref={containerRef} style={{ display: "flex", flexDirection: "column", height: chatHeight ? `${chatHeight}px` : "100%", minHeight: 0, background: "#080808", overflow: "hidden" }}>
+    <div ref={containerRef} style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0, background: "#080808", overflow: "hidden" }}>
 
       {/* 메시지 스크롤 영역 */}
       <div style={{ flex: 1, overflowY: "auto", padding: "12px 14px 8px", WebkitOverflowScrolling: "touch" }}>
