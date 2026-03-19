@@ -182,16 +182,19 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, isAdmin = f
         {showComments && (
           <div style={{ borderTop: "1px solid #111", paddingTop: 12, marginTop: 10 }}>
             {(post.comments || []).map(c => (
-              <div key={c.id} style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+              <div key={c.id} style={{ display: "flex", gap: 8, marginBottom: 10, alignItems: "flex-start" }}>
                 <div style={{ width: 30, height: 30, borderRadius: 15, background: "#111", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>{c.userAvatar || "🏃"}</div>
                 <div style={{ flex: 1, background: "#0d0d0d", borderRadius: 10, padding: "8px 12px" }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: "#666", marginBottom: 2 }}>{c.userName}</div>
                   <div style={{ fontSize: 15, color: "#aaa", lineHeight: 1.5 }}>{c.text}</div>
                 </div>
+                {c.userId === currentUser?.uid && (
+                  <button onClick={() => onDeleteComment(post.id, c.id)}
+                    style={{ background: "none", border: "none", color: "#333", fontSize: 16, padding: "4px", marginTop: 4, flexShrink: 0 }}>✕</button>
+                )}
               </div>
             ))}
             <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
-              <Avatar user={currentUser} size={30} />
               <input value={commentText} onChange={e => setCommentText(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && submitComment()}
                 placeholder="댓글 달기..."
