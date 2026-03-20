@@ -34,17 +34,19 @@ const resizeToBase64 = (file) => new Promise((resolve, reject) => {
   const img = new Image();
   const url = URL.createObjectURL(file);
   img.onload = () => {
-    // 최대 픽셀 수 제한 (7000px 이하로 강제)
-    const MAX_PX = 1200;
+    const MAX_W = 1000;
+    const MAX_H = 1000;
     let w = img.width, h = img.height;
-    const scale = Math.min(MAX_PX / w, MAX_PX / h, 1);
-    w = Math.floor(w * scale);
-    h = Math.floor(h * scale);
+    // 세로가 너무 긴 경우 상단 부분만 크롭 (러닝 데이터는 주로 상단에 있음)
+    const cropH = Math.min(h, w * 2);
+    const scale = Math.min(MAX_W / w, MAX_H / cropH, 1);
+    const dw = Math.floor(w * scale);
+    const dh = Math.floor(cropH * scale);
     const canvas = document.createElement("canvas");
-    canvas.width = w; canvas.height = h;
-    canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+    canvas.width = dw; canvas.height = dh;
+    canvas.getContext("2d").drawImage(img, 0, 0, w, cropH, 0, 0, dw, dh);
     URL.revokeObjectURL(url);
-    resolve(canvas.toDataURL("image/jpeg", 0.8));
+    resolve(canvas.toDataURL("image/jpeg", 0.85));
   };
   img.onerror = reject;
   img.src = url;
