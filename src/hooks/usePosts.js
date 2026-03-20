@@ -34,16 +34,17 @@ const resizeToBase64 = (file) => new Promise((resolve, reject) => {
   const img = new Image();
   const url = URL.createObjectURL(file);
   img.onload = () => {
-    const MAX_W = 800; const MAX_H = 800;
+    // 최대 픽셀 수 제한 (7000px 이하로 강제)
+    const MAX_PX = 1200;
     let w = img.width, h = img.height;
-    const ratio = w / h;
-    if (w > MAX_W) { w = MAX_W; h = Math.round(w / ratio); }
-    if (h > MAX_H) { h = MAX_H; w = Math.round(h * ratio); }
+    const scale = Math.min(MAX_PX / w, MAX_PX / h, 1);
+    w = Math.floor(w * scale);
+    h = Math.floor(h * scale);
     const canvas = document.createElement("canvas");
     canvas.width = w; canvas.height = h;
     canvas.getContext("2d").drawImage(img, 0, 0, w, h);
     URL.revokeObjectURL(url);
-    resolve(canvas.toDataURL("image/jpeg", 0.85));
+    resolve(canvas.toDataURL("image/jpeg", 0.8));
   };
   img.onerror = reject;
   img.src = url;
