@@ -34,7 +34,7 @@ const resizeToBase64 = (file) => new Promise((resolve, reject) => {
   const img = new Image();
   const url = URL.createObjectURL(file);
   img.onload = () => {
-    const MAX_W = 1000; const MAX_H = 1500;
+    const MAX_W = 800; const MAX_H = 800;
     let w = img.width, h = img.height;
     const ratio = w / h;
     if (w > MAX_W) { w = MAX_W; h = Math.round(w / ratio); }
