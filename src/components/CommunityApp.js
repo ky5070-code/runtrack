@@ -64,11 +64,15 @@ const Avatar = ({ user, size = 38 }) => (
 );
 
 /* ══ POST CARD ══ */
-function PostCard({ post, currentUser, onReact, onComment, onDelete, onDeleteComment, isAdmin = false }) {
+function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onDeleteComment, isAdmin = false }) {
   const author = post.author || {};
   const [showComments, setShowComments] = useState(false);
+  const [showCommentInput, setShowCommentInput] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editCaption, setEditCaption] = useState(post.caption || "");
   const [showFeedback, setShowFeedback] = useState(false);
   const myReaction = post[`myReaction_${currentUser?.uid}`];
   const isMyPost = post.userId === currentUser?.uid;
@@ -81,10 +85,10 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onDeleteCom
   };
 
   return (
-    <div style={{ background: isMyPost ? "#0a0f0a" : "#0b0b0b", border: isMyPost ? "1.5px solid #00cc55" : "1px solid #181818", borderRadius: 18, marginBottom: 12, boxShadow: isMyPost ? "0 2px 20px rgba(0,255,136,0.08)" : "none" }}>
+    <div style={{ background: isMyPost ? "#0a0f0a" : "#0b0b0b", border: isMyPost ? "1.5px solid #00cc55" : "1px solid #181818", borderRadius: 18, overflow: "hidden", marginBottom: 12, boxShadow: isMyPost ? "0 2px 20px rgba(0,255,136,0.08)" : "none", isolation: "isolate" }}>
 
-      {/* 상단 컬러 바 - 남의 게시물만 */}
-      {!isMyPost && <div style={{ height: 3, background: post.source === "ai" ? "linear-gradient(90deg,#00ff88,#009944)" : "#1e1e1e" }} />}
+      {/* 상단 컬러 바 */}
+      <div style={{ height: 3, background: isMyPost ? "#00ff88" : post.source === "ai" ? "linear-gradient(90deg,#00ff88,#009944)" : "#1e1e1e" }} />
 
       <div style={{ padding: "14px 14px 12px" }}>
         {/* 이름/아바타 */}
@@ -106,7 +110,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onDeleteCom
             </div>
           </div>
           {canDelete && (
-            <button onClick={() => setShowDeleteConfirm(true)} style={{ background: "none", border: "none", color: "#333", fontSize: 20, minWidth: 36, minHeight: 36, display: "flex", alignItems: "center", justifyContent: "center" }}>⋯</button>
+            <button onClick={() => setShowMenu(true)} style={{ background: "none", border: "none", color: "#333", fontSize: 20, minWidth: 36, minHeight: 36, display: "flex", alignItems: "center", justifyContent: "center" }}>⋯</button>
           )}
         </div>
 
@@ -117,6 +121,29 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onDeleteCom
           </div>
         )}
 
+        {/* ⋯ 메뉴 모달 */}
+        {showMenu && (
+          <div onClick={() => setShowMenu(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", zIndex: 400, display: "flex", alignItems: "flex-end" }}>
+            <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "#111", borderRadius: "20px 20px 0 0", padding: "20px 16px", paddingBottom: "calc(20px + env(safe-area-inset-bottom, 0px))" }}>
+              <div style={{ width: 40, height: 4, background: "#222", borderRadius: 2, margin: "0 auto 16px" }} />
+              {isMyPost && (
+                <button onClick={() => { setShowMenu(false); setEditCaption(post.caption || ""); setShowEditModal(true); }}
+                  style={{ width: "100%", padding: "15px", borderRadius: 12, border: "none", background: "#0d0d0d", color: "#e0e0e0", fontFamily: "inherit", fontSize: 16, fontWeight: 700, marginBottom: 8, textAlign: "left" }}>
+                  ✏️ 메모 수정
+                </button>
+              )}
+              <button onClick={() => { setShowMenu(false); setShowDeleteConfirm(true); }}
+                style={{ width: "100%", padding: "15px", borderRadius: 12, border: "none", background: "#1a0808", color: "#ff4444", fontFamily: "inherit", fontSize: 16, fontWeight: 700, textAlign: "left" }}>
+                🗑️ 삭제
+              </button>
+              <button onClick={() => setShowMenu(false)}
+                style={{ width: "100%", padding: "15px", borderRadius: 12, border: "none", background: "transparent", color: "#444", fontFamily: "inherit", fontSize: 16, marginTop: 4 }}>
+                취소
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* 삭제 확인 */}
         {showDeleteConfirm && (
           <div style={{ background: "#1a0808", border: "1px solid #3d1010", borderRadius: 12, padding: "12px 14px", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -124,6 +151,26 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onDeleteCom
             <div style={{ display: "flex", gap: 8 }}>
               <button onClick={() => setShowDeleteConfirm(false)} style={{ padding: "6px 12px", borderRadius: 8, background: "transparent", border: "1px solid #333", color: "#666", fontFamily: "inherit", fontSize: 14, minHeight: 34 }}>취소</button>
               <button onClick={() => { onDelete(post.id); setShowDeleteConfirm(false); }} style={{ padding: "6px 12px", borderRadius: 8, background: "#ff3b3b", border: "none", color: "#fff", fontFamily: "inherit", fontSize: 14, fontWeight: 700, minHeight: 34 }}>삭제</button>
+            </div>
+          </div>
+        )}
+
+        {/* 수정 모달 */}
+        {showEditModal && (
+          <div onClick={() => setShowEditModal(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", zIndex: 400, display: "flex", alignItems: "flex-end" }}>
+            <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "#111", borderRadius: "20px 20px 0 0", padding: "20px 16px", paddingBottom: "calc(20px + env(safe-area-inset-bottom, 0px))" }}>
+              <div style={{ width: 40, height: 4, background: "#222", borderRadius: 2, margin: "0 auto 16px" }} />
+              <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14 }}>✏️ 메모 수정</div>
+              <textarea value={editCaption} onChange={e => setEditCaption(e.target.value)}
+                placeholder="러닝 메모를 입력하세요..."
+                rows={3} maxLength={200}
+                style={{ width: "100%", background: "#0d0d0d", border: "1px solid #222", borderRadius: 12, padding: "12px 14px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 15, outline: "none", resize: "none", boxSizing: "border-box", marginBottom: 14 }} />
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => setShowEditModal(false)}
+                  style={{ flex: 1, padding: "14px", borderRadius: 12, border: "1px solid #222", background: "transparent", color: "#555", fontFamily: "inherit", fontSize: 15, fontWeight: 700 }}>취소</button>
+                <button onClick={() => { onEdit && onEdit(post.id, { caption: editCaption }); setShowEditModal(false); }}
+                  style={{ flex: 1, padding: "14px", borderRadius: 12, border: "none", background: "#00ff88", color: "#000", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>저장</button>
+              </div>
             </div>
           </div>
         )}
@@ -182,24 +229,40 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onDeleteCom
         {showComments && (
           <div style={{ borderTop: "1px solid #111", paddingTop: 12, marginTop: 10 }}>
             {(post.comments || []).map(c => (
-              <div key={c.id} style={{ display: "flex", gap: 8, marginBottom: 10, alignItems: "flex-start" }}>
+              <div key={c.id} style={{ display: "flex", gap: 8, marginBottom: 10 }}>
                 <div style={{ width: 30, height: 30, borderRadius: 15, background: "#111", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>{c.userAvatar || "🏃"}</div>
                 <div style={{ flex: 1, background: "#0d0d0d", borderRadius: 10, padding: "8px 12px" }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: "#666", marginBottom: 2 }}>{c.userName}</div>
                   <div style={{ fontSize: 15, color: "#aaa", lineHeight: 1.5 }}>{c.text}</div>
                 </div>
-                {c.userId === currentUser?.uid && (
-                  <button onClick={() => onDeleteComment(post.id, c.id)}
-                    style={{ background: "none", border: "none", color: "#333", fontSize: 16, padding: "4px", marginTop: 4, flexShrink: 0 }}>✕</button>
-                )}
               </div>
             ))}
-            <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
-              <input value={commentText} onChange={e => setCommentText(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && submitComment()}
-                placeholder="댓글 달기..."
-                style={{ flex: 1, background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: "8px 14px", color: "#ccc", fontFamily: "inherit", fontSize: 15, outline: "none" }} />
-              <button onClick={submitComment} style={{ width: 38, height: 38, borderRadius: 19, background: commentText ? "#00ff88" : "#111", border: "none", color: commentText ? "#000" : "#333", fontSize: 18, fontWeight: 800 }}>↑</button>
+            {/* 댓글 달기 버튼 - 모달로 */}
+            <button onClick={() => setShowCommentInput(true)}
+              style={{ width: "100%", marginTop: 6, padding: "10px", borderRadius: 12, border: "1px dashed #222", background: "transparent", color: "#444", fontFamily: "inherit", fontSize: 14, textAlign: "left" }}>
+              💬 댓글 달기...
+            </button>
+          </div>
+        )}
+
+        {/* 댓글 입력 모달 */}
+        {showCommentInput && (
+          <div onClick={() => setShowCommentInput(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", zIndex: 400, display: "flex", alignItems: "flex-end" }}>
+            <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "#111", borderRadius: "20px 20px 0 0", padding: "20px 16px", paddingBottom: "calc(20px + env(safe-area-inset-bottom, 0px))" }}>
+              <div style={{ fontSize: 14, color: "#444", marginBottom: 12 }}>댓글 달기</div>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <Avatar user={currentUser} size={28} />
+                <input autoFocus value={commentText} onChange={e => setCommentText(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && (submitComment(), setShowCommentInput(false))}
+                  placeholder="댓글을 입력하세요..."
+                  style={{ flex: 1, minWidth: 0, background: "#0d0d0d", border: "1px solid #222", borderRadius: 20, padding: "9px 12px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box" }} />
+                <button onClick={() => { submitComment(); setShowCommentInput(false); }}
+                  style={{ width: 34, height: 34, borderRadius: 17, background: commentText.trim() ? "#00ff88" : "#1a1a1a", border: "none", color: commentText.trim() ? "#000" : "#444", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -227,12 +290,11 @@ function UploadModal({ onClose, onPost, currentUser, isPro }) {
     setPreviewUrl(URL.createObjectURL(f));
     setStep("analyzing");
     const reader = new FileReader();
+    // Storage 업로드용이 아닌 AI 분석용 base64 별도 추출
     reader.onload = async (e) => {
+      const b64 = e.target.result.split(",")[1];
       try {
-        // resizeToBase64로 8000px 제한 방지
-        const resized = await resizeToBase64(f);
-        const b64 = resized.split(",")[1];
-        const r = await analyzeRunImage(b64, "image/jpeg");
+        const r = await analyzeRunImage(b64, f.type);
         if (r.error === "not_running") {
           setError("러닝 기록 이미지가 아닌 것 같아요 🤔");
           setStep("pick"); setPreviewUrl(null); setFile(null);
@@ -627,7 +689,7 @@ function NotificationModal({ notifications, onClose, onMarkAllRead, onDelete, sc
 
 
 /* ══ CHAT TAB ══ */
-function ChatTab({ setId, currentUser, currentSet, onNotify }) {
+function ChatTab({ setId, currentUser }) {
   const { messages, sendMessage, sendSchedule, joinSchedule, closeSchedule } = useChat(setId);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
@@ -643,13 +705,26 @@ function ChatTab({ setId, currentUser, currentSet, onNotify }) {
 
   useEffect(() => { scrollToBottom(); }, [messages]);
 
-  // 키보드 올라올 때 스크롤만 처리
+  // visualViewport로 키보드 높이 반영해 채팅 영역 동적 조정
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
-    const update = () => scrollToBottom(false);
+
+    const update = () => {
+      // 뷰포트 높이 - GNB 높이(58px) - safe area
+      const gnbH = 58;
+      const safeB = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--safe-bottom") || "0") || 0;
+      setChatHeight(vv.height - gnbH);
+      scrollToBottom(false);
+    };
+
+    update();
     vv.addEventListener("resize", update);
-    return () => vv.removeEventListener("resize", update);
+    vv.addEventListener("scroll", update);
+    return () => {
+      vv.removeEventListener("resize", update);
+      vv.removeEventListener("scroll", update);
+    };
   }, []);
 
   const relTime = (val) => {
@@ -666,14 +741,6 @@ function ChatTab({ setId, currentUser, currentSet, onNotify }) {
     if (!text.trim() || sending) return;
     setSending(true);
     await sendMessage(text, currentUser);
-    // 크루원들에게 채팅 알림
-    if (onNotify && currentSet?.memberIds) {
-      currentSet.memberIds.forEach(uid => {
-        if (uid !== currentUser?.uid) {
-          onNotify({ toUserId: uid, fromUser: currentUser, text: text.trim() });
-        }
-      });
-    }
     setText("");
     setSending(false);
     inputRef.current?.focus();
@@ -695,7 +762,7 @@ function ChatTab({ setId, currentUser, currentSet, onNotify }) {
   };
 
   return (
-    <div ref={containerRef} style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0, background: "#080808", overflow: "hidden" }}>
+    <div ref={containerRef} style={{ display: "flex", flexDirection: "column", height: chatHeight ? `${chatHeight}px` : "100%", minHeight: 0, background: "#080808", overflow: "hidden" }}>
 
       {/* 메시지 스크롤 영역 */}
       <div style={{ flex: 1, overflowY: "auto", padding: "12px 14px 8px", WebkitOverflowScrolling: "touch" }}>
@@ -846,7 +913,7 @@ function ChatTab({ setId, currentUser, currentSet, onNotify }) {
       {/* 입력창 */}
       <div style={{ display: "flex", gap: 8, alignItems: "center", padding: "10px 12px", borderTop: "1px solid #111", background: "#060606", flexShrink: 0 }}>
         <button onClick={() => setShowScheduleModal(true)}
-          style={{ width: 32, height: 32, borderRadius: 16, background: "#0d0d0d", border: "1px solid #1a3028", color: "#00cc66", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>
+          style={{ width: 42, height: 42, borderRadius: 21, background: "#0d0d0d", border: "1px solid #1a3028", color: "#00cc66", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
           📅
         </button>
         <input
@@ -856,13 +923,13 @@ function ChatTab({ setId, currentUser, currentSet, onNotify }) {
           onKeyDown={e => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), handleSend())}
           placeholder="메시지 입력..."
           maxLength={500}
-          style={{ flex: 1, minWidth: 0, background: "#0d0d0d", border: "1px solid #222", borderRadius: 20, padding: "9px 12px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box" }}
+          style={{ flex: 1, background: "#0d0d0d", border: "1px solid #222", borderRadius: 22, padding: "10px 16px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none", transition: "border-color 0.15s" }}
           onFocus={e => e.target.style.borderColor = "#00ff88"}
           onBlur={e => e.target.style.borderColor = "#222"}
         />
         <button onClick={handleSend} disabled={!text.trim() || sending}
-          style={{ width: 32, height: 32, borderRadius: 16, background: text.trim() ? "#00ff88" : "#111", border: "none", color: text.trim() ? "#000" : "#333", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          style={{ width: 42, height: 42, borderRadius: 21, background: text.trim() ? "#00ff88" : "#111", border: "none", color: text.trim() ? "#000" : "#333", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s" }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
           </svg>
         </button>
@@ -1186,20 +1253,16 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
 
       {/* 👥 크루 비교 */}
       {isPro ? (() => {
-        const otherPosts = posts.filter(p => p.userId !== currentUser?.uid);
-        const otherUsers = [...new Set(otherPosts.map(p => p.userId))];
-        const otherCount = Math.max(1, otherUsers.length);
-        const otherDist = otherPosts.reduce((a,p) => a + (parseFloat(p.dist)||0), 0);
-        const otherRuns = otherPosts.length;
-        const otherAvgTotalDist = otherDist / otherCount;
-        const otherAvgRuns = otherRuns / otherCount;
-        const otherAvgPerRun = otherRuns > 0 ? otherDist / otherRuns : 0;
+        const crewPosts = posts;
+        const crewDist = crewPosts.reduce((a,p) => a + (parseFloat(p.dist)||0), 0);
+        const crewRuns = crewPosts.length;
+        const crewAvg = crewRuns > 0 ? crewDist / crewRuns : 0;
         const myRuns = myPosts.length;
-        const myAvgPerRun = myRuns > 0 ? totalDist / myRuns : 0;
+        const myAvg = myRuns > 0 ? totalDist / myRuns : 0;
         const metrics = [
-          { label: "총 거리", me: `${totalDist.toFixed(1)}km`, crew: `${otherAvgTotalDist.toFixed(1)}km`, unit: "크루원 평균" },
-          { label: "러닝 횟수", me: `${myRuns}회`, crew: `${Math.round(otherAvgRuns)}회`, unit: "크루원 평균" },
-          { label: "평균 거리", me: `${myAvgPerRun.toFixed(1)}km`, crew: `${otherAvgPerRun.toFixed(1)}km`, unit: "크루원 평균" },
+          { label: "총 거리", me: `${totalDist.toFixed(1)}km`, crew: `${(crewDist/Math.max(1, [...new Set(crewPosts.map(p=>p.userId))].length)).toFixed(1)}km`, unit: "크루 평균" },
+          { label: "러닝 횟수", me: `${myRuns}회`, crew: `${Math.round(crewRuns/Math.max(1, [...new Set(crewPosts.map(p=>p.userId))].length))}회`, unit: "크루 평균" },
+          { label: "평균 거리", me: `${myAvg.toFixed(1)}km`, crew: `${crewAvg.toFixed(1)}km`, unit: "크루 평균" },
         ];
         return (
           <div style={{ background: "#080808", border: "1px solid #161616", borderRadius: 16, padding: "16px", marginBottom: 16 }}>
@@ -1619,7 +1682,7 @@ function BottomNav({ tab, setTab, onUpload, newFeedCount = 0, newChatCount = 0 }
 
 /* ══ MAIN ══ */
 export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLogout, onUpdateProfile, onRedeemCoupon }) {
-  const { posts, loading, createPost, toggleReaction, addComment, deleteComment, deletePost, getMyMonthlyPostCount } = usePosts(currentUser, currentSet?.id);
+  const { posts, loading, createPost, updatePost, toggleReaction, addComment, deletePost, getMyMonthlyPostCount } = usePosts(currentUser, currentSet?.id);
   const { kickMember, transferAdmin, leaveSet, addNotice, deleteNotice, getInviteLink, deleteSet } = useSets(currentUser);
   const isAdmin = currentSet?.adminId === currentUser?.uid;
   const isPro = currentUser?.isPro === true;
@@ -1712,7 +1775,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
       {/* 헤더 */}
       <div style={{ padding: `calc(14px + ${safeTop}) 18px 10px`, display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, background: "#060606", zIndex: 50 }}>
         <div>
-          <div style={{ fontSize: 10, color: "#333", letterSpacing: 4 }}>RUNCREW</div>
+          <div style={{ fontSize: 10, color: "#1e1e1e", letterSpacing: 4 }}>RUNTRACK</div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <button onClick={onLeaveSet} style={{ background: "none", border: "none", color: "#e0e0e0", fontSize: 26, padding: "0 4px 0 0", cursor: "pointer", lineHeight: 1 }}>‹</button>
             <div style={{ fontSize: 20, fontWeight: 800, color: "#00ff88", letterSpacing: -0.5 }}>{currentSet?.emoji} {currentSet?.name}</div>
@@ -1784,7 +1847,6 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
             )}
             {posts.map(post => (
               <PostCard key={post.id} post={post} currentUser={currentUser} isAdmin={isAdmin}
-                onDeleteComment={(postId, commentId) => deleteComment(postId, commentId)}
                 onReact={async (id, e) => {
                   await toggleReaction(id, e, currentUser?.uid);
                   const p = posts.find(p => p.id === id);
@@ -1799,6 +1861,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
                     createNotification({ toUserId: p.userId, fromUser: currentUser, type: "comment", postId: id, postDist: p.dist, commentText: t });
                   }
                 }}
+                onEdit={(postId, updates) => updatePost(postId, updates)}
                 onDelete={(id) => deletePost(id, isAdmin)} />
             ))}
           </>

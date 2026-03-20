@@ -34,17 +34,16 @@ const resizeToBase64 = (file) => new Promise((resolve, reject) => {
   const img = new Image();
   const url = URL.createObjectURL(file);
   img.onload = () => {
-    // 전체 이미지를 유지하되 가로 500px로 줄여서 세로가 길어도 8000px 안 넘게
-    const MAX_W = 500;
+    const MAX_W = 1200; const MAX_H = 2400;
     let w = img.width, h = img.height;
-    const scale = Math.min(MAX_W / w, 1);
-    const dw = Math.floor(w * scale);
-    const dh = Math.floor(h * scale);
+    const ratio = w / h;
+    if (w > MAX_W) { w = MAX_W; h = Math.round(w / ratio); }
+    if (h > MAX_H) { h = MAX_H; w = Math.round(h * ratio); }
     const canvas = document.createElement("canvas");
-    canvas.width = dw; canvas.height = dh;
-    canvas.getContext("2d").drawImage(img, 0, 0, dw, dh);
+    canvas.width = w; canvas.height = h;
+    canvas.getContext("2d").drawImage(img, 0, 0, w, h);
     URL.revokeObjectURL(url);
-    resolve(canvas.toDataURL("image/jpeg", 0.9));
+    resolve(canvas.toDataURL("image/jpeg", 0.85));
   };
   img.onerror = reject;
   img.src = url;
@@ -97,8 +96,8 @@ export function usePosts(currentUser, setId) {
         const blob = await resizeToBlob(imageFile);
         const filename = `posts/${currentUser.uid}/${Date.now()}.jpg`;
         const storageRef = ref(storage, filename);
-        const snapshot = await uploadBytes(storageRef, blob, { contentType: "image/jpeg" });
-        imageUrl = await getDownloadURL(snapshot.ref);
+        await uploadBytes(storageRef, blob, { contentType: "image/jpeg" });
+        imageUrl = await getDownloadURL(storageRef);
       } catch (e) {
         console.warn("이미지 업로드 실패, 이미지 없이 저장:", e);
       }
@@ -179,14 +178,10 @@ export function usePosts(currentUser, setId) {
     await deleteDoc(postRef);
   };
 
-  // 댓글 삭제
-  const deleteComment = async (postId, commentId) => {
-    const postRef = doc(db, "posts", postId);
-    const snap = await getDoc(postRef);
-    if (!snap.exists()) return;
-    const comments = (snap.data().comments || []).filter(c => c.id !== commentId);
-    await updateDoc(postRef, { comments });
+  // 게시글 수정
+  const updatePost = async (postId, updates) => {
+    await updateDoc(doc(db, "posts", postId), updates);
   };
 
-  return { posts, loading, createPost, toggleReaction, addComment, deleteComment, deletePost, getMyMonthlyPostCount };
+  return { posts, loading, createPost, updatePost, toggleReaction, addComment, deletePost, getMyMonthlyPostCount };
 }
