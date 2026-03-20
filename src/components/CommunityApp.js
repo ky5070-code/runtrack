@@ -627,7 +627,7 @@ function NotificationModal({ notifications, onClose, onMarkAllRead, onDelete, sc
 
 
 /* ══ CHAT TAB ══ */
-function ChatTab({ setId, currentUser }) {
+function ChatTab({ setId, currentUser, currentSet, onNotify }) {
   const { messages, sendMessage, sendSchedule, joinSchedule, closeSchedule } = useChat(setId);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
@@ -666,6 +666,14 @@ function ChatTab({ setId, currentUser }) {
     if (!text.trim() || sending) return;
     setSending(true);
     await sendMessage(text, currentUser);
+    // 크루원들에게 채팅 알림
+    if (onNotify && currentSet?.memberIds) {
+      currentSet.memberIds.forEach(uid => {
+        if (uid !== currentUser?.uid) {
+          onNotify({ toUserId: uid, fromUser: currentUser, text: text.trim() });
+        }
+      });
+    }
     setText("");
     setSending(false);
     inputRef.current?.focus();
