@@ -262,8 +262,13 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
                 </div>
               </div>
             ))}
-            {/* 댓글 달기 버튼 - 모달로 */}
-            <button onClick={() => setShowCommentInput(true)}
+            {/* 댓글 달기 - prompt 방식 */}
+            <button onClick={() => {
+              const text = window.prompt("댓글을 입력하세요");
+              if (text?.trim()) {
+                onComment(post.id, text.trim());
+              }
+            }}
               style={{ width: "100%", marginTop: 6, padding: "10px", borderRadius: 12, border: "1px dashed #222", background: "transparent", color: "#444", fontFamily: "inherit", fontSize: 14, textAlign: "left" }}>
               💬 댓글 달기...
             </button>
