@@ -1300,17 +1300,21 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
 
       {/* 👥 크루 비교 */}
       {isPro ? (() => {
-        const crewPosts = posts;
-        const crewDist = crewPosts.reduce((a,p) => a + (parseFloat(p.dist)||0), 0);
-        const crewRuns = crewPosts.length;
-        const crewAvg = crewRuns > 0 ? crewDist / crewRuns : 0;
+      {isPro ? (() => {
+        const otherPosts = posts.filter(p => p.userId !== currentUser?.uid);
+        const otherUsers = [...new Set(otherPosts.map(p => p.userId))];
+        const otherCount = Math.max(1, otherUsers.length);
+        const otherDist = otherPosts.reduce((a,p) => a + (parseFloat(p.dist)||0), 0);
+        const otherRuns = otherPosts.length;
+        const otherAvgTotalDist = otherDist / otherCount;
+        const otherAvgRuns = otherRuns / otherCount;
+        const otherAvgPerRun = otherRuns > 0 ? otherDist / otherRuns : 0;
         const myRuns = myPosts.length;
-        const myAvg = myRuns > 0 ? totalDist / myRuns : 0;
+        const myAvgPerRun = myRuns > 0 ? totalDist / myRuns : 0;
         const metrics = [
-          { label: "총 거리", me: `${totalDist.toFixed(1)}km`, crew: `${(crewDist/Math.max(1, [...new Set(crewPosts.map(p=>p.userId))].length)).toFixed(1)}km`, unit: "크루 평균" },
-          { label: "러닝 횟수", me: `${myRuns}회`, crew: `${Math.round(crewRuns/Math.max(1, [...new Set(crewPosts.map(p=>p.userId))].length))}회`, unit: "크루 평균" },
-          { label: "평균 거리", me: `${myAvg.toFixed(1)}km`, crew: `${crewAvg.toFixed(1)}km`, unit: "크루 평균" },
-        ];
+          { label: "총 거리", me: `${totalDist.toFixed(1)}km`, crew: `${otherAvgTotalDist.toFixed(1)}km`, unit: "크루원 평균" },
+          { label: "러닝 횟수", me: `${myRuns}회`, crew: `${Math.round(otherAvgRuns)}회`, unit: "크루원 평균" },
+          { label: "평균 거리", me: `${myAvgPerRun.toFixed(1)}km`, crew: `${otherAvgPerRun.toFixed(1)}km`, unit: "크루원 평균" },
         return (
           <div style={{ background: "#080808", border: "1px solid #161616", borderRadius: 16, padding: "16px", marginBottom: 16 }}>
             <div style={{ fontSize: 13, color: "#444", letterSpacing: 1, marginBottom: 12 }}>👥 크루 비교</div>
