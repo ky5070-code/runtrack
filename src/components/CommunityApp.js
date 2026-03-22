@@ -245,14 +245,16 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
                     )}
                   </div>
                   {editingCommentId === c.id ? (
-                    <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
+                    <div style={{ marginTop: 6 }}>
                       <input value={editingCommentText} onChange={e => setEditingCommentText(e.target.value)}
                         autoFocus
-                        style={{ flex: 1, background: "#111", border: "1px solid #00ff88", borderRadius: 8, padding: "6px 10px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none" }} />
-                      <button onClick={() => { onEditComment && onEditComment(post.id, c.id, editingCommentText); setEditingCommentId(null); }}
-                        style={{ background: "#00ff88", border: "none", borderRadius: 8, padding: "6px 10px", color: "#000", fontFamily: "inherit", fontSize: 13, fontWeight: 800 }}>저장</button>
-                      <button onClick={() => setEditingCommentId(null)}
-                        style={{ background: "#1a1a1a", border: "none", borderRadius: 8, padding: "6px 10px", color: "#555", fontFamily: "inherit", fontSize: 13 }}>취소</button>
+                        style={{ width: "100%", background: "#111", border: "1px solid #00ff88", borderRadius: 8, padding: "7px 10px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box", marginBottom: 6 }} />
+                      <div style={{ display: "flex", gap: 6 }}>
+                        <button onClick={() => { onEditComment && onEditComment(post.id, c.id, editingCommentText); setEditingCommentId(null); }}
+                          style={{ flex: 1, background: "#00ff88", border: "none", borderRadius: 8, padding: "7px", color: "#000", fontFamily: "inherit", fontSize: 13, fontWeight: 800 }}>저장</button>
+                        <button onClick={() => setEditingCommentId(null)}
+                          style={{ flex: 1, background: "#1a1a1a", border: "none", borderRadius: 8, padding: "7px", color: "#555", fontFamily: "inherit", fontSize: 13 }}>취소</button>
+                      </div>
                     </div>
                   ) : (
                     <div style={{ fontSize: 15, color: "#aaa", lineHeight: 1.5 }}>{c.text}</div>
