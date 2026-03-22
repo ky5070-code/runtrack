@@ -1851,7 +1851,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
 
       {/* 주간 요약 - 채팅 탭에서는 숨김 */}
       <div style={{ margin: "0 18px 12px", background: "#0a0a0a", border: "1px solid #161616", borderRadius: 16, padding: "12px 16px", display: tab === "chat" ? "none" : "flex", flexShrink: 0 }}>
-        {[[`${myWeekDist.toFixed(1)}km`, "이번 주"], [`${posts.filter(p => p.userId === currentUser?.uid).length}회`, "총 러닝"], [`${calcStreak(posts, currentUser?.uid)}일`, "🔥 스트릭"]].map(([v, l], i) => (
+        {[[`${myWeekDist.toFixed(1)}km`, "이번 주"], [`${posts.filter(p => { if (p.userId !== currentUser?.uid) return false; const ts = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt||0); return ts.getTime() >= getThisWeekStart(); }).length}회`, "이번 주 횟수"], [`${calcStreak(posts, currentUser?.uid)}일`, "🔥 스트릭"]].map(([v, l], i) => (
           <div key={l} style={{ flex: 1, borderLeft: i > 0 ? "1px solid #141414" : "none", paddingLeft: i > 0 ? 14 : 0 }}>
             <div style={{ fontSize: 19, fontWeight: 800, color: "#00ff88" }}>{v}</div>
             <div style={{ fontSize: 12, color: "#2e2e2e" }}>{l}</div>
