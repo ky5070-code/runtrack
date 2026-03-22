@@ -1315,6 +1315,7 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
           { label: "총 거리", me: `${totalDist.toFixed(1)}km`, crew: `${otherAvgTotalDist.toFixed(1)}km`, unit: "크루원 평균" },
           { label: "러닝 횟수", me: `${myRuns}회`, crew: `${Math.round(otherAvgRuns)}회`, unit: "크루원 평균" },
           { label: "평균 거리", me: `${myAvgPerRun.toFixed(1)}km`, crew: `${otherAvgPerRun.toFixed(1)}km`, unit: "크루원 평균" },
+        ];
         return (
           <div style={{ background: "#080808", border: "1px solid #161616", borderRadius: 16, padding: "16px", marginBottom: 16 }}>
             <div style={{ fontSize: 13, color: "#444", letterSpacing: 1, marginBottom: 12 }}>👥 크루 비교</div>
