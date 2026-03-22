@@ -27,10 +27,11 @@ Return ONLY a raw JSON object, no markdown, no explanation:
 {"distance":<km decimal>,"duration":<total seconds int>,"pace":<"M'SS\\"">,"calories":<total kcal int>,"date":<"YYYY-MM-DD" or null>,"appName":<app name or null>,"confidence":<"high"|"medium"|"low">,"error":<null or "not_running">}
 
 RULES:
-- distance: "러닝 거리" / "Distance" / km value. Miles → km (×1.609)
-- duration: "총 시간" / "Elapsed Time" / "Duration". HH:MM:SS or MM:SS → seconds
-- pace: "평균 페이스" / "Avg Pace" → format M'SS" e.g. 7'25"
-- calories: "총 칼로리" / "Total Calories" — prefer total over active
+- distance: "러닝 거리" / "Running Distance" / km value (e.g. "5,280.00 m" = 5.28km, "5.28 km"). Miles → km (×1.609). DO NOT confuse with pace.
+- duration: "총 시간" / "러닝 시간" / "Elapsed Time". HH:MM:SS or MM:SS → total seconds
+- pace: "러닝 페이스" / "평균 페이스" / "Avg Pace" → format M'SS" e.g. 5'42". This is min/km, NOT a distance value.
+- calories: "총 칼로리" / "활성 칼로리" / "Total Calories" — prefer 총 over 활성
+- Garmin specific: "운동 요약" section has "러닝 거리" in meters (e.g. 5,280.00 m) and "러닝 페이스" in min/km. Convert meters to km.
 - If not a running record: {"error":"not_running"}`,
           },
         ],
