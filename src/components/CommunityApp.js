@@ -1300,7 +1300,6 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
 
       {/* 👥 크루 비교 */}
       {isPro ? (() => {
-      {isPro ? (() => {
         const otherPosts = posts.filter(p => p.userId !== currentUser?.uid);
         const otherUsers = [...new Set(otherPosts.map(p => p.userId))];
         const otherCount = Math.max(1, otherUsers.length);
