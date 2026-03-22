@@ -262,16 +262,34 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
                 </div>
               </div>
             ))}
-            {/* 댓글 달기 - prompt 방식 */}
-            <button onClick={() => {
-              const text = window.prompt("댓글을 입력하세요");
-              if (text?.trim()) {
-                onComment(post.id, text.trim());
-              }
-            }}
-              style={{ width: "100%", marginTop: 6, padding: "10px", borderRadius: 12, border: "1px dashed #222", background: "transparent", color: "#444", fontFamily: "inherit", fontSize: 14, textAlign: "left" }}>
-              💬 댓글 달기...
-            </button>
+            {/* 댓글 달기 인라인 입력 */}
+            {showCommentInput ? (
+              <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 8 }}>
+                <Avatar user={currentUser} size={26} />
+                <input
+                  autoFocus
+                  value={commentText}
+                  onChange={e => setCommentText(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && (submitComment(), setShowCommentInput(false))}
+                  placeholder="댓글을 입력하세요..."
+                  style={{ flex: 1, minWidth: 0, background: "#0a0a0a", border: "1px solid #00ff88", borderRadius: 20, padding: "8px 12px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box" }}
+                />
+                <button onClick={() => { submitComment(); setShowCommentInput(false); }}
+                  style={{ width: 32, height: 32, borderRadius: 16, background: commentText.trim() ? "#00ff88" : "#1a1a1a", border: "none", color: commentText.trim() ? "#000" : "#444", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                  </svg>
+                </button>
+                <button onClick={() => setShowCommentInput(false)}
+                  style={{ background: "none", border: "none", color: "#333", fontSize: 18, padding: "0 2px" }}>✕</button>
+              </div>
+            ) : (
+              <button onClick={() => setShowCommentInput(true)}
+                style={{ width: "100%", marginTop: 8, padding: "8px 12px", borderRadius: 20, border: "1px solid #1e1e1e", background: "#0a0a0a", color: "#333", fontFamily: "inherit", fontSize: 14, textAlign: "left", display: "flex", alignItems: "center", gap: 8 }}>
+                <Avatar user={currentUser} size={22} />
+                <span>댓글 달기...</span>
+              </button>
+            )}
           </div>
         )}
 
