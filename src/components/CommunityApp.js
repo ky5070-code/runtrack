@@ -157,14 +157,14 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
         {/* 수정 모달 */}
         {showEditModal && (
           <div onClick={() => setShowEditModal(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", zIndex: 400, display: "flex", alignItems: "flex-end" }}>
-            <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "#111", borderRadius: "20px 20px 0 0", padding: "20px 16px", paddingBottom: "calc(20px + env(safe-area-inset-bottom, 0px))" }}>
-              <div style={{ width: 40, height: 4, background: "#222", borderRadius: 2, margin: "0 auto 16px" }} />
-              <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14 }}>✏️ 메모 수정</div>
+            <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "#111", borderRadius: "20px 20px 0 0", padding: "16px 16px 0", paddingBottom: "calc(16px + env(safe-area-inset-bottom, 0px))" }}>
+              <div style={{ width: 40, height: 4, background: "#222", borderRadius: 2, margin: "0 auto 14px" }} />
+              <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 12 }}>✏️ 메모 수정</div>
               <textarea value={editCaption} onChange={e => setEditCaption(e.target.value)}
                 placeholder="러닝 메모를 입력하세요..."
                 rows={3} maxLength={200}
-                style={{ width: "100%", background: "#0d0d0d", border: "1px solid #222", borderRadius: 12, padding: "12px 14px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 15, outline: "none", resize: "none", boxSizing: "border-box", marginBottom: 14 }} />
-              <div style={{ display: "flex", gap: 8 }}>
+                style={{ width: "100%", background: "#0d0d0d", border: "1px solid #222", borderRadius: 12, padding: "12px 14px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 15, outline: "none", resize: "none", boxSizing: "border-box", marginBottom: 10 }} />
+              <div style={{ display: "flex", gap: 8, position: "sticky", bottom: 0, background: "#111", paddingBottom: "calc(8px + env(safe-area-inset-bottom, 0px))", paddingTop: 8 }}>
                 <button onClick={() => setShowEditModal(false)}
                   style={{ flex: 1, padding: "14px", borderRadius: 12, border: "1px solid #222", background: "transparent", color: "#555", fontFamily: "inherit", fontSize: 15, fontWeight: 700 }}>취소</button>
                 <button onClick={() => { onEdit && onEdit(post.id, { caption: editCaption }); setShowEditModal(false); }}
