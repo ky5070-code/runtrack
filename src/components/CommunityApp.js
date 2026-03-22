@@ -64,10 +64,12 @@ const Avatar = ({ user, size = 38 }) => (
 );
 
 /* ══ POST CARD ══ */
-function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onDeleteComment, isAdmin = false }) {
+function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onDeleteComment, onEditComment, isAdmin = false }) {
   const author = post.author || {};
   const [showComments, setShowComments] = useState(false);
   const [showCommentInput, setShowCommentInput] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editingCommentText, setEditingCommentText] = useState("");
   const [commentText, setCommentText] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -231,8 +233,30 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
               <div key={c.id} style={{ display: "flex", gap: 8, marginBottom: 10 }}>
                 <div style={{ width: 30, height: 30, borderRadius: 15, background: "#111", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>{c.userAvatar || "🏃"}</div>
                 <div style={{ flex: 1, background: "#0d0d0d", borderRadius: 10, padding: "8px 12px" }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#666", marginBottom: 2 }}>{c.userName}</div>
-                  <div style={{ fontSize: 15, color: "#aaa", lineHeight: 1.5 }}>{c.text}</div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#666" }}>{c.userName}</div>
+                    {c.userId === currentUser?.uid && (
+                      <div style={{ display: "flex", gap: 6 }}>
+                        <button onClick={() => { setEditingCommentId(c.id); setEditingCommentText(c.text); }}
+                          style={{ background: "none", border: "none", color: "#444", fontSize: 12, padding: "0 2px", cursor: "pointer" }}>수정</button>
+                        <button onClick={() => onDeleteComment && onDeleteComment(post.id, c.id)}
+                          style={{ background: "none", border: "none", color: "#333", fontSize: 12, padding: "0 2px", cursor: "pointer" }}>✕</button>
+                      </div>
+                    )}
+                  </div>
+                  {editingCommentId === c.id ? (
+                    <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
+                      <input value={editingCommentText} onChange={e => setEditingCommentText(e.target.value)}
+                        autoFocus
+                        style={{ flex: 1, background: "#111", border: "1px solid #00ff88", borderRadius: 8, padding: "6px 10px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none" }} />
+                      <button onClick={() => { onEditComment && onEditComment(post.id, c.id, editingCommentText); setEditingCommentId(null); }}
+                        style={{ background: "#00ff88", border: "none", borderRadius: 8, padding: "6px 10px", color: "#000", fontFamily: "inherit", fontSize: 13, fontWeight: 800 }}>저장</button>
+                      <button onClick={() => setEditingCommentId(null)}
+                        style={{ background: "#1a1a1a", border: "none", borderRadius: 8, padding: "6px 10px", color: "#555", fontFamily: "inherit", fontSize: 13 }}>취소</button>
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: 15, color: "#aaa", lineHeight: 1.5 }}>{c.text}</div>
+                  )}
                 </div>
               </div>
             ))}
@@ -1680,7 +1704,7 @@ function BottomNav({ tab, setTab, onUpload, newFeedCount = 0, newChatCount = 0 }
 
 /* ══ MAIN ══ */
 export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLogout, onUpdateProfile, onRedeemCoupon }) {
-  const { posts, loading, createPost, updatePost, toggleReaction, addComment, deletePost, getMyMonthlyPostCount } = usePosts(currentUser, currentSet?.id);
+  const { posts, loading, createPost, updatePost, toggleReaction, addComment, editComment, deletePost, getMyMonthlyPostCount } = usePosts(currentUser, currentSet?.id);
   const { kickMember, transferAdmin, leaveSet, addNotice, deleteNotice, getInviteLink, deleteSet } = useSets(currentUser);
   const isAdmin = currentSet?.adminId === currentUser?.uid;
   const isPro = currentUser?.isPro === true;
@@ -1860,6 +1884,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
                   }
                 }}
                 onEdit={(postId, updates) => updatePost(postId, updates)}
+                onEditComment={(postId, commentId, text) => editComment(postId, commentId, text)}
                 onDelete={(id) => deletePost(id, isAdmin)} />
             ))}
           </>

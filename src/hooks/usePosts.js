@@ -183,5 +183,16 @@ export function usePosts(currentUser, setId) {
     await updateDoc(doc(db, "posts", postId), updates);
   };
 
-  return { posts, loading, createPost, updatePost, toggleReaction, addComment, deletePost, getMyMonthlyPostCount };
+  // 댓글 수정
+  const editComment = async (postId, commentId, newText) => {
+    const postRef = doc(db, "posts", postId);
+    const snap = await getDoc(postRef);
+    if (!snap.exists()) return;
+    const comments = (snap.data().comments || []).map(c =>
+      c.id === commentId ? { ...c, text: newText } : c
+    );
+    await updateDoc(postRef, { comments });
+  };
+
+  return { posts, loading, createPost, updatePost, toggleReaction, addComment, editComment, deletePost, getMyMonthlyPostCount };
 }
