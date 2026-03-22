@@ -289,11 +289,12 @@ function UploadModal({ onClose, onPost, currentUser, isPro }) {
     setPreviewUrl(URL.createObjectURL(f));
     setStep("analyzing");
     const reader = new FileReader();
-    // Storage 업로드용이 아닌 AI 분석용 base64 별도 추출
-    reader.onload = async (e) => {
-      const b64 = e.target.result.split(",")[1];
+    reader.onload = async () => {
       try {
-        const r = await analyzeRunImage(b64, f.type);
+        // resizeToBase64로 8000px 제한 방지
+        const resized = await resizeToBase64(f);
+        const b64 = resized.split(",")[1];
+        const r = await analyzeRunImage(b64, "image/jpeg");
         if (r.error === "not_running") {
           setError("러닝 기록 이미지가 아닌 것 같아요 🤔");
           setStep("pick"); setPreviewUrl(null); setFile(null);
