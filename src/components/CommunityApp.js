@@ -523,7 +523,7 @@ function LeaderboardTab({ posts, currentUser, isPro }) {
     if (!p.author) return;
     const ts = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt || 0);
     const age = Date.now() - ts.getTime();
-    if (period === "week" && age > 7 * 86400000) return;
+    if (period === "week" && ts.getTime() < getThisWeekStart()) return;
     if (period === "month" && age > 30 * 86400000) return;
     if (!userMap[p.userId]) userMap[p.userId] = { user: p.author, dist: 0, runs: 0, totalDuration: 0 };
     userMap[p.userId].dist += parseFloat(p.dist) || 0;
@@ -1764,7 +1764,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
     const thisWeekDist = posts.filter(p => {
       if (p.userId !== currentUser?.uid) return false;
       const ts = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt||0);
-      return Date.now() - ts.getTime() < 7 * 86400000;
+      return ts.getTime() >= getThisWeekStart();
     }).reduce((a,p) => a+(parseFloat(p.dist)||0), 0);
     const pct = (thisWeekDist / goal) * 100;
     if (prevGoalPct.current < 100 && pct >= 100) {
@@ -1825,7 +1825,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
 
   const myWeekDist = posts.filter(p => {
     const ts = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt || 0);
-    return p.userId === currentUser?.uid && Date.now() - ts.getTime() < 7 * 86400000;
+    return p.userId === currentUser?.uid && ts.getTime() >= getThisWeekStart();
   }).reduce((a, p) => a + (parseFloat(p.dist) || 0), 0);
 
   return (
