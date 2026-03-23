@@ -27,6 +27,16 @@ const safeBottom = "env(safe-area-inset-bottom, 0px)";
 const safeTop = "env(safe-area-inset-top, 0px)";
 const FREE_MONTHLY_LIMIT = 5;
 
+const getThisWeekStart = () => {
+  const now = new Date();
+  const day = now.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  const mon = new Date(now);
+  mon.setDate(now.getDate() + diff);
+  mon.setHours(0, 0, 0, 0);
+  return mon.getTime();
+};
+
 /* ══ TOAST & CONFIRM ══ */
 function Toast({ message, type }) {
   const bg = type === "success" ? "#00ff88" : type === "error" ? "#ff4444" : "#ffaa00";
