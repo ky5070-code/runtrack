@@ -1208,10 +1208,10 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
             );
           })}
         </div>
-        <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 100 }}>
+        <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 120 }}>
           {chartData.map((w, i) => {
             const isLast = i === chartData.length - 1;
-            const h = maxDist > 0 ? Math.max((w.dist / maxDist) * 88, w.dist > 0 ? 5 : 0) : 0;
+            const h = maxDist > 0 ? Math.max((w.dist / maxDist) * 72, w.dist > 0 ? 5 : 0) : 0;
             return (
               <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
                 {w.dist > 0 && <div style={{ fontSize: 9, color: isLast ? "#00ff88" : "#444" }}>{w.dist.toFixed(1)}</div>}
