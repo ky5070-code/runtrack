@@ -327,6 +327,73 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
   );
 }
 
+/* ══ NOTICE BOARD ══ */
+function NoticeBoard({ notices, isAdmin, onAdd, onDelete }) {
+  const [showInput, setShowInput] = useState(false);
+  const [text, setText] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleAdd = async () => {
+    if (!text.trim()) return;
+    setLoading(true);
+    await onAdd(text.trim());
+    setText(""); setShowInput(false); setLoading(false);
+  };
+
+  const relTime = (val) => {
+    const ts = new Date(val || 0);
+    const d = Date.now() - ts.getTime();
+    if (d < 60000) return "방금";
+    if (d < 3600000) return `${Math.floor(d/60000)}분 전`;
+    if (d < 86400000) return `${Math.floor(d/3600000)}시간 전`;
+    return `${Math.floor(d/86400000)}일 전`;
+  };
+
+  return (
+    <div style={{ background: "#080808", border: "1px solid #1a3028", borderRadius: 16, padding: "14px 16px", marginBottom: 14 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: notices.length > 0 || showInput ? 12 : 0 }}>
+        <div style={{ fontSize: 13, color: "#00cc66", fontWeight: 700 }}>📢 공지사항</div>
+        {isAdmin && (
+          <button onClick={() => setShowInput(s => !s)}
+            style={{ background: showInput ? "#1a3028" : "none", border: "1px solid #1a3028", borderRadius: 8, padding: "4px 10px", color: "#00cc66", fontFamily: "inherit", fontSize: 12, fontWeight: 700 }}>
+            {showInput ? "취소" : "+ 공지 작성"}
+          </button>
+        )}
+      </div>
+
+      {showInput && (
+        <div style={{ marginBottom: 12 }}>
+          <textarea value={text} onChange={e => setText(e.target.value)}
+            placeholder="공지사항을 입력하세요..."
+            rows={3} maxLength={300}
+            style={{ width: "100%", background: "#0a0a0a", border: "1px solid #1a3028", borderRadius: 10, padding: "10px 12px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none", resize: "none", boxSizing: "border-box", marginBottom: 8 }} />
+          <button onClick={handleAdd} disabled={!text.trim() || loading}
+            style={{ width: "100%", padding: "11px", borderRadius: 10, border: "none", background: text.trim() ? "#00ff88" : "#111", color: text.trim() ? "#000" : "#333", fontFamily: "inherit", fontSize: 14, fontWeight: 800 }}>
+            {loading ? "등록 중..." : "공지 등록"}
+          </button>
+        </div>
+      )}
+
+      {notices.slice().reverse().map(n => (
+        <div key={n.id} style={{ display: "flex", gap: 10, marginBottom: 8, paddingBottom: 8, borderBottom: "1px solid #111" }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, color: "#ccc", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{n.text}</div>
+            <div style={{ fontSize: 11, color: "#2a2a2a", marginTop: 4 }}>{n.authorName} · {relTime(n.createdAt)}</div>
+          </div>
+          {isAdmin && (
+            <button onClick={() => onDelete(n.id)}
+              style={{ background: "none", border: "none", color: "#2a2a2a", fontSize: 16, flexShrink: 0, alignSelf: "flex-start", padding: "2px 4px" }}>✕</button>
+          )}
+        </div>
+      ))}
+
+      {notices.length === 0 && !showInput && (
+        <div style={{ fontSize: 13, color: "#2a2a2a", textAlign: "center", padding: "4px 0" }}>아직 공지사항이 없어요</div>
+      )}
+    </div>
+  );
+}
+
 /* ══ UPLOAD MODAL ══ */
 function UploadModal({ onClose, onPost, currentUser, isPro }) {
   const [step, setStep] = useState("pick");
@@ -1886,6 +1953,14 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
 
         {tab === "feed" && !loading && (
           <>
+            {((currentSet?.notices || []).length > 0 || isAdmin) && (
+              <NoticeBoard
+                notices={currentSet?.notices || []}
+                isAdmin={isAdmin}
+                onAdd={async (text) => { await addNotice(currentSet.id, text); }}
+                onDelete={async (id) => { await deleteNotice(currentSet.id, id); }}
+              />
+            )}
             {posts.length === 0 && (
               <div style={{ textAlign: "center", padding: "50px 0 40px", color: "#2a2a2a" }}>
                 <div style={{ fontSize: 60, marginBottom: 16 }}>🏃</div>
