@@ -1093,14 +1093,14 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
 
   const goal = currentUser?.weeklyGoal || 0;
 
-  // 주간 차트 (8주)
+  // 주간 차트 (8주) - 월요일 기준
   const weeklyData = [];
   for (let i = 7; i >= 0; i--) {
-    const start = Date.now() - (i + 1) * 7 * 86400000;
-    const end = Date.now() - i * 7 * 86400000;
+    const weekStart = getThisWeekStart() - i * 7 * 86400000;
+    const weekEnd = weekStart + 7 * 86400000;
     const dist = myPosts.filter(p => {
       const t = p.createdAt?.toDate ? p.createdAt.toDate().getTime() : new Date(p.createdAt || 0).getTime();
-      return t >= start && t < end;
+      return t >= weekStart && t < weekEnd;
     }).reduce((a, p) => a + (parseFloat(p.dist) || 0), 0);
     weeklyData.push({ label: i === 0 ? "이번주" : `${i}주전`, dist });
   }
