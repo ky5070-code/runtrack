@@ -1093,39 +1093,46 @@ function ScheduleCreateModal({ onClose, onCreate }) {
 
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", zIndex: 300, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-      <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, background: "#0d0d0d", borderRadius: "22px 22px 0 0", border: "1px solid #1a1a1a", padding: "20px 20px", paddingBottom: `calc(24px + ${safeBottom})` }}>
-        <div style={{ width: 40, height: 4, background: "#222", borderRadius: 2, margin: "0 auto 18px" }} />
-        <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
-          <span>🏃</span> 같이 러닝 일정 만들기
-        </div>
-
-        <div style={{ marginBottom: 14 }}>
-          <div style={labelStyle}>일정 제목</div>
-          <input value={title} onChange={e => setTitle(e.target.value)} placeholder="예) 한강 야간 러닝" style={inputStyle} />
-        </div>
-
-        <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
-          <div style={{ flex: 1 }}>
-            <div style={labelStyle}>날짜</div>
-            <input type="date" value={date} onChange={e => setDate(e.target.value)} style={inputStyle} />
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={labelStyle}>시간</div>
-            <input type="time" value={time} onChange={e => setTime(e.target.value)} style={inputStyle} />
+      <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, background: "#0d0d0d", borderRadius: "22px 22px 0 0", border: "1px solid #1a1a1a", maxHeight: "85vh", display: "flex", flexDirection: "column" }}>
+        {/* 헤더 고정 */}
+        <div style={{ padding: "20px 20px 0", flexShrink: 0 }}>
+          <div style={{ width: 40, height: 4, background: "#222", borderRadius: 2, margin: "0 auto 18px" }} />
+          <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
+            <span>🏃</span> 같이 러닝 일정 만들기
           </div>
         </div>
 
-        <div style={{ marginBottom: 14 }}>
-          <div style={labelStyle}>장소</div>
-          <input value={place} onChange={e => setPlace(e.target.value)} placeholder="예) 잠실 한강공원 주차장" style={inputStyle} />
+        {/* 스크롤 영역 */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "0 20px", WebkitOverflowScrolling: "touch" }}>
+          <div style={{ marginBottom: 14 }}>
+            <div style={labelStyle}>일정 제목</div>
+            <input value={title} onChange={e => setTitle(e.target.value)} placeholder="예) 한강 야간 러닝" style={inputStyle} />
+          </div>
+
+          <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+            <div style={{ flex: 1 }}>
+              <div style={labelStyle}>날짜</div>
+              <input type="date" value={date} onChange={e => setDate(e.target.value)} style={inputStyle} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={labelStyle}>시간</div>
+              <input type="time" value={time} onChange={e => setTime(e.target.value)} style={inputStyle} />
+            </div>
+          </div>
+
+          <div style={{ marginBottom: 14 }}>
+            <div style={labelStyle}>장소</div>
+            <input value={place} onChange={e => setPlace(e.target.value)} placeholder="예) 잠실 한강공원 주차장" style={inputStyle} />
+          </div>
+
+          <div style={{ marginBottom: 8 }}>
+            <div style={labelStyle}>최대 인원 (0 = 제한 없음)</div>
+            <input type="number" value={maxMembers} onChange={e => setMaxMembers(e.target.value)} placeholder="0" min="0" max="99" style={inputStyle} />
+          </div>
         </div>
 
-        <div style={{ marginBottom: 22 }}>
-          <div style={labelStyle}>최대 인원 (0 = 제한 없음)</div>
-          <input type="number" value={maxMembers} onChange={e => setMaxMembers(e.target.value)} placeholder="0" min="0" max="99" style={inputStyle} />
-        </div>
-
-        <div style={{ display: "flex", gap: 10 }}>
+        {/* 버튼 항상 하단 고정 */}
+        <div style={{ padding: "16px 20px", paddingBottom: `calc(16px + ${safeBottom})`, borderTop: "1px solid #1a1a1a", flexShrink: 0, display: "flex", gap: 10 }}>
           <button onClick={onClose} style={{ flex: 1, padding: "14px", borderRadius: 12, border: "1px solid #222", background: "transparent", color: "#555", fontFamily: "inherit", fontSize: 15, fontWeight: 700 }}>취소</button>
           <button onClick={handleCreate} disabled={!title.trim() || !date || loading}
             style={{ flex: 2, padding: "14px", borderRadius: 12, border: "none", background: title.trim() && date ? "#00ff88" : "#111", color: title.trim() && date ? "#000" : "#333", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>
