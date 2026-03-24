@@ -1108,7 +1108,7 @@ function ScheduleCreateModal({ onClose, onCreate }) {
         </div>
 
         {/* 폼 - 스크롤 가능 */}
-        <div style={{ padding: "18px 20px 0", maxHeight: "60vh", overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
+        <div style={{ padding: "18px 20px 0", maxHeight: "70vh", overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
           <div style={{ marginBottom: 14 }}>
             <div style={labelStyle}>일정 제목</div>
             <input value={title} onChange={e => setTitle(e.target.value)} placeholder="예) 한강 야간 러닝" style={inputStyle} />
