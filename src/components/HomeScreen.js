@@ -163,7 +163,7 @@ export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
             <div style={{ fontSize: 15, fontWeight: 700 }}>{currentUser?.name}</div>
             <button onClick={onLogout} style={{ background: "none", border: "none", color: "#333", fontFamily: "inherit", fontSize: 12, cursor: "pointer", padding: 0 }}>로그아웃</button>
           </div>
-          <Avatar user={currentUser} size={42} />
+          <Avatar user={currentUser} size={44} />
         </div>
       </div>
 
