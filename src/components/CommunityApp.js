@@ -841,19 +841,20 @@ function ChatTab({ setId, currentUser }) {
     if (!vv) return;
 
     const update = () => {
-      // 뷰포트 높이 - GNB 높이(58px) - safe area
+      // 키보드 올라왔을 때: visualViewport.height = 화면 - 키보드
+      // 채팅 높이 = vv.height - 상단헤더(54px) - 바텀네비(58px)
+      // 키보드 없을 때: window.innerHeight 기준
+      const headerH = 54;
       const gnbH = 58;
-      const safeB = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--safe-bottom") || "0") || 0;
-      setChatHeight(vv.height - gnbH);
-      scrollToBottom(false);
+      const h = vv.height - headerH - gnbH;
+      setChatHeight(Math.max(200, h));
+      setTimeout(() => scrollToBottom(false), 50);
     };
 
     update();
     vv.addEventListener("resize", update);
-    vv.addEventListener("scroll", update);
     return () => {
       vv.removeEventListener("resize", update);
-      vv.removeEventListener("scroll", update);
     };
   }, []);
 
