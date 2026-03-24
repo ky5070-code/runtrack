@@ -21,53 +21,18 @@ export async function analyzeRunImage(base64Data, mediaType) {
           { type: "image", source: { type: "base64", media_type: mediaType, data: base64Data } },
           {
             type: "text",
-            text: `You are analyzing a running workout screenshot. Extract the key metrics and return ONLY a raw JSON object (no markdown, no explanation, no backticks).
+            text: `Analyze this running workout screenshot (Garmin, Nike Run Club, Apple Watch, Strava, etc).
 
-OUTPUT FORMAT:
-{"distance":<km decimal>,"duration":<total seconds int>,"pace":<"M'SS\\"">,"calories":<total kcal int>,"date":<"YYYY-MM-DD" or null>,"appName":<string or null>,"confidence":<"high"|"medium"|"low">,"error":<null or "not_running">}
+Return ONLY a raw JSON object, no markdown, no explanation:
+{"distance":<km decimal>,"duration":<total seconds int>,"pace":<"M'SS\\"">,"calories":<total kcal int>,"date":<"YYYY-MM-DD" or null>,"appName":<app name or null>,"confidence":<"high"|"medium"|"low">,"error":<null or "not_running">}
 
-=== DISTANCE RULES ===
-- Look for "러닝 거리" (in 운동 요약 section) or "Running Distance"
-- If in meters (e.g. "3,100.00 m" or "5,280.00 m"): divide by 1000 → km (3,100m = 3.1km)
-- If in km (e.g. "5.28 km"): use as-is
-- If in miles: multiply by 1.609
-- NEVER use pace value as distance. Pace looks like "5:24 /km" and is always under 20.
-
-=== DURATION RULES ===
-- Look for "총 시간" or "러닝 시간" (in 운동 요약 section) or "Elapsed Time" or "Moving Time"
-- Format HH:MM:SS → hours×3600 + min×60 + sec
-- Format MM:SS (e.g. "16:43") → min×60 + sec = 1003 seconds
-- IGNORE "이동 시간", "경과 시간" if "총 시간" exists
-
-=== PACE RULES ===
-- Priority order: "러닝 페이스" (운동 요약) > "평균 페이스" (페이스 섹션) > "Avg Pace"
-- Format is always M:SS /km → output as M'SS" (e.g. "5:24 /km" → "5'24\"")
-- IGNORE "최대 페이스" / "Max Pace" / "평균 이동 페이스" — these are NOT average pace
-- "최대 페이스" like "0:45 /km" is a sprint value, never use it
-
-=== CALORIES RULES ===
-- Prefer "총 칼로리" over "활성 칼로리" over "소모 칼로리"
-- If only one calorie value exists, use it
-
-=== DATE RULES ===
-- Look at the top of the screen for date like "3월 24일 (화)" or "Mar 24"
-- Current year is 2026. If only month/day visible, assume 2026
-- Format: YYYY-MM-DD (e.g. "3월 24일" → "2026-03-24")
-
-=== APP NAME RULES ===
-- Garmin Connect: screen has Korean labels like "러닝 거리", "평균 페이스", "운동 요약" → "Garmin"
-- Nike Run Club, Strava, Apple Watch: detect from UI style
-- "트랙 러닝" is the ACTIVITY TYPE, not the app name
-
-=== GARMIN SPECIFIC ===
-This screenshot appears to be Garmin Connect Korean. The layout has:
-- Top section: "페이스" with 평균/이동/최대 페이스 (use 평균 페이스 here only if 운동 요약 not visible)
-- Bottom section "운동 요약": has "러닝 시간", "러닝 거리" (in meters!), "러닝 페이스" ← USE THESE
-- "운동 요약" values are the most accurate — always prefer them
-
-=== ERROR CASES ===
-- If not a running workout screenshot: {"error":"not_running"}
-- If image is too blurry to read: {"error":"not_running"}`,
+RULES:
+- distance: "러닝 거리" / "Running Distance" / km value (e.g. "5,280.00 m" = 5.28km, "5.28 km"). Miles → km (×1.609). DO NOT confuse with pace.
+- duration: "총 시간" / "러닝 시간" / "Elapsed Time". HH:MM:SS or MM:SS → total seconds
+- pace: "러닝 페이스" / "평균 페이스" / "Avg Pace" → format M'SS" e.g. 5'42". This is min/km, NOT a distance value.
+- calories: "총 칼로리" / "활성 칼로리" / "Total Calories" — prefer 총 over 활성
+- Garmin specific: "운동 요약" section has "러닝 거리" in meters (e.g. 5,280.00 m) and "러닝 페이스" in min/km. Convert meters to km.
+- If not a running record: {"error":"not_running"}`,
           },
         ],
       }],

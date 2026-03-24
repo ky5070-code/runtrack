@@ -70,7 +70,12 @@ const Avatar = ({ user, size = 38 }) => (
     background: "linear-gradient(135deg,#111,#1a1a1a)",
     border: "1.5px solid #222", display: "flex", alignItems: "center",
     justifyContent: "center", fontSize: size * 0.44, flexShrink: 0,
-  }}>{user?.avatar || "🏃"}</div>
+    overflow: "hidden",
+  }}>
+    {user?.photoURL
+      ? <img src={user.photoURL} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+      : (user?.avatar || "🏃")}
+  </div>
 );
 
 /* ══ POST CARD ══ */
@@ -97,7 +102,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
   };
 
   return (
-    <div style={{ background: isMyPost ? "#0a0f0a" : "#0b0b0b", border: isMyPost ? "1.5px solid #00cc55" : "1px solid #181818", borderRadius: 18, marginBottom: 12, boxShadow: isMyPost ? "0 2px 20px rgba(0,255,136,0.08)" : "none" }}>
+    <div style={{ background: isMyPost ? "#0a0f0a" : "#0b0b0b", border: isMyPost ? "1.5px solid #00cc55" : "1px solid #181818", borderRadius: 18, overflow: "hidden", marginBottom: 12, boxShadow: isMyPost ? "0 2px 20px rgba(0,255,136,0.08)" : "none", isolation: "isolate" }}>
 
       {!isMyPost && <div style={{ height: 3, background: post.source === "ai" ? "linear-gradient(90deg,#00ff88,#009944)" : "#1e1e1e" }} />}
 
@@ -1555,6 +1560,9 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
   const [name, setName] = useState(currentUser?.name || "");
   const [bio, setBio] = useState(currentUser?.bio || "");
   const [selectedAvatar, setSelectedAvatar] = useState(currentUser?.avatar || "🏃");
+  const [photoURL, setPhotoURL] = useState(currentUser?.photoURL || null);
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const photoInputRef = useRef(null);
   const [couponCode, setCouponCode] = useState("");
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponMsg, setCouponMsg] = useState(null);
@@ -1562,7 +1570,25 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
   const [payLoading, setPayLoading] = useState(false);
   const AVATARS_LIST = ["🏃", "⚡", "🔥", "🌊", "💨", "🦅", "🐆", "🎯", "🚀", "💎", "🏅", "🌟"];
 
-  const saveProfile = async () => { await onUpdateProfile({ name, bio, avatar: selectedAvatar }); setEditMode(false); };
+  const handlePhotoChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setPhotoUploading(true);
+    try {
+      const { storage } = await import("../lib/firebase");
+      const { ref, uploadBytes, getDownloadURL } = await import("firebase/storage");
+      const storageRef = ref(storage, `profiles/${currentUser.uid}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      setPhotoURL(url);
+      await onUpdateProfile({ photoURL: url });
+    } catch (err) {
+      console.error("사진 업로드 실패:", err);
+    }
+    setPhotoUploading(false);
+  };
+
+  const saveProfile = async () => { await onUpdateProfile({ name, bio, avatar: selectedAvatar, photoURL }); setEditMode(false); };
 
   const handlePayment = async () => {
     setPayLoading(true);
@@ -1610,7 +1636,22 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
         <div style={{ width: 40, height: 4, background: "#222", borderRadius: 2, margin: "0 auto 14px" }} />
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 18 }}>
           <div style={{ display: "flex", gap: 14, alignItems: "center", flex: 1 }}>
-            <div style={{ width: 70, height: 70, borderRadius: 35, background: "#111", border: "1.5px solid #222", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 34 }}>{selectedAvatar}</div>
+            <div style={{ position: "relative", flexShrink: 0 }}>
+              <div style={{ width: 70, height: 70, borderRadius: 35, background: "#111", border: "1.5px solid #222", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 34, overflow: "hidden" }}>
+                {photoURL
+                  ? <img src={photoURL} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  : selectedAvatar}
+              </div>
+              {editMode && (
+                <>
+                  <input ref={photoInputRef} type="file" accept="image/*" onChange={handlePhotoChange} style={{ display: "none" }} />
+                  <button onClick={() => photoInputRef.current?.click()} disabled={photoUploading}
+                    style={{ position: "absolute", bottom: 0, right: 0, width: 24, height: 24, borderRadius: 12, background: photoUploading ? "#333" : "#00ff88", border: "2px solid #0d0d0d", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#000", padding: 0 }}>
+                    {photoUploading ? "⏳" : "📷"}
+                  </button>
+                </>
+              )}
+            </div>
             <div style={{ flex: 1 }}>
               {editMode ? <input value={name} onChange={e => setName(e.target.value)} style={{ background: "transparent", border: "none", borderBottom: "1px solid #333", color: "#fff", fontFamily: "inherit", fontSize: 19, fontWeight: 800, outline: "none", width: "100%" }} />
                 : <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
