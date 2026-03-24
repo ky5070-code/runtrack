@@ -1080,22 +1080,6 @@ function ScheduleCreateModal({ onClose, onCreate }) {
   const [place, setPlace] = useState("");
   const [maxMembers, setMaxMembers] = useState("");
   const [loading, setLoading] = useState(false);
-  const [kbHeight, setKbHeight] = useState(0);
-
-  useEffect(() => {
-    const onResize = () => {
-      const vv = window.visualViewport;
-      if (!vv) return;
-      const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-      setKbHeight(kb);
-    };
-    window.visualViewport?.addEventListener("resize", onResize);
-    window.visualViewport?.addEventListener("scroll", onResize);
-    return () => {
-      window.visualViewport?.removeEventListener("resize", onResize);
-      window.visualViewport?.removeEventListener("scroll", onResize);
-    };
-  }, []);
 
   const handleCreate = async () => {
     if (!title.trim() || !date) return;
@@ -1108,43 +1092,45 @@ function ScheduleCreateModal({ onClose, onCreate }) {
   const inputStyle = { width: "100%", background: "#0a0a0a", border: "1px solid #1e1e1e", borderRadius: 10, padding: "11px 14px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box" };
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "#0d0d0d", zIndex: 300, display: "flex", flexDirection: "column", maxWidth: 480, margin: "0 auto" }}>
-      {/* 상단 헤더 */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", paddingTop: `calc(16px + ${safeTop})`, borderBottom: "1px solid #1a1a1a", flexShrink: 0 }}>
-        <button onClick={onClose} style={{ background: "none", border: "none", color: "#555", fontFamily: "inherit", fontSize: 15, fontWeight: 700, padding: "4px 0" }}>취소</button>
-        <div style={{ fontSize: 16, fontWeight: 800 }}>🏃 러닝 일정 만들기</div>
-        <button onClick={handleCreate} disabled={!title.trim() || !date || loading}
-          style={{ background: "none", border: "none", color: title.trim() && date ? "#00ff88" : "#333", fontFamily: "inherit", fontSize: 15, fontWeight: 800, padding: "4px 0" }}>
-          {loading ? "저장 중..." : "저장"}
-        </button>
-      </div>
-
-      {/* 스크롤 가능한 폼 */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "20px 20px", WebkitOverflowScrolling: "touch" }}>
-        <div style={{ marginBottom: 18 }}>
-          <div style={labelStyle}>일정 제목</div>
-          <input value={title} onChange={e => setTitle(e.target.value)} placeholder="예) 한강 야간 러닝" style={inputStyle} />
-        </div>
-
-        <div style={{ display: "flex", gap: 10, marginBottom: 18 }}>
-          <div style={{ flex: 1 }}>
-            <div style={labelStyle}>날짜</div>
-            <input type="date" value={date} onChange={e => setDate(e.target.value)} style={inputStyle} />
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={labelStyle}>시간</div>
-            <input type="time" value={time} onChange={e => setTime(e.target.value)} style={inputStyle} />
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", zIndex: 500, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+      <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, background: "#0d0d0d", borderRadius: "22px 22px 0 0", border: "1px solid #1a1a1a", paddingBottom: `calc(20px + ${safeBottom})` }}>
+        {/* 핸들 + 헤더 (취소/저장 항상 노출) */}
+        <div style={{ padding: "16px 20px 14px", borderBottom: "1px solid #1a1a1a" }}>
+          <div style={{ width: 40, height: 4, background: "#222", borderRadius: 2, margin: "0 auto 14px" }} />
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <button onClick={onClose} style={{ background: "none", border: "none", color: "#555", fontFamily: "inherit", fontSize: 15, fontWeight: 700 }}>취소</button>
+            <div style={{ fontSize: 16, fontWeight: 800 }}>🏃 러닝 일정 만들기</div>
+            <button onClick={handleCreate} disabled={!title.trim() || !date || loading}
+              style={{ background: "none", border: "none", color: title.trim() && date ? "#00ff88" : "#333", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>
+              {loading ? "저장 중..." : "저장"}
+            </button>
           </div>
         </div>
 
-        <div style={{ marginBottom: 18 }}>
-          <div style={labelStyle}>장소</div>
-          <input value={place} onChange={e => setPlace(e.target.value)} placeholder="예) 잠실 한강공원 주차장" style={inputStyle} />
-        </div>
-
-        <div style={{ marginBottom: 18 }}>
-          <div style={labelStyle}>최대 인원 (0 = 제한 없음)</div>
-          <input type="number" value={maxMembers} onChange={e => setMaxMembers(e.target.value)} placeholder="0" min="0" max="99" style={inputStyle} />
+        {/* 폼 - 스크롤 가능 */}
+        <div style={{ padding: "18px 20px 0", maxHeight: "60vh", overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
+          <div style={{ marginBottom: 14 }}>
+            <div style={labelStyle}>일정 제목</div>
+            <input value={title} onChange={e => setTitle(e.target.value)} placeholder="예) 한강 야간 러닝" style={inputStyle} />
+          </div>
+          <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+            <div style={{ flex: 1 }}>
+              <div style={labelStyle}>날짜</div>
+              <input type="date" value={date} onChange={e => setDate(e.target.value)} style={inputStyle} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={labelStyle}>시간</div>
+              <input type="time" value={time} onChange={e => setTime(e.target.value)} style={inputStyle} />
+            </div>
+          </div>
+          <div style={{ marginBottom: 14 }}>
+            <div style={labelStyle}>장소</div>
+            <input value={place} onChange={e => setPlace(e.target.value)} placeholder="예) 잠실 한강공원 주차장" style={inputStyle} />
+          </div>
+          <div style={{ marginBottom: 14 }}>
+            <div style={labelStyle}>최대 인원 (0 = 제한 없음)</div>
+            <input type="number" value={maxMembers} onChange={e => setMaxMembers(e.target.value)} placeholder="0" min="0" max="99" style={inputStyle} />
+          </div>
         </div>
       </div>
     </div>
