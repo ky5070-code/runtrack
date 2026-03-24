@@ -827,34 +827,26 @@ function ChatTab({ setId, currentUser }) {
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
   const containerRef = useRef(null);
-  const [chatHeight, setChatHeight] = useState(null);
-
   const scrollToBottom = (smooth = true) => {
     bottomRef.current?.scrollIntoView({ behavior: smooth ? "smooth" : "auto" });
   };
 
   useEffect(() => { scrollToBottom(); }, [messages]);
 
-  // visualViewport로 키보드 높이 반영해 채팅 영역 동적 조정
+  // iOS 키보드 대응 - interactive-widget 방식
   useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-
-    const update = () => {
-      // 키보드 올라왔을 때: visualViewport.height = 화면 - 키보드
-      // 채팅 높이 = vv.height - 상단헤더(54px) - 바텀네비(58px)
-      // 키보드 없을 때: window.innerHeight 기준
-      const headerH = 54;
-      const gnbH = 58;
-      const h = vv.height - headerH - gnbH;
-      setChatHeight(Math.max(200, h));
-      setTimeout(() => scrollToBottom(false), 50);
-    };
-
-    update();
-    vv.addEventListener("resize", update);
+    const metaViewport = document.querySelector("meta[name=viewport]");
+    if (metaViewport) {
+      metaViewport.setAttribute("content",
+        "width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content"
+      );
+    }
     return () => {
-      vv.removeEventListener("resize", update);
+      if (metaViewport) {
+        metaViewport.setAttribute("content",
+          "width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover"
+        );
+      }
     };
   }, []);
 
@@ -893,7 +885,7 @@ function ChatTab({ setId, currentUser }) {
   };
 
   return (
-    <div ref={containerRef} style={{ display: "flex", flexDirection: "column", height: chatHeight ? `${chatHeight}px` : "100%", minHeight: 0, background: "#080808", overflow: "hidden" }}>
+    <div ref={containerRef} style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0, background: "#080808", overflow: "hidden" }}>
 
       {/* 메시지 스크롤 영역 */}
       <div style={{ flex: 1, overflowY: "auto", padding: "12px 14px 8px", WebkitOverflowScrolling: "touch" }}>
