@@ -70,10 +70,10 @@ const Avatar = ({ user, size = 38 }) => (
     background: "linear-gradient(135deg,#111,#1a1a1a)",
     border: "1.5px solid #222", display: "flex", alignItems: "center",
     justifyContent: "center", fontSize: size * 0.44, flexShrink: 0,
-    overflow: "hidden",
+    overflow: "hidden", position: "relative",
   }}>
     {user?.photoURL
-      ? <img src={user.photoURL} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+      ? <img src={user.photoURL} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
       : (user?.avatar || "🏃")}
   </div>
 );
