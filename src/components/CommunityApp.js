@@ -1110,7 +1110,7 @@ function ScheduleCreateModal({ onClose, onCreate }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "#0d0d0d", zIndex: 300, display: "flex", flexDirection: "column", maxWidth: 480, margin: "0 auto" }}>
       {/* 상단 헤더 */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: "1px solid #1a1a1a", flexShrink: 0 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", paddingTop: `calc(16px + ${safeTop})`, borderBottom: "1px solid #1a1a1a", flexShrink: 0 }}>
         <button onClick={onClose} style={{ background: "none", border: "none", color: "#555", fontFamily: "inherit", fontSize: 15, fontWeight: 700, padding: "4px 0" }}>취소</button>
         <div style={{ fontSize: 16, fontWeight: 800 }}>🏃 러닝 일정 만들기</div>
         <button onClick={handleCreate} disabled={!title.trim() || !date || loading}
