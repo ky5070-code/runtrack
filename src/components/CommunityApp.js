@@ -220,24 +220,28 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
           </div>
         )}
 
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <div style={{ display: "flex", gap: 5, flex: 1, flexWrap: "wrap" }}>
-            {EMOJIS.map(e => {
-              const count = post.reactions?.[e] || 0;
-              const active = myReaction === e;
-              return (
-                <button key={e} onClick={() => onReact(post.id, e)} style={{
-                  padding: "5px 10px", borderRadius: 20, minHeight: 34,
-                  border: active ? "1px solid #00ff88" : "1px solid #1e1e1e",
-                  background: active ? "#0d1f14" : "#0d0d0d",
-                  fontSize: 15, display: "flex", alignItems: "center", gap: 3, whiteSpace: "nowrap"
-                }}>
-                  <span>{e}</span>{count > 0 && <span style={{ fontSize: 13, color: active ? "#00ff88" : "#555", lineHeight: 1 }}>{count}</span>}
-                </button>
-              );
-            })}
+        <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
+          {/* 리액션 - 가로 스크롤, 댓글 버튼이 밀리지 않게 overflow hidden */}
+          <div style={{ flex: 1, overflow: "hidden" }}>
+            <div style={{ display: "flex", gap: 5, overflowX: "auto", WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
+              {EMOJIS.map(e => {
+                const count = post.reactions?.[e] || 0;
+                const active = myReaction === e;
+                return (
+                  <button key={e} onClick={() => onReact(post.id, e)} style={{
+                    padding: "5px 10px", borderRadius: 20, minHeight: 34, flexShrink: 0,
+                    border: active ? "1px solid #00ff88" : "1px solid #1e1e1e",
+                    background: active ? "#0d1f14" : "#0d0d0d",
+                    fontSize: 15, display: "flex", alignItems: "center", gap: 3, whiteSpace: "nowrap"
+                  }}>
+                    <span>{e}</span>{count > 0 && <span style={{ fontSize: 13, color: active ? "#00ff88" : "#555", lineHeight: 1 }}>{count}</span>}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-          <button onClick={() => setShowComments(s => !s)} style={{ background: "none", border: "none", color: "#555", fontSize: 16, minWidth: 40, minHeight: 40, display: "flex", alignItems: "center", gap: 3 }}>
+          {/* 댓글 버튼 - 항상 오른쪽 고정 */}
+          <button onClick={() => setShowComments(s => !s)} style={{ background: "none", border: "none", color: "#555", fontSize: 16, minWidth: 40, minHeight: 40, flexShrink: 0, display: "flex", alignItems: "center", gap: 3 }}>
             💬{post.comments?.length > 0 && <span style={{ fontSize: 13 }}>{post.comments.length}</span>}
           </button>
         </div>
