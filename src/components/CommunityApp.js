@@ -110,7 +110,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
         {/* 이름/아바타 */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
           <div style={{ position: "relative" }}>
-            <Avatar user={isMyPost ? currentUser : author} size={42} />
+            <Avatar user={isMyPost ? currentUser : author} size={50} />
             {isMyPost && <div style={{ position: "absolute", inset: -2, borderRadius: 23, border: "2px solid #00ff88", pointerEvents: "none" }} />}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -1992,7 +1992,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
           </div>
           {/* 프로필 아바타 */}
           <div style={{ cursor: "pointer" }} onClick={() => setShowProfile(true)}>
-            <Avatar user={currentUser} size={36} />
+            <Avatar user={currentUser} size={44} />
           </div>
         </div>
       </div>
