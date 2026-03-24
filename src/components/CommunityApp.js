@@ -230,9 +230,9 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
                   padding: "5px 10px", borderRadius: 20, minHeight: 34,
                   border: active ? "1px solid #00ff88" : "1px solid #1e1e1e",
                   background: active ? "#0d1f14" : "#0d0d0d",
-                  fontSize: 15, display: "flex", alignItems: "center", gap: 3
+                  fontSize: 15, display: "flex", alignItems: "center", gap: 3, whiteSpace: "nowrap"
                 }}>
-                  {e}{count > 0 && <span style={{ fontSize: 13, color: active ? "#00ff88" : "#555" }}>{count}</span>}
+                  <span>{e}</span>{count > 0 && <span style={{ fontSize: 13, color: active ? "#00ff88" : "#555", lineHeight: 1 }}>{count}</span>}
                 </button>
               );
             })}
@@ -246,7 +246,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
           <div style={{ borderTop: "1px solid #111", paddingTop: 12, marginTop: 10 }}>
             {(post.comments || []).map(c => (
               <div key={c.id} style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-                <div style={{ width: 30, height: 30, borderRadius: 15, background: "#111", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>{c.userAvatar || "🏃"}</div>
+                <Avatar user={{ avatar: c.userAvatar, photoURL: c.userPhotoURL }} size={30} />
                 <div style={{ flex: 1, background: "#0d0d0d", borderRadius: 10, padding: "8px 12px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: "#666" }}>{c.userName}</div>

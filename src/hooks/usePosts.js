@@ -157,6 +157,7 @@ export function usePosts(currentUser, setId) {
         userId: author.uid,
         userName: author.name,
         userAvatar: author.avatar,
+        userPhotoURL: author.photoURL || null,
         text,
         createdAt: new Date().toISOString(),
       }),
