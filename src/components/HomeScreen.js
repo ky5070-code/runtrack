@@ -2,6 +2,20 @@
 import React, { useState, useEffect } from "react";
 import { useSets } from "../hooks/useSets";
 
+const Avatar = ({ user, size = 38 }) => (
+  <div style={{
+    width: size, height: size, borderRadius: size / 2,
+    background: "linear-gradient(135deg,#111,#1a1a1a)",
+    border: "1.5px solid #222", display: "flex", alignItems: "center",
+    justifyContent: "center", fontSize: size * 0.44, flexShrink: 0,
+    overflow: "hidden", position: "relative",
+  }}>
+    {user?.photoURL
+      ? <img src={user.photoURL} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
+      : (user?.avatar || "🏃")}
+  </div>
+);
+
 const safeTop = "env(safe-area-inset-top, 0px)";
 const safeBottom = "env(safe-area-inset-bottom, 0px)";
 
@@ -149,7 +163,7 @@ export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
             <div style={{ fontSize: 15, fontWeight: 700 }}>{currentUser?.name}</div>
             <button onClick={onLogout} style={{ background: "none", border: "none", color: "#333", fontFamily: "inherit", fontSize: 12, cursor: "pointer", padding: 0 }}>로그아웃</button>
           </div>
-          <div style={{ width: 42, height: 42, borderRadius: 21, background: "#111", border: "1.5px solid #222", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{currentUser?.avatar || "🏃"}</div>
+          <Avatar user={currentUser} size={42} />
         </div>
       </div>
 
