@@ -1080,6 +1080,22 @@ function ScheduleCreateModal({ onClose, onCreate }) {
   const [place, setPlace] = useState("");
   const [maxMembers, setMaxMembers] = useState("");
   const [loading, setLoading] = useState(false);
+  const [kbHeight, setKbHeight] = useState(0);
+
+  useEffect(() => {
+    const onResize = () => {
+      const vv = window.visualViewport;
+      if (!vv) return;
+      const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      setKbHeight(kb);
+    };
+    window.visualViewport?.addEventListener("resize", onResize);
+    window.visualViewport?.addEventListener("scroll", onResize);
+    return () => {
+      window.visualViewport?.removeEventListener("resize", onResize);
+      window.visualViewport?.removeEventListener("scroll", onResize);
+    };
+  }, []);
 
   const handleCreate = async () => {
     if (!title.trim() || !date) return;
@@ -1093,7 +1109,7 @@ function ScheduleCreateModal({ onClose, onCreate }) {
 
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", zIndex: 300, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-      <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, background: "#0d0d0d", borderRadius: "22px 22px 0 0", border: "1px solid #1a1a1a", maxHeight: "85vh", display: "flex", flexDirection: "column" }}>
+      <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, background: "#0d0d0d", borderRadius: "22px 22px 0 0", border: "1px solid #1a1a1a", maxHeight: "90vh", display: "flex", flexDirection: "column", marginBottom: kbHeight }}>
         {/* 헤더 고정 */}
         <div style={{ padding: "20px 20px 0", flexShrink: 0 }}>
           <div style={{ width: 40, height: 4, background: "#222", borderRadius: 2, margin: "0 auto 18px" }} />
