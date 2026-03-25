@@ -12,20 +12,46 @@ export function useSets(currentUser) {
   const [publicSets, setPublicSets] = useState([]); // 공개 세트 (검색용)
   const [loading, setLoading] = useState(true);
 
-  // 내가 멤버인 세트 실시간 구독
+  // 내가 멤버인 세트 실시간 구독 (members를 users 컬렉션 최신 데이터로 머지)
   useEffect(() => {
     if (!currentUser?.uid) return;
     const q = query(
       collection(db, "sets"),
       where("memberIds", "array-contains", currentUser.uid)
     );
-    const unsub = onSnapshot(q, (snap) => {
+    const unsub = onSnapshot(q, async (snap) => {
       const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       data.sort((a, b) => {
         const ta = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
         const tb = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
         return tb - ta;
       });
+
+      // memberIds로 users 컬렉션에서 최신 프로필 조회 후 members에 머지
+      try {
+        const allUids = [...new Set(data.flatMap(s => s.memberIds || []))];
+        if (allUids.length > 0) {
+          const userDocs = await Promise.all(
+            allUids.map(uid => getDoc(doc(db, "users", uid)))
+          );
+          const userMap = {};
+          userDocs.forEach(d => { if (d.exists()) userMap[d.id] = d.data(); });
+
+          data.forEach(set => {
+            set.members = (set.members || []).map(m => ({
+              ...m,
+              ...(userMap[m.uid] ? {
+                name: userMap[m.uid].name || m.name,
+                avatar: userMap[m.uid].avatar || m.avatar,
+                photoURL: userMap[m.uid].photoURL || null,
+              } : {}),
+            }));
+          });
+        }
+      } catch (e) {
+        console.warn("members 동기화 실패:", e);
+      }
+
       setMySets(data);
       setLoading(false);
     });
