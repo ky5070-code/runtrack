@@ -133,7 +133,7 @@ function JoinSetModal({ onClose, onJoin, currentUser }) {
               {s.description && <div style={{ fontSize: 13, color: "var(--text4)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.description}</div>}
               <div style={{ fontSize: 12, color: "var(--text4)", marginTop: 3 }}>멤버 {s.memberIds?.length || 0}명</div>
             </div>
-            <button onClick={() => handleJoin(s)} disabled={joining === s.id} style={{ padding: "8px 16px", background: "#00ff88", border: "none", borderRadius: 10, color: "#000", fontFamily: "inherit", fontSize: 14, fontWeight: 800, minHeight: 38, flexShrink: 0 }}>
+            <button onClick={() => handleJoin(s)} disabled={joining === s.id} style={{ padding: "8px 16px", background: "var(--accent)", border: "none", borderRadius: 10, color: "#000", fontFamily: "inherit", fontSize: 14, fontWeight: 800, minHeight: 38, flexShrink: 0 }}>
               {joining === s.id ? "..." : "입장"}
             </button>
           </div>
@@ -157,7 +157,7 @@ export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
       <div style={{ padding: "14px 20px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: 10, color: "var(--border)", letterSpacing: 4 }}>RUNTRACK</div>
-          <div style={{ fontSize: 24, fontWeight: 800, color: "#00ff88", letterSpacing: -0.5 }}>HOME</div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: "var(--accent)", letterSpacing: -0.5 }}>HOME</div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ textAlign: "right" }}>
@@ -172,7 +172,7 @@ export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
 
         {/* 액션 버튼 */}
         <div style={{ display: "flex", gap: 10, marginBottom: 24 }}>
-          <button onClick={() => setShowCreate(true)} style={{ flex: 1, padding: "14px", background: "#00ff88", border: "none", borderRadius: 14, color: "#000", fontFamily: "inherit", fontSize: 16, fontWeight: 800, minHeight: 52 }}>
+          <button onClick={() => setShowCreate(true)} style={{ flex: 1, padding: "14px", background: "var(--accent)", border: "none", borderRadius: 14, color: "#000", fontFamily: "inherit", fontSize: 16, fontWeight: 800, minHeight: 52 }}>
             + 러닝크루 만들기
           </button>
           <button onClick={() => setShowJoin(true)} style={{ flex: 1, padding: "14px", background: "var(--modal-bg)", border: "1px solid var(--border)", borderRadius: 14, color: "var(--text3)", fontFamily: "inherit", fontSize: 16, fontWeight: 700, minHeight: 52 }}>
@@ -206,7 +206,7 @@ export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <div style={{ fontSize: 17, fontWeight: 800, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{set.name}</div>
-                {set.adminId === currentUser?.uid && <span style={{ background: "#0d1f14", border: "1px solid #1a3d28", borderRadius: 4, padding: "1px 6px", fontSize: 11, color: "#00cc66", flexShrink: 0 }}>관리자</span>}
+                {set.adminId === currentUser?.uid && <span style={{ background: "#0d1f14", border: "1px solid #1a3d28", borderRadius: 4, padding: "1px 6px", fontSize: 11, color: "var(--accent2)", flexShrink: 0 }}>관리자</span>}
                 
               </div>
               {set.description && <div style={{ fontSize: 14, color: "var(--text4)", marginTop: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{set.description}</div>}

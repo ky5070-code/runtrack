@@ -112,17 +112,17 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
           <div style={{ position: "relative" }}>
             <Avatar user={isMyPost ? currentUser : author} size={50} />
-            {isMyPost && <div style={{ position: "absolute", inset: -2, borderRadius: 23, border: "2px solid #00ff88", pointerEvents: "none" }} />}
+            {isMyPost && <div style={{ position: "absolute", inset: -2, borderRadius: 23, border: "2px solid var(--accent)", pointerEvents: "none" }} />}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <div style={{ fontSize: 16, fontWeight: 700, color: isMyPost ? "var(--text1)" : "#e0e0e0" }}>{isMyPost ? (currentUser?.name || "나") : (author.name || "러너")}</div>
-              {isMyPost && <span style={{ background: "#00ff88", color: "#000", borderRadius: 5, padding: "1px 7px", fontSize: 11, fontWeight: 800 }}>나</span>}
+              {isMyPost && <span style={{ background: "var(--accent)", color: "#000", borderRadius: 5, padding: "1px 7px", fontSize: 11, fontWeight: 800 }}>나</span>}
               {(isMyPost ? currentUser?.isPro : author?.isPro) && <span style={{ background: "transparent", border: "1px solid #555", color: "var(--text3)", borderRadius: 5, padding: "1px 7px", fontSize: 11, fontWeight: 800, letterSpacing: 0.5 }}>PRO</span>}
             </div>
             <div style={{ display: "flex", gap: 6, marginTop: 2, alignItems: "center" }}>
               <span style={{ fontSize: 13, color: "var(--text4)" }}>{relTime(post.createdAt)}</span>
-              {post.source === "ai" && <span style={{ background: "var(--accent-bg)", border: "1px solid var(--accent-bd)", borderRadius: 4, padding: "1px 6px", fontSize: 11, color: "#00cc66" }}>AI</span>}
+              {post.source === "ai" && <span style={{ background: "var(--accent-bg)", border: "1px solid var(--accent-bd)", borderRadius: 4, padding: "1px 6px", fontSize: 11, color: "var(--accent2)" }}>AI</span>}
               {post.appName && <span style={{ fontSize: 12, color: "var(--text4)" }}>{post.appName}</span>}
             </div>
           </div>
@@ -186,7 +186,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
                 <button onClick={() => setShowEditModal(false)}
                   style={{ flex: 1, padding: "14px", borderRadius: 12, border: "1px solid var(--border2)", background: "transparent", color: "var(--text3)", fontFamily: "inherit", fontSize: 15, fontWeight: 700 }}>취소</button>
                 <button onClick={() => { onEdit && onEdit(post.id, { caption: editCaption }); setShowEditModal(false); }}
-                  style={{ flex: 1, padding: "14px", borderRadius: 12, border: "none", background: "#00ff88", color: "#000", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>저장</button>
+                  style={{ flex: 1, padding: "14px", borderRadius: 12, border: "none", background: "var(--accent)", color: "#000", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>저장</button>
               </div>
             </div>
           </div>
@@ -208,7 +208,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
           <div style={{ marginBottom: 12 }}>
             <button onClick={() => setShowFeedback(s => !s)} style={{ width: "100%", background: "var(--accent-bg)", border: "1px solid var(--accent-bd)", borderRadius: showFeedback ? "12px 12px 0 0" : 12, padding: "10px 14px", display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontFamily: "inherit" }}>
               <span style={{ fontSize: 13 }}>✨</span>
-              <span style={{ fontSize: 12, color: "#00cc66", fontWeight: 700, letterSpacing: 1 }}>AI 코치 피드백</span>
+              <span style={{ fontSize: 12, color: "var(--accent2)", fontWeight: 700, letterSpacing: 1 }}>AI 코치 피드백</span>
               <span style={{ marginLeft: "auto", fontSize: 12, color: "var(--accent2)", transform: showFeedback ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", display: "inline-block" }}>▼</span>
             </button>
             {showFeedback && (
@@ -235,7 +235,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
                     background: active ? "#0d1f14" : "#0d0d0d",
                     fontSize: 15, display: "flex", alignItems: "center", gap: 3, whiteSpace: "nowrap"
                   }}>
-                    <span>{e}</span>{count > 0 && <span style={{ fontSize: 13, color: active ? "#00ff88" : "#555", lineHeight: 1 }}>{count}</span>}
+                    <span>{e}</span>{count > 0 && <span style={{ fontSize: 13, color: active ? "var(--accent)" : "#555", lineHeight: 1 }}>{count}</span>}
                   </button>
                 );
               })}
@@ -268,10 +268,10 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
                     <div style={{ marginTop: 6 }}>
                       <input value={editingCommentText} onChange={e => setEditingCommentText(e.target.value)}
                         autoFocus
-                        style={{ width: "100%", background: "var(--bg4)", border: "1px solid #00ff88", borderRadius: 8, padding: "7px 10px", color: "var(--text1)", fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box", marginBottom: 6 }} />
+                        style={{ width: "100%", background: "var(--bg4)", border: "1px solid var(--accent)", borderRadius: 8, padding: "7px 10px", color: "var(--text1)", fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box", marginBottom: 6 }} />
                       <div style={{ display: "flex", gap: 6 }}>
                         <button onClick={() => { onEditComment && onEditComment(post.id, c.id, editingCommentText); setEditingCommentId(null); }}
-                          style={{ flex: 1, background: "#00ff88", border: "none", borderRadius: 8, padding: "7px", color: "#000", fontFamily: "inherit", fontSize: 13, fontWeight: 800 }}>저장</button>
+                          style={{ flex: 1, background: "var(--accent)", border: "none", borderRadius: 8, padding: "7px", color: "#000", fontFamily: "inherit", fontSize: 13, fontWeight: 800 }}>저장</button>
                         <button onClick={() => setEditingCommentId(null)}
                           style={{ flex: 1, background: "var(--border)", border: "none", borderRadius: 8, padding: "7px", color: "var(--text3)", fontFamily: "inherit", fontSize: 13 }}>취소</button>
                       </div>
@@ -292,7 +292,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
                   onChange={e => setCommentText(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && (submitComment(), setShowCommentInput(false))}
                   placeholder="댓글을 입력하세요..."
-                  style={{ flex: 1, minWidth: 0, background: "var(--bg2)", border: "1px solid #00ff88", borderRadius: 20, padding: "8px 12px", color: "var(--text1)", fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box" }}
+                  style={{ flex: 1, minWidth: 0, background: "var(--bg2)", border: "1px solid var(--accent)", borderRadius: 20, padding: "8px 12px", color: "var(--text1)", fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box" }}
                 />
                 <button onClick={() => { submitComment(); setShowCommentInput(false); }}
                   style={{ width: 32, height: 32, borderRadius: 16, background: commentText.trim() ? "#00ff88" : "var(--border)", border: "none", color: commentText.trim() ? "#000" : "#444", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -362,10 +362,10 @@ function NoticeBoard({ notices, isAdmin, onAdd, onDelete }) {
   return (
     <div style={{ background: "var(--bg)", border: "1px solid var(--accent-bd)", borderRadius: 16, padding: "14px 16px", marginBottom: 14 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: notices.length > 0 || showInput ? 12 : 0 }}>
-        <div style={{ fontSize: 13, color: "#00cc66", fontWeight: 700 }}>📢 공지사항</div>
+        <div style={{ fontSize: 13, color: "var(--accent2)", fontWeight: 700 }}>📢 공지사항</div>
         {isAdmin && (
           <button onClick={() => setShowInput(s => !s)}
-            style={{ background: showInput ? "#1a3028" : "none", border: "1px solid var(--accent-bd)", borderRadius: 8, padding: "4px 10px", color: "#00cc66", fontFamily: "inherit", fontSize: 12, fontWeight: 700 }}>
+            style={{ background: showInput ? "#1a3028" : "none", border: "1px solid var(--accent-bd)", borderRadius: 8, padding: "4px 10px", color: "var(--accent2)", fontFamily: "inherit", fontSize: 12, fontWeight: 700 }}>
             {showInput ? "취소" : "+ 공지 작성"}
           </button>
         )}
@@ -471,7 +471,7 @@ function UploadModal({ onClose, onPost, currentUser, isPro }) {
       <div style={{ fontSize: 12, color: "var(--text4)", marginBottom: 5 }}>{label}</div>
       <div style={{ display: "flex", alignItems: "baseline", gap: 2 }}>
         <input value={edited[key] ?? ""} onChange={e => setEdited(p => ({ ...p, [key]: e.target.value }))} inputMode={kbd}
-          style={{ width: "100%", background: "transparent", border: "none", borderBottom: "1px solid #222", color: "#00ff88", fontFamily: "inherit", fontSize: 19, fontWeight: 800, outline: "none", padding: "4px 0" }} />
+          style={{ width: "100%", background: "transparent", border: "none", borderBottom: "1px solid #222", color: "var(--accent)", fontFamily: "inherit", fontSize: 19, fontWeight: 800, outline: "none", padding: "4px 0" }} />
         {unit && <span style={{ fontSize: 12, color: "var(--text5)" }}>{unit}</span>}
       </div>
     </div>
@@ -508,11 +508,11 @@ function UploadModal({ onClose, onPost, currentUser, isPro }) {
             {previewUrl && <div style={{ position: "relative", width: 120, height: 120, borderRadius: 18, overflow: "hidden", margin: "0 auto 20px" }}>
               <img src={previewUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.4 }} />
               <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <div style={{ width: 44, height: 44, border: "2px solid #00ff88", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
+                <div style={{ width: 44, height: 44, border: "2px solid var(--accent)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
               </div>
             </div>}
             <style>{`@keyframes spin{to{transform:rotate(360deg)}} @keyframes scan{0%{transform:translateX(-200%)}100%{transform:translateX(500%)}}`}</style>
-            <div style={{ fontSize: 17, color: "#00ff88", fontWeight: 700, marginBottom: 8 }}>Claude AI가 분석 중이에요</div>
+            <div style={{ fontSize: 17, color: "var(--accent)", fontWeight: 700, marginBottom: 8 }}>Claude AI가 분석 중이에요</div>
             <div style={{ fontSize: 14, color: "var(--text5)", marginBottom: 20 }}>거리 · 시간 · 페이스 · 칼로리 추출 중</div>
             <div style={{ height: 3, background: "var(--bg4)", borderRadius: 2, overflow: "hidden" }}>
               <div style={{ height: "100%", width: "40%", background: "linear-gradient(90deg,transparent,#00ff88,transparent)", animation: "scan 1.4s ease-in-out infinite" }} />
@@ -524,12 +524,12 @@ function UploadModal({ onClose, onPost, currentUser, isPro }) {
           {previewUrl && <div style={{ height: 130, borderRadius: 14, overflow: "hidden", marginBottom: 18, position: "relative" }}>
             <img src={previewUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.6 }} />
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom,transparent 40%,#0d0d0d)" }} />
-            {result && <div style={{ position: "absolute", top: 10, right: 10, background: "var(--accent-bg)", border: "1px solid #00ff88", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "#00ff88" }}>AI 분석 완료 ✓</div>}
+            {result && <div style={{ position: "absolute", top: 10, right: 10, background: "var(--accent-bg)", border: "1px solid var(--accent)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "var(--accent)" }}>AI 분석 완료 ✓</div>}
           </div>}
           {/* AI 피드백 */}
           {isPro && feedback && (
             <div style={{ background: "var(--accent-bg)", border: "1px solid var(--accent-bd)", borderRadius: 14, padding: "14px 16px", marginBottom: 16 }}>
-              <div style={{ fontSize: 12, color: "#00ff88", letterSpacing: 2, marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+              <div style={{ fontSize: 12, color: "var(--accent)", letterSpacing: 2, marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
                 <span>✨</span> AI 코치 피드백
               </div>
               {feedback.split("\n").filter(l => l.trim()).map((line, i) => (
@@ -539,7 +539,7 @@ function UploadModal({ onClose, onPost, currentUser, isPro }) {
           )}
           {isPro && !feedback && result && (
             <div style={{ background: "var(--bg)", border: "1px solid #161616", borderRadius: 14, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ width: 16, height: 16, border: "2px solid #00ff88", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
+              <div style={{ width: 16, height: 16, border: "2px solid var(--accent)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
               <div style={{ fontSize: 14, color: "var(--text5)" }}>AI 코치가 피드백 작성 중...</div>
             </div>
           )}
@@ -557,7 +557,7 @@ function UploadModal({ onClose, onPost, currentUser, isPro }) {
           <div style={{ display: "flex", gap: 14, marginBottom: 22 }}>{ef("calories", "칼로리", "kcal")}{ef("date", "날짜", "", "text")}</div>
           <div style={{ display: "flex", gap: 10 }}>
             <button onClick={() => { setStep("pick"); setPreviewUrl(null); setFile(null); setResult(null); }} style={{ flex: 1, padding: "14px", background: "transparent", border: "1px solid #1e1e1e", borderRadius: 14, color: "var(--text3)", fontFamily: "inherit", fontSize: 16, minHeight: 52 }}>다시</button>
-            <button onClick={() => setStep("caption")} style={{ flex: 2, padding: "14px", background: "#00ff88", border: "none", borderRadius: 14, color: "#000", fontFamily: "inherit", fontSize: 17, fontWeight: 800, minHeight: 52 }}>다음 →</button>
+            <button onClick={() => setStep("caption")} style={{ flex: 2, padding: "14px", background: "var(--accent)", border: "none", borderRadius: 14, color: "#000", fontFamily: "inherit", fontSize: 17, fontWeight: 800, minHeight: 52 }}>다음 →</button>
           </div>
         </>}
 
@@ -646,7 +646,7 @@ function LeaderboardTab({ posts, currentUser, isPro }) {
               <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 5 }}>
                 <Avatar user={s.user} size={44} />
                 <div style={{ fontSize: 14, fontWeight: 700, color: rank === 0 ? "#00ff88" : "#888", textAlign: "center" }}>{s.user.name}</div>
-                <div style={{ fontSize: 15, color: "#00ff88", fontWeight: 800 }}>{s.dist.toFixed(1)}km</div>
+                <div style={{ fontSize: 15, color: "var(--accent)", fontWeight: 800 }}>{s.dist.toFixed(1)}km</div>
                 <div style={{ width: "100%", height: heights[i], background: rank === 0 ? "linear-gradient(180deg,var(--accent),var(--accent2))" : "var(--bg3)", borderRadius: "10px 10px 0 0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, border: rank !== 0 ? "1px solid #1a1a1a" : "none" }}>{medals[rank]}</div>
               </div>
             );
@@ -659,11 +659,11 @@ function LeaderboardTab({ posts, currentUser, isPro }) {
           <div style={{ fontSize: i < 3 ? 22 : 14, width: 28, textAlign: "center", color: i < 3 ? "inherit" : "var(--text4)", fontWeight: 700 }}>{i < 3 ? medals[i] : i + 1}</div>
           <Avatar user={s.user} size={44} />
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 16, fontWeight: 700 }}>{s.user.name}{s.user.uid === currentUser?.uid && <span style={{ color: "#00ff88", fontSize: 12, marginLeft: 6 }}>ME</span>}</div>
+            <div style={{ fontSize: 16, fontWeight: 700 }}>{s.user.name}{s.user.uid === currentUser?.uid && <span style={{ color: "var(--accent)", fontSize: 12, marginLeft: 6 }}>ME</span>}</div>
             <div style={{ fontSize: 13, color: "var(--text4)", marginTop: 2 }}>{s.runs}회 러닝 · 평균 {s.avgPace}/km</div>
           </div>
           <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: 22, fontWeight: 800, color: i === 0 ? "#00ff88" : "#aaa" }}>{s.dist.toFixed(1)}</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: i === 0 ? "var(--accent)" : "var(--text2)" }}>{s.dist.toFixed(1)}</div>
             <div style={{ fontSize: 12, color: "var(--text4)" }}>km 누적</div>
           </div>
         </div>
@@ -739,7 +739,7 @@ function NotificationModal({ notifications, onClose, onMarkAllRead, onDelete, sc
           <div style={{ fontSize: 18, fontWeight: 800 }}>🔔 알림</div>
           <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
             {notifications.some(n => !n.read) && (
-              <button onClick={onMarkAllRead} style={{ background: "none", border: "none", color: "#00ff88", fontFamily: "inherit", fontSize: 14, cursor: "pointer" }}>모두 읽음</button>
+              <button onClick={onMarkAllRead} style={{ background: "none", border: "none", color: "var(--accent)", fontFamily: "inherit", fontSize: 14, cursor: "pointer" }}>모두 읽음</button>
             )}
             <button onClick={onClose} style={{ background: "var(--bg4)", border: "none", borderRadius: "50%", width: 32, height: 32, color: "var(--text3)", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
           </div>
@@ -809,7 +809,7 @@ function NotificationModal({ notifications, onClose, onMarkAllRead, onDelete, sc
                 <div style={{ fontSize: 12, color: "var(--text4)", marginTop: 2 }}>{relTime(n.createdAt)}</div>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-                {!n.read && <div style={{ width: 7, height: 7, borderRadius: 4, background: "#00ff88" }} />}
+                {!n.read && <div style={{ width: 7, height: 7, borderRadius: 4, background: "var(--accent)" }} />}
                 {onDelete && (
                   <button onClick={() => onDelete(n.id)} style={{ background: "none", border: "none", color: "var(--text5)", fontSize: 18, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 14, cursor: "pointer" }}>✕</button>
                 )}
@@ -891,7 +891,7 @@ function ChatTab({ setId, currentUser }) {
               } else {
                 navigator.clipboard.writeText(link).then(() => showToast("초대 링크가 복사됐어요! 🔗", "success"));
               }
-            }} style={{ background: "var(--accent-bg)", border: "1px solid var(--accent-bd)", borderRadius: 14, padding: "11px 22px", color: "#00ff88", fontFamily: "inherit", fontSize: 14, fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 8, marginTop: 4 }}>
+            }} style={{ background: "var(--accent-bg)", border: "1px solid var(--accent-bd)", borderRadius: 14, padding: "11px 22px", color: "var(--accent)", fontFamily: "inherit", fontSize: 14, fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 8, marginTop: 4 }}>
               🔗 크루원 초대하기
             </button>
           </div>
@@ -1026,7 +1026,7 @@ function ChatTab({ setId, currentUser }) {
       {/* 입력창 */}
       <div style={{ display: "flex", gap: 8, alignItems: "center", padding: "10px 14px", paddingBottom: `calc(10px + ${safeBottom})`, paddingRight: "14px", borderTop: "1px solid var(--border)", background: "var(--bg)", flexShrink: 0 }}>
         <button onClick={() => setShowScheduleModal(true)}
-          style={{ width: 42, height: 42, borderRadius: 21, background: "var(--modal-bg)", border: "1px solid var(--accent-bd)", color: "#00cc66", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
+          style={{ width: 42, height: 42, borderRadius: 21, background: "var(--modal-bg)", border: "1px solid var(--accent-bd)", color: "var(--accent2)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
           📅
         </button>
         <input
@@ -1208,7 +1208,7 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
         ].map(([v, l, icon]) => (
           <div key={l} style={{ background: "var(--bg)", border: "1px solid #161616", borderRadius: 16, padding: "16px 14px" }}>
             <div style={{ fontSize: 13, marginBottom: 6 }}>{icon}</div>
-            <div style={{ fontSize: 22, fontWeight: 800, color: "#00ff88" }}>{v}</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: "var(--accent)" }}>{v}</div>
             <div style={{ fontSize: 12, color: "var(--text5)", marginTop: 4 }}>{l}</div>
           </div>
         ))}
@@ -1220,14 +1220,14 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
             <div style={{ fontSize: 13, color: "var(--text4)", letterSpacing: 1 }}>🎯 이번 주 목표</div>
             <button onClick={() => { setGoalInput(goal || ""); setShowGoalEdit(true); }}
-              style={{ fontSize: 12, color: "#00ff88", background: "none", border: "1px solid var(--accent-bd)", borderRadius: 8, padding: "3px 10px", fontFamily: "inherit" }}>
+              style={{ fontSize: 12, color: "var(--accent)", background: "none", border: "1px solid var(--accent-bd)", borderRadius: 8, padding: "3px 10px", fontFamily: "inherit" }}>
               {goal > 0 ? "수정" : "설정하기"}
             </button>
           </div>
           {goal > 0 ? (
             <>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                <span style={{ fontSize: 20, fontWeight: 800, color: "#00ff88" }}>{thisWeekDist.toFixed(1)}km</span>
+                <span style={{ fontSize: 20, fontWeight: 800, color: "var(--accent)" }}>{thisWeekDist.toFixed(1)}km</span>
                 <span style={{ fontSize: 14, color: "var(--text5)" }}>/ {goal}km</span>
               </div>
               <div style={{ background: "var(--bg4)", borderRadius: 8, height: 10, overflow: "hidden" }}>
@@ -1293,7 +1293,7 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
                 {earned.map(b => (
                   <div key={b.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, background: "#0a1a0a", border: "1px solid var(--accent-bd)", borderRadius: 12, padding: "10px 12px", minWidth: 72 }}>
                     <span style={{ fontSize: 26 }}>{b.emoji}</span>
-                    <span style={{ fontSize: 11, color: "#00ff88", fontWeight: 700, textAlign: "center" }}>{b.name}</span>
+                    <span style={{ fontSize: 11, color: "var(--accent)", fontWeight: 700, textAlign: "center" }}>{b.name}</span>
                     <span style={{ fontSize: 10, color: "var(--text4)", textAlign: "center" }}>{b.desc}</span>
                   </div>
                 ))}
@@ -1319,7 +1319,7 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
         const paceRuns = myPosts.filter(p => p.pace && p.pace !== "--");
         const zones = [
           { name: "쉬움",   color: "#4fc3f7", range: [0, 6],   desc: "6분00초 이상" },
-          { name: "적당",   color: "#00ff88", range: [5, 6],   desc: "5분~6분" },
+          { name: "적당",   color: "var(--accent)", range: [5, 6],   desc: "5분~6분" },
           { name: "빠름",   color: "#ffaa00", range: [4, 5],   desc: "4분~5분" },
           { name: "전력",   color: "#ff4444", range: [0, 4],   desc: "4분 미만" },
         ];
@@ -1389,7 +1389,7 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
                 <div style={{ width: 70, fontSize: 12, color: "var(--text4)" }}>{m.label}</div>
                 <div style={{ flex: 1, display: "flex", gap: 6, alignItems: "center" }}>
                   <div style={{ flex: 1, background: "#0a1a0a", border: "1px solid var(--accent-bd)", borderRadius: 8, padding: "6px 10px", textAlign: "center" }}>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: "#00ff88" }}>{m.me}</div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "var(--accent)" }}>{m.me}</div>
                     <div style={{ fontSize: 10, color: "var(--text4)" }}>나</div>
                   </div>
                   <div style={{ fontSize: 12, color: "var(--border2)" }}>vs</div>
@@ -1442,7 +1442,7 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={() => setShowGoalEdit(false)} style={{ flex: 1, padding: "13px", borderRadius: 12, border: "1px solid var(--border2)", background: "transparent", color: "var(--text3)", fontFamily: "inherit", fontSize: 15, fontWeight: 700 }}>취소</button>
               <button onClick={async () => { await onUpdateProfile({ weeklyGoal: parseFloat(goalInput) || 0 }); setShowGoalEdit(false); }}
-                style={{ flex: 1, padding: "13px", borderRadius: 12, border: "none", background: "#00ff88", color: "#000", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>저장</button>
+                style={{ flex: 1, padding: "13px", borderRadius: 12, border: "none", background: "var(--accent)", color: "#000", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>저장</button>
             </div>
           </div>
         </div>
@@ -1514,12 +1514,12 @@ function MonthlyAIReport({ myPosts }) {
         <div style={{ fontSize: 13, color: "var(--text4)", textAlign: "center", padding: "8px 0" }}>이번 달 러닝 기록이 없어요</div>
       ) : loading ? (
         <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0" }}>
-          <div style={{ width: 18, height: 18, border: "2px solid #00ff88", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
+          <div style={{ width: 18, height: 18, border: "2px solid var(--accent)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
           <div style={{ fontSize: 14, color: "var(--text4)" }}>🤖 AI가 분석 중이에요...</div>
         </div>
       ) : !generated ? (
         <button onClick={generateReport}
-          style={{ width: "100%", padding: "12px", borderRadius: 12, border: "none", background: "#00ff88", color: "#000", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>
+          style={{ width: "100%", padding: "12px", borderRadius: 12, border: "none", background: "var(--accent)", color: "#000", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>
           ✨ 이번 달 리포트 생성 ({monthPosts.length}회 기록)
         </button>
       ) : (
@@ -1654,7 +1654,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
               {editMode ? <input value={name} onChange={e => setName(e.target.value)} style={{ background: "transparent", border: "none", borderBottom: "1px solid #333", color: "var(--text1)", fontFamily: "inherit", fontSize: 19, fontWeight: 800, outline: "none", width: "100%" }} />
                 : <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <span style={{ fontSize: 19, fontWeight: 800 }}>{currentUser?.name}</span>
-                    {currentUser?.isPro && <span style={{ background: "transparent", border: "1px solid #00ff88", color: "#00ff88", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 800, letterSpacing: 1 }}>PRO</span>}
+                    {currentUser?.isPro && <span style={{ background: "transparent", border: "1px solid var(--accent)", color: "var(--accent)", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 800, letterSpacing: 1 }}>PRO</span>}
                   </div>}
               {editMode ? <input value={bio} onChange={e => setBio(e.target.value)} placeholder="한 줄 소개..." style={{ background: "transparent", border: "none", borderBottom: "1px solid #222", color: "var(--text3)", fontFamily: "inherit", fontSize: 14, outline: "none", width: "100%", marginTop: 6 }} />
                 : <div style={{ fontSize: 14, color: "var(--text3)", marginTop: 4 }}>{currentUser?.bio || "한 줄 소개를 입력해보세요"}</div>}
@@ -1686,7 +1686,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
                   <span style={{ fontSize: 15, fontWeight: 800, color: "var(--text1)" }}>PRO 회원</span>
-                  <span style={{ background: "transparent", border: "1px solid #00ff88", color: "#00ff88", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 800, letterSpacing: 1 }}>PRO</span>
+                  <span style={{ background: "transparent", border: "1px solid var(--accent)", color: "var(--accent)", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 800, letterSpacing: 1 }}>PRO</span>
                 </div>
                 <div style={{ fontSize: 13, color: "var(--text4)" }}>AI 코치 · 무제한 업로드 이용 중</div>
               </div>
@@ -1709,7 +1709,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
                 ].map(p => (
                   <button key={p.type} onClick={() => setPayPlan(p.type)}
                     style={{ flex: 1, padding: "12px 8px", borderRadius: 14, border: payPlan === p.type ? "1.5px solid #00ff88" : "1px solid #222", background: payPlan === p.type ? "#0a1a0a" : "var(--bg2)", textAlign: "center", position: "relative" }}>
-                    {p.badge && <div style={{ position: "absolute", top: -8, right: 6, background: "#00ff88", color: "#000", fontSize: 10, fontWeight: 900, borderRadius: 6, padding: "2px 6px" }}>{p.badge}</div>}
+                    {p.badge && <div style={{ position: "absolute", top: -8, right: 6, background: "var(--accent)", color: "#000", fontSize: 10, fontWeight: 900, borderRadius: 6, padding: "2px 6px" }}>{p.badge}</div>}
                     <div style={{ fontSize: 13, color: payPlan === p.type ? "#00ff88" : "#555", fontWeight: 700 }}>{p.label}</div>
                     <div style={{ fontSize: 16, fontWeight: 900, color: payPlan === p.type ? "#e0e0e0" : "#444", marginTop: 3 }}>{p.price}</div>
                     <div style={{ fontSize: 11, color: "var(--text5)", marginTop: 2 }}>{p.sub}</div>
@@ -1718,7 +1718,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
               </div>
 
               <button onClick={handlePayment} disabled={payLoading}
-                style={{ width: "100%", padding: "14px", borderRadius: 12, border: "none", background: "#00ff88", color: "#000", fontFamily: "inherit", fontSize: 16, fontWeight: 800, marginBottom: 12 }}>
+                style={{ width: "100%", padding: "14px", borderRadius: 12, border: "none", background: "var(--accent)", color: "#000", fontFamily: "inherit", fontSize: 16, fontWeight: 800, marginBottom: 12 }}>
                 {payLoading ? "결제 준비 중..." : `💳 ${payPlan === "yearly" ? "29,900원" : "3,900원"} 결제하기`}
               </button>
 
@@ -1756,7 +1756,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 15, fontWeight: 700 }}>
                     {m.name}
-                    {m.uid === currentUser?.uid && <span style={{ color: "#00ff88", fontSize: 12, marginLeft: 6 }}>나</span>}
+                    {m.uid === currentUser?.uid && <span style={{ color: "var(--accent)", fontSize: 12, marginLeft: 6 }}>나</span>}
                     {m.uid === currentSet.adminId && <span style={{ color: "#ffaa00", fontSize: 11, marginLeft: 6 }}>👑 관리자</span>}
                   </div>
                 </div>
@@ -1829,7 +1829,7 @@ function BottomNav({ tab, setTab, onUpload, newFeedCount = 0, newChatCount = 0 }
 
       {/* 중앙 + 버튼 */}
       <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center", paddingBottom: 4 }}>
-        <button onClick={onUpload} style={{ width: 52, height: 52, borderRadius: 26, background: "#00ff88", border: "none", color: "#000", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 20px rgba(0,255,136,0.4)", marginTop: -10 }}>
+        <button onClick={onUpload} style={{ width: 52, height: 52, borderRadius: 26, background: "var(--accent)", border: "none", color: "#000", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 20px rgba(0,255,136,0.4)", marginTop: -10 }}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
             <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
@@ -1952,7 +1952,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
           <div style={{ fontSize: 10, color: "var(--border)", letterSpacing: 4 }}>RUNTRACK</div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <button onClick={onLeaveSet} style={{ background: "none", border: "none", color: "var(--text1)", fontSize: 26, padding: "0 4px 0 0", cursor: "pointer", lineHeight: 1 }}>‹</button>
-            <div style={{ fontSize: 20, fontWeight: 800, color: "#00ff88", letterSpacing: -0.5 }}>{currentSet?.emoji} {currentSet?.name}</div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: "var(--accent)", letterSpacing: -0.5 }}>{currentSet?.emoji} {currentSet?.name}</div>
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -1980,7 +1980,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
       <div style={{ margin: "0 18px 12px", background: "var(--bg2)", border: "1px solid #161616", borderRadius: 16, padding: "12px 16px", display: tab === "chat" ? "none" : "flex", flexShrink: 0 }}>
         {[[`${myWeekDist.toFixed(1)}km`, "이번 주"], [`${posts.filter(p => { if (p.userId !== currentUser?.uid) return false; const ts = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt||0); return ts.getTime() >= getThisWeekStart(); }).length}회`, "이번 주 횟수"], [`${calcStreak(posts, currentUser?.uid)}일`, "🔥 스트릭"]].map(([v, l], i) => (
           <div key={l} style={{ flex: 1, borderLeft: i > 0 ? "1px solid #141414" : "none", paddingLeft: i > 0 ? 14 : 0 }}>
-            <div style={{ fontSize: 19, fontWeight: 800, color: "#00ff88" }}>{v}</div>
+            <div style={{ fontSize: 19, fontWeight: 800, color: "var(--accent)" }}>{v}</div>
             <div style={{ fontSize: 12, color: "var(--text4)" }}>{l}</div>
           </div>
         ))}
@@ -1992,7 +1992,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
       <div style={{ flex: 1, overflowY: tab === "chat" ? "hidden" : "auto", WebkitOverflowScrolling: "touch", display: "flex", flexDirection: "column", padding: tab === "chat" ? "0" : "0 18px", paddingBottom: tab === "chat" ? "0" : `calc(80px + ${safeBottom})`, minHeight: 0 }}>
         {loading && (
           <div style={{ display: "flex", justifyContent: "center", paddingTop: 60 }}>
-            <div style={{ width: 34, height: 34, border: "2px solid #00ff88", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+            <div style={{ width: 34, height: 34, border: "2px solid var(--accent)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
             <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
           </div>
         )}
@@ -2012,7 +2012,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
                 <div style={{ fontSize: 60, marginBottom: 16 }}>🏃</div>
                 <div style={{ fontSize: 18, fontWeight: 800, color: "var(--text5)", marginBottom: 10 }}>아직 기록이 없어요</div>
                 <div style={{ fontSize: 14, color: "var(--text4)", lineHeight: 1.9, marginBottom: 28 }}>
-                  아래 <span style={{ color: "#00ff88", fontWeight: 800 }}>+</span> 버튼으로 러닝 기록을 올리거나<br />
+                  아래 <span style={{ color: "var(--accent)", fontWeight: 800 }}>+</span> 버튼으로 러닝 기록을 올리거나<br />
                   크루원을 초대해서 같이 달려보세요!
                 </div>
                 <button onClick={() => {
@@ -2022,7 +2022,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
                   } else {
                     navigator.clipboard.writeText(link).then(() => showToast("초대 링크가 복사됐어요! 🔗", "success"));
                   }
-                }} style={{ background: "var(--accent-bg)", border: "1px solid var(--accent-bd)", borderRadius: 14, padding: "13px 24px", color: "#00ff88", fontFamily: "inherit", fontSize: 15, fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 8 }}>
+                }} style={{ background: "var(--accent-bg)", border: "1px solid var(--accent-bd)", borderRadius: 14, padding: "13px 24px", color: "var(--accent)", fontFamily: "inherit", fontSize: 15, fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 8 }}>
                   🔗 크루원 초대하기
                 </button>
               </div>

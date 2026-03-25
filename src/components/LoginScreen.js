@@ -110,7 +110,7 @@ export default function LoginScreen({ onLogin }) {
         <div style={{ textAlign: "center", marginBottom: 48, animation: "fadeUp 0.5s ease both" }}>
           <div style={{ fontSize: 64, marginBottom: 20, lineHeight: 1 }}>🏃</div>
           <div style={{ fontSize: 11, color: "var(--text4)", letterSpacing: 8, marginBottom: 8, fontWeight: 600 }}>WELCOME TO</div>
-          <div style={{ fontSize: 44, fontWeight: 900, color: "#00ff88", letterSpacing: -2, lineHeight: 1, animation: "glow 3s ease-in-out infinite" }}>RUNCREW</div>
+          <div style={{ fontSize: 44, fontWeight: 900, color: "var(--accent)", letterSpacing: -2, lineHeight: 1, animation: "glow 3s ease-in-out infinite" }}>RUNCREW</div>
           <div style={{ fontSize: 14, color: "#333", marginTop: 12, letterSpacing: 1 }}>AI 기반 러닝 크루 커뮤니티</div>
         </div>
 
