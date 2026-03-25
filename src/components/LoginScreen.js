@@ -56,7 +56,7 @@ export default function LoginScreen({ onLogin }) {
   return (
     <div style={{
       position: "fixed", inset: 0,
-      background: "#060606",
+      background: "var(--bg)",
       display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center",
       padding: "0 28px",

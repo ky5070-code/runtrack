@@ -1,5 +1,6 @@
 // src/App.js
 import React, { useState, useEffect } from "react";
+import { ThemeProvider } from "./context/ThemeContext";
 import { useAuth } from "./hooks/useAuth";
 import { useSets } from "./hooks/useSets";
 import LoginScreen from "./components/LoginScreen";
@@ -7,9 +8,12 @@ import HomeScreen from "./components/HomeScreen";
 import CommunityApp from "./components/CommunityApp";
 
 function AppInner({ user, profile, loading, loginWithGoogle, logout, updateUserProfile, redeemCoupon }) {
-  const [currentSet, setCurrentSet] = useState(null);
+  const [currentSetId, setCurrentSetId] = useState(null);
   const currentUser = profile ? { ...profile, uid: user?.uid } : null;
-  const { joinByInvite } = useSets(currentUser);
+  const { joinByInvite, mySets } = useSets(currentUser);
+
+  // currentSetId 기준으로 항상 최신 Firestore 데이터 사용
+  const currentSet = currentSetId ? (mySets.find(s => s.id === currentSetId) || null) : null;
 
   // 초대 링크 처리
   useEffect(() => {
@@ -19,7 +23,7 @@ function AppInner({ user, profile, loading, loginWithGoogle, logout, updateUserP
       joinByInvite(inviteId)
         .then(set => {
           window.history.replaceState({}, "", window.location.pathname);
-          setCurrentSet(set);
+          setCurrentSetId(set.id);
         })
         .catch(e => {
           if (e.message !== "already_member") alert(e.message);
@@ -49,7 +53,7 @@ function AppInner({ user, profile, loading, loginWithGoogle, logout, updateUserP
     return (
       <HomeScreen
         currentUser={currentUser}
-        onEnterSet={(set) => setCurrentSet(set)}
+        onEnterSet={(set) => setCurrentSetId(set.id)}
         onLogout={logout}
       />
     );
@@ -59,7 +63,7 @@ function AppInner({ user, profile, loading, loginWithGoogle, logout, updateUserP
     <CommunityApp
       currentUser={currentUser}
       currentSet={currentSet}
-      onLeaveSet={() => setCurrentSet(null)}
+      onLeaveSet={() => setCurrentSetId(null)}
       onLogout={logout}
       onUpdateProfile={updateUserProfile}
       onRedeemCoupon={redeemCoupon}
@@ -69,5 +73,5 @@ function AppInner({ user, profile, loading, loginWithGoogle, logout, updateUserP
 
 export default function App() {
   const auth = useAuth();
-  return <AppInner {...auth} />;
+  return <ThemeProvider><AppInner {...auth} /></ThemeProvider>;
 }

@@ -39,6 +39,61 @@
         --safe-top: env(safe-area-inset-top, 0px);
         --safe-bottom: env(safe-area-inset-bottom, 0px);
       }
+
+      /* ── 다크 모드 (기본) ── */
+      :root, [data-theme="dark"] {
+        --bg:        #060606;
+        --bg2:       #0a0a0a;
+        --bg3:       #0d0d0d;
+        --bg4:       #111111;
+        --bg5:       #141414;
+        --border:    #1a1a1a;
+        --border2:   #222222;
+        --border3:   #2a2a2a;
+        --text1:     #e0e0e0;
+        --text2:     #aaaaaa;
+        --text3:     #666666;
+        --text4:     #444444;
+        --text5:     #333333;
+        --card:      #0b0b0b;
+        --card-me:   #0a0f0a;
+        --input-bg:  #0a0a0a;
+        --modal-bg:  #0d0d0d;
+        --overlay:   rgba(0,0,0,0.85);
+        --accent:    #00ff88;
+        --accent2:   #00cc66;
+        --accent-bg: #0d1f14;
+        --accent-bd: #1a3028;
+      }
+
+      /* ── 라이트 모드 ── */
+      [data-theme="light"] {
+        --bg:        #f5f5f5;
+        --bg2:       #efefef;
+        --bg3:       #ffffff;
+        --bg4:       #f0f0f0;
+        --bg5:       #e8e8e8;
+        --border:    #e0e0e0;
+        --border2:   #d0d0d0;
+        --border3:   #c0c0c0;
+        --text1:     #111111;
+        --text2:     #555555;
+        --text3:     #888888;
+        --text4:     #aaaaaa;
+        --text5:     #cccccc;
+        --card:      #ffffff;
+        --card-me:   #f0fdf6;
+        --input-bg:  #f8f8f8;
+        --modal-bg:  #ffffff;
+        --overlay:   rgba(0,0,0,0.6);
+        --accent:    #00cc55;
+        --accent2:   #009944;
+        --accent-bg: #e8fdf2;
+        --accent-bd: #b3f0d0;
+      }
+
+      /* 테마 전환 트랜지션 */
+      body { transition: background-color 0.25s ease; }
       ::-webkit-scrollbar { display: none; }
       * { scrollbar-width: none; }
       body { -webkit-user-select: none; user-select: none; }
