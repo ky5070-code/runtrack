@@ -1023,7 +1023,7 @@ function ChatTab({ setId, currentUser }) {
       </div>
 
       {/* 입력창 */}
-      <div style={{ display: "flex", gap: 8, alignItems: "center", padding: "10px 12px", borderTop: "1px solid #111", background: "#060606", flexShrink: 0 }}>
+      <div style={{ display: "flex", gap: 8, alignItems: "center", padding: "10px 12px", paddingBottom: `calc(10px + ${safeBottom})`, borderTop: "1px solid #111", background: "#060606", flexShrink: 0 }}>
         <button onClick={() => setShowScheduleModal(true)}
           style={{ width: 42, height: 42, borderRadius: 21, background: "#0d0d0d", border: "1px solid #1a3028", color: "#00cc66", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
           📅
