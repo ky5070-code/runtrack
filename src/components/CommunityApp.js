@@ -994,7 +994,7 @@ function ChatTab({ setId, currentUser }) {
 
               <div style={{ display: "flex", flexDirection: isMe ? "row-reverse" : "row", alignItems: "flex-end", gap: 6, marginBottom: isLastInGroup ? 8 : 2 }}>
                 {!isMe && (
-                  <div style={{ width: 28, height: 28, flexShrink: 0, visibility: isLastInGroup ? "visible" : "hidden" }}>
+                  <div style={{ width: 28, height: 28, flexShrink: 0, alignSelf: "flex-start", opacity: isNewSender ? 1 : 0 }}>
                     <Avatar user={{ avatar: msg.userAvatar, photoURL: msg.userPhotoURL }} size={28} />
                   </div>
                 )}
