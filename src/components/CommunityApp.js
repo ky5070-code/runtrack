@@ -1672,7 +1672,13 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
           </div>
         </div>}
 
-        {/* PRO 업그레이드 영역 */}
+        {/* 다크/라이트 토글 */}
+        <button onClick={toggleTheme} style={{ width: "100%", marginBottom: 12, padding: "13px 16px", background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 14, color: "var(--text2)", fontFamily: "inherit", fontSize: 15, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <span>{theme === "dark" ? "🌙 다크 모드" : "☀️ 라이트 모드"}</span>
+          <span style={{ fontSize: 12, color: "var(--text3)" }}>{theme === "dark" ? "라이트로 전환 →" : "다크로 전환 →"}</span>
+        </button>
+
+        {/* PRO 업그레이드 영역 */}}
         <div style={{ marginBottom: 18, background: currentUser?.isPro ? "#080f08" : "#0a0a0a", border: currentUser?.isPro ? "1px solid #1a3028" : "1px solid #1e1e1e", borderRadius: 16, padding: "16px" }}>
           {currentUser?.isPro ? (
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -1774,9 +1780,6 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
           </button>
         )}
 
-        <button onClick={toggleTheme} style={{ width: "100%", marginTop: 12, padding: "15px", background: "transparent", border: "1px solid var(--border2)", borderRadius: 14, color: "var(--text2)", fontFamily: "inherit", fontSize: 16, minHeight: 52, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-          {theme === "dark" ? "☀️ 라이트 모드로 전환" : "🌙 다크 모드로 전환"}
-        </button>
         <button onClick={onLogout} style={{ width: "100%", marginTop: 8, padding: "15px", background: "transparent", border: "1px solid var(--border3)", borderRadius: 14, color: "var(--text4)", fontFamily: "inherit", fontSize: 16, minHeight: 52 }}>로그아웃</button>
       </div>
     </div>
