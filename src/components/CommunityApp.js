@@ -1556,27 +1556,29 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
   const handlePhotoChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    // 파일 크기 체크 (5MB 이하)
     if (file.size > 5 * 1024 * 1024) {
       alert("사진 크기는 5MB 이하로 해주세요.");
       return;
     }
+    // ✅ Optimistic Update: 즉시 로컬 미리보기 표시
+    const localPreview = URL.createObjectURL(file);
+    setPhotoURL(localPreview);
     setPhotoUploading(true);
     try {
       const { storage } = await import("../lib/firebase");
       const { ref, uploadBytes, getDownloadURL } = await import("firebase/storage");
-      // 확장자 추출
       const ext = file.name.split(".").pop() || "jpg";
       const storageRef = ref(storage, `profiles/${currentUser.uid}.${ext}`);
-      const snap = await uploadBytes(storageRef, file);
-      console.log("[Storage] 업로드 완료:", snap.metadata.fullPath);
+      await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
-      console.log("[Storage] URL:", url);
+      // 업로드 완료 후 실제 URL로 교체
       setPhotoURL(url);
+      URL.revokeObjectURL(localPreview);
       await onUpdateProfile({ photoURL: url });
-      console.log("[Firestore] photoURL 저장 완료");
     } catch (err) {
-      console.error("사진 업로드 실패:", err.code, err.message);
+      // 실패 시 이전 사진으로 롤백
+      setPhotoURL(currentUser?.photoURL || null);
+      URL.revokeObjectURL(localPreview);
       alert("업로드 실패: " + (err.message || "다시 시도해주세요"));
     }
     setPhotoUploading(false);
