@@ -44,6 +44,7 @@ export function useChat(setId) {
       userId: currentUser.uid,
       userName: currentUser.name,
       userAvatar: currentUser.avatar || "🏃",
+      userPhotoURL: currentUser.photoURL || null,
       createdAt: serverTimestamp(),
     });
   };
@@ -55,6 +56,7 @@ export function useChat(setId) {
       userId: currentUser.uid,
       userName: currentUser.name,
       userAvatar: currentUser.avatar || "🏃",
+      userPhotoURL: currentUser.photoURL || null,
       schedule: {
         title: schedule.title,
         date: schedule.date,

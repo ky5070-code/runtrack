@@ -994,8 +994,8 @@ function ChatTab({ setId, currentUser }) {
 
               <div style={{ display: "flex", flexDirection: isMe ? "row-reverse" : "row", alignItems: "flex-end", gap: 6, marginBottom: isLastInGroup ? 8 : 2 }}>
                 {!isMe && (
-                  <div style={{ width: 28, height: 28, borderRadius: 14, background: isLastInGroup ? "#111" : "transparent", border: isLastInGroup ? "1px solid #1e1e1e" : "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>
-                    {isLastInGroup ? msg.userAvatar : ""}
+                  <div style={{ width: 28, height: 28, flexShrink: 0, visibility: isLastInGroup ? "visible" : "hidden" }}>
+                    <Avatar user={{ avatar: msg.userAvatar, photoURL: msg.userPhotoURL }} size={28} />
                   </div>
                 )}
                 <div style={{ maxWidth: "75%", display: "flex", flexDirection: "column", alignItems: isMe ? "flex-end" : "flex-start", gap: 1 }}>
