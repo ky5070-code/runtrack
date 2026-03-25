@@ -40,7 +40,7 @@ function CreateSetModal({ onClose, onCreate }) {
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.92)", zIndex: 200, display: "flex", alignItems: "flex-end" }}>
       <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "var(--modal-bg)", borderRadius: "22px 22px 0 0", border: "1px solid var(--border)", padding: "20px 20px", paddingBottom: `calc(24px + ${safeBottom})`, maxHeight: "90vh", overflowY: "auto" }}>
-        <div style={{ width: 40, height: 4, background: "#222", borderRadius: 2, margin: "0 auto 18px" }} />
+        <div style={{ width: 40, height: 4, background: "var(--border2)", borderRadius: 2, margin: "0 auto 18px" }} />
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
           <div style={{ fontSize: 18, fontWeight: 800 }}>🏃 새 러닝크루 만들기</div>
@@ -70,7 +70,7 @@ function CreateSetModal({ onClose, onCreate }) {
           {[[true, "🌍 공개", "누구나 검색하고 입장 가능"], [false, "🔒 비공개", "링크로만 입장 가능"]].map(([val, label, desc]) => (
             <button key={String(val)} onClick={() => setIsPublic(val)} style={{ flex: 1, padding: "12px 10px", borderRadius: 14, border: isPublic === val ? "1.5px solid #00ff88" : "1px solid #1a1a1a", background: isPublic === val ? "#0d1f14" : "#080808", textAlign: "left" }}>
               <div style={{ fontSize: 15, fontWeight: 700, color: isPublic === val ? "#00ff88" : "#555", marginBottom: 4 }}>{label}</div>
-              <div style={{ fontSize: 12, color: "#2a2a2a", lineHeight: 1.4 }}>{desc}</div>
+              <div style={{ fontSize: 12, color: "var(--text4)", lineHeight: 1.4 }}>{desc}</div>
             </button>
           ))}
         </div>
@@ -109,7 +109,7 @@ function JoinSetModal({ onClose, onJoin, currentUser }) {
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.92)", zIndex: 200, display: "flex", alignItems: "flex-end" }}>
       <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "var(--modal-bg)", borderRadius: "22px 22px 0 0", border: "1px solid var(--border)", padding: "20px 20px", paddingBottom: `calc(24px + ${safeBottom})`, maxHeight: "85vh", overflowY: "auto" }}>
-        <div style={{ width: 40, height: 4, background: "#222", borderRadius: 2, margin: "0 auto 18px" }} />
+        <div style={{ width: 40, height: 4, background: "var(--border2)", borderRadius: 2, margin: "0 auto 18px" }} />
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
           <div style={{ fontSize: 18, fontWeight: 800 }}>🌍 공개 러닝크루 찾기</div>
           <button onClick={onClose} style={{ background: "var(--bg4)", border: "none", borderRadius: "50%", width: 32, height: 32, color: "var(--text3)", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
@@ -119,7 +119,7 @@ function JoinSetModal({ onClose, onJoin, currentUser }) {
           style={{ width: "100%", background: "#080808", border: "1px solid var(--border)", borderRadius: 12, padding: "12px 14px", color: "var(--text1)", fontFamily: "inherit", fontSize: 16, outline: "none", marginBottom: 14, boxSizing: "border-box" }} />
 
         {filtered.length === 0 && (
-          <div style={{ textAlign: "center", padding: "40px 0", color: "#2a2a2a" }}>
+          <div style={{ textAlign: "center", padding: "40px 0", color: "var(--text4)" }}>
             <div style={{ fontSize: 38, marginBottom: 8 }}>🔍</div>
             <div style={{ fontSize: 15 }}>공개 러닝크루가 없어요</div>
           </div>
@@ -131,7 +131,7 @@ function JoinSetModal({ onClose, onJoin, currentUser }) {
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 16, fontWeight: 700 }}>{s.name}</div>
               {s.description && <div style={{ fontSize: 13, color: "var(--text4)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.description}</div>}
-              <div style={{ fontSize: 12, color: "#2a2a2a", marginTop: 3 }}>멤버 {s.memberIds?.length || 0}명</div>
+              <div style={{ fontSize: 12, color: "var(--text4)", marginTop: 3 }}>멤버 {s.memberIds?.length || 0}명</div>
             </div>
             <button onClick={() => handleJoin(s)} disabled={joining === s.id} style={{ padding: "8px 16px", background: "#00ff88", border: "none", borderRadius: 10, color: "#000", fontFamily: "inherit", fontSize: 14, fontWeight: 800, minHeight: 38, flexShrink: 0 }}>
               {joining === s.id ? "..." : "입장"}
@@ -156,7 +156,7 @@ export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
       {/* 헤더 */}
       <div style={{ padding: "14px 20px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
-          <div style={{ fontSize: 10, color: "#1e1e1e", letterSpacing: 4 }}>RUNTRACK</div>
+          <div style={{ fontSize: 10, color: "var(--border)", letterSpacing: 4 }}>RUNTRACK</div>
           <div style={{ fontSize: 24, fontWeight: 800, color: "#00ff88", letterSpacing: -0.5 }}>HOME</div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -181,7 +181,7 @@ export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
         </div>
 
         {/* 내 러닝크루 목록 */}
-        <div style={{ fontSize: 12, color: "#2e2e2e", letterSpacing: 3, marginBottom: 14 }}>내 러닝크루 {mySets.length > 0 ? `(${mySets.length})` : ""}</div>
+        <div style={{ fontSize: 12, color: "var(--text4)", letterSpacing: 3, marginBottom: 14 }}>내 러닝크루 {mySets.length > 0 ? `(${mySets.length})` : ""}</div>
 
         {loading && (
           <div style={{ display: "flex", justifyContent: "center", paddingTop: 40 }}>
@@ -191,7 +191,7 @@ export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
         )}
 
         {!loading && mySets.length === 0 && (
-          <div style={{ textAlign: "center", padding: "50px 0", color: "#2a2a2a" }}>
+          <div style={{ textAlign: "center", padding: "50px 0", color: "var(--text4)" }}>
             <div style={{ fontSize: 50, marginBottom: 14 }}>🏃</div>
             <div style={{ fontSize: 16, lineHeight: 1.9, color: "#333" }}>
               아직 러닝크루가 없어요<br />
@@ -202,7 +202,7 @@ export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
 
         {mySets.map(set => (
           <div key={set.id} onClick={() => onEnterSet(set)} style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px", background: "var(--bg2)", border: `1px solid ${set.adminId === currentUser?.uid ? "#1a3d28" : "#161616"}`, borderRadius: 18, marginBottom: 10, cursor: "pointer" }}>
-            <div style={{ width: 56, height: 56, borderRadius: 18, background: set.adminId === currentUser?.uid ? "#0d1f14" : "#0d0d0d", border: `1.5px solid ${set.adminId === currentUser?.uid ? "#1a3d28" : "#1a1a1a"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30, flexShrink: 0 }}>{set.emoji}</div>
+            <div style={{ width: 56, height: 56, borderRadius: 18, background: set.adminId === currentUser?.uid ? "#0d1f14" : "#0d0d0d", border: `1.5px solid ${set.adminId === currentUser?.uid ? "#1a3d28" : "var(--border)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30, flexShrink: 0 }}>{set.emoji}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <div style={{ fontSize: 17, fontWeight: 800, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{set.name}</div>
@@ -210,7 +210,7 @@ export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
                 
               </div>
               {set.description && <div style={{ fontSize: 14, color: "var(--text4)", marginTop: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{set.description}</div>}
-              <div style={{ fontSize: 13, color: "#2e2e2e", marginTop: 4 }}>멤버 {set.memberIds?.length || 0}명</div>
+              <div style={{ fontSize: 13, color: "var(--text4)", marginTop: 4 }}>멤버 {set.memberIds?.length || 0}명</div>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
               <button onClick={e => {
@@ -222,7 +222,7 @@ export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
                   navigator.clipboard.writeText(link).then(() => alert("초대 링크가 복사됐어요! 🔗"));
                 }
               }} style={{ background: "var(--modal-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "6px 10px", color: "var(--text3)", fontFamily: "inherit", fontSize: 13, minHeight: 32 }}>🔗</button>
-              <div style={{ color: "#2a2a2a", fontSize: 20 }}>›</div>
+              <div style={{ color: "var(--text4)", fontSize: 20 }}>›</div>
             </div>
           </div>
         ))}

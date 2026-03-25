@@ -109,7 +109,7 @@ export default function LoginScreen({ onLogin }) {
         {/* 로고 */}
         <div style={{ textAlign: "center", marginBottom: 48, animation: "fadeUp 0.5s ease both" }}>
           <div style={{ fontSize: 64, marginBottom: 20, lineHeight: 1 }}>🏃</div>
-          <div style={{ fontSize: 11, color: "#2a2a2a", letterSpacing: 8, marginBottom: 8, fontWeight: 600 }}>WELCOME TO</div>
+          <div style={{ fontSize: 11, color: "var(--text4)", letterSpacing: 8, marginBottom: 8, fontWeight: 600 }}>WELCOME TO</div>
           <div style={{ fontSize: 44, fontWeight: 900, color: "#00ff88", letterSpacing: -2, lineHeight: 1, animation: "glow 3s ease-in-out infinite" }}>RUNCREW</div>
           <div style={{ fontSize: 14, color: "#333", marginTop: 12, letterSpacing: 1 }}>AI 기반 러닝 크루 커뮤니티</div>
         </div>
@@ -124,7 +124,7 @@ export default function LoginScreen({ onLogin }) {
             <div key={title} style={{ display: "flex", gap: 14, alignItems: "center", padding: "13px 16px", background: "rgba(255,255,255,0.02)", border: "1px solid #141414", borderRadius: 14 }}>
               <span style={{ fontSize: 22, flexShrink: 0 }}>{icon}</span>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "#ccc", marginBottom: 2 }}>{title}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text2)", marginBottom: 2 }}>{title}</div>
                 <div style={{ fontSize: 12, color: "#333" }}>{desc}</div>
               </div>
             </div>
@@ -157,7 +157,7 @@ export default function LoginScreen({ onLogin }) {
           {inApp ? "외부 브라우저에서 로그인 가능" : "Google로 시작하기"}
         </button>
 
-        <div style={{ marginTop: 20, fontSize: 11, color: "#1e1e1e", textAlign: "center", lineHeight: 1.8, animation: "fadeUp 0.8s ease both" }}>
+        <div style={{ marginTop: 20, fontSize: 11, color: "var(--border)", textAlign: "center", lineHeight: 1.8, animation: "fadeUp 0.8s ease both" }}>
           가입하면 이용약관 및 개인정보처리방침에 동의하는 것으로 간주됩니다
         </div>
       </div>
