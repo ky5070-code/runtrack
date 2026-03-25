@@ -647,7 +647,7 @@ function LeaderboardTab({ posts, currentUser, isPro }) {
                 <Avatar user={s.user} size={44} />
                 <div style={{ fontSize: 14, fontWeight: 700, color: rank === 0 ? "#00ff88" : "#888", textAlign: "center" }}>{s.user.name}</div>
                 <div style={{ fontSize: 15, color: "#00ff88", fontWeight: 800 }}>{s.dist.toFixed(1)}km</div>
-                <div style={{ width: "100%", height: heights[i], background: rank === 0 ? "linear-gradient(180deg,var(--accent),var(--accent2))" : "var(--bg4)", borderRadius: "10px 10px 0 0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, border: rank !== 0 ? "1px solid #1a1a1a" : "none" }}>{medals[rank]}</div>
+                <div style={{ width: "100%", height: heights[i], background: rank === 0 ? "linear-gradient(180deg,var(--accent),var(--accent2))" : "var(--bg3)", borderRadius: "10px 10px 0 0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, border: rank !== 0 ? "1px solid #1a1a1a" : "none" }}>{medals[rank]}</div>
               </div>
             );
           })}
@@ -655,7 +655,7 @@ function LeaderboardTab({ posts, currentUser, isPro }) {
       )}
 
       {scores.map((s, i) => (
-        <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px", background: s.user.uid === currentUser?.uid ? "var(--accent-bg)" : "var(--bg2)", border: `1px solid ${s.user.uid === currentUser?.uid ? "#1a3d28" : "#161616"}`, borderRadius: 14, marginBottom: 8, minHeight: 66 }}>
+        <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px", background: s.user.uid === currentUser?.uid ? "var(--accent-bg)" : "var(--bg3)", border: `1px solid ${s.user.uid === currentUser?.uid ? "#1a3d28" : "#161616"}`, borderRadius: 14, marginBottom: 8, minHeight: 66 }}>
           <div style={{ fontSize: i < 3 ? 22 : 14, width: 28, textAlign: "center", color: i < 3 ? "inherit" : "var(--text4)", fontWeight: 700 }}>{i < 3 ? medals[i] : i + 1}</div>
           <Avatar user={s.user} size={44} />
           <div style={{ flex: 1 }}>
@@ -788,7 +788,7 @@ function NotificationModal({ notifications, onClose, onMarkAllRead, onDelete, sc
             : n.type === "feed" ? " 님이 새 러닝을 공유했어요"
             : " 님이 메시지를 보냈어요";
           return (
-            <div key={n.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: n.read ? "#080808" : "#0a1a0f", border: `1px solid ${n.read ? "#111" : "#1a3d28"}`, borderRadius: 14, marginBottom: 8 }}>
+            <div key={n.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: n.read ? "var(--bg)" : "#0a1a0f", border: `1px solid ${n.read ? "#111" : "#1a3d28"}`, borderRadius: 14, marginBottom: 8 }}>
               <div style={{ width: 42, height: 42, borderRadius: 21, background: "var(--bg4)", border: "1.5px solid #1e1e1e", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0, position: "relative" }}>
                 {n.fromUserAvatar || "🏃"}
                 <div style={{ position: "absolute", bottom: -2, right: -2, width: 18, height: 18, borderRadius: 9, background: "var(--modal-bg)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13 }}>
@@ -1668,7 +1668,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
         {editMode && <div style={{ marginBottom: 18 }}>
           <div style={{ fontSize: 12, color: "var(--text5)", letterSpacing: 2, marginBottom: 10 }}>아바타 선택</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {AVATARS_LIST.map(a => <button key={a} onClick={() => setSelectedAvatar(a)} style={{ width: 46, height: 46, borderRadius: 23, background: selectedAvatar === a ? "#0d1f14" : "#0d0d0d", border: selectedAvatar === a ? "2px solid #00ff88" : "1px solid #1a1a1a", fontSize: 24 }}>{a}</button>)}
+            {AVATARS_LIST.map(a => <button key={a} onClick={() => setSelectedAvatar(a)} style={{ width: 46, height: 46, borderRadius: 23, background: selectedAvatar === a ? "var(--accent-bg)" : "var(--bg2)", border: selectedAvatar === a ? "2px solid var(--accent)" : "1px solid var(--border)", fontSize: 24 }}>{a}</button>)}
           </div>
         </div>}
 
@@ -1678,8 +1678,8 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
           <span style={{ fontSize: 12, color: "var(--text3)" }}>{theme === "dark" ? "라이트로 전환 →" : "다크로 전환 →"}</span>
         </button>
 
-        {/* PRO 업그레이드 영역 */}}
-        <div style={{ marginBottom: 18, background: currentUser?.isPro ? "var(--accent-bg)" : "#0a0a0a", border: currentUser?.isPro ? "1px solid #1a3028" : "1px solid #1e1e1e", borderRadius: 16, padding: "16px" }}>
+        {/* PRO 업그레이드 영역 */}
+        <div style={{ marginBottom: 18, background: currentUser?.isPro ? "var(--accent-bg)" : "var(--bg2)", border: currentUser?.isPro ? "1px solid var(--accent-bd)" : "1px solid var(--border)", borderRadius: 16, padding: "16px" }}>
           {currentUser?.isPro ? (
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ width: 42, height: 42, borderRadius: 21, background: "var(--accent-bg)", border: "1px solid var(--accent-bd)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>✨</div>
@@ -1708,7 +1708,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
                   { type: "yearly",  label: "연간", price: "29,900원", sub: "월 2,491원 · 36% 할인", badge: "BEST" },
                 ].map(p => (
                   <button key={p.type} onClick={() => setPayPlan(p.type)}
-                    style={{ flex: 1, padding: "12px 8px", borderRadius: 14, border: payPlan === p.type ? "1.5px solid #00ff88" : "1px solid #222", background: payPlan === p.type ? "#0a1a0a" : "#0a0a0a", textAlign: "center", position: "relative" }}>
+                    style={{ flex: 1, padding: "12px 8px", borderRadius: 14, border: payPlan === p.type ? "1.5px solid #00ff88" : "1px solid #222", background: payPlan === p.type ? "#0a1a0a" : "var(--bg2)", textAlign: "center", position: "relative" }}>
                     {p.badge && <div style={{ position: "absolute", top: -8, right: 6, background: "#00ff88", color: "#000", fontSize: 10, fontWeight: 900, borderRadius: 6, padding: "2px 6px" }}>{p.badge}</div>}
                     <div style={{ fontSize: 13, color: payPlan === p.type ? "#00ff88" : "#555", fontWeight: 700 }}>{p.label}</div>
                     <div style={{ fontSize: 16, fontWeight: 900, color: payPlan === p.type ? "#e0e0e0" : "#444", marginTop: 3 }}>{p.price}</div>
@@ -1762,8 +1762,8 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
                 </div>
                 {isAdmin && m.uid !== currentUser?.uid && (
                   <div style={{ display: "flex", gap: 6 }}>
-                    <button onClick={() => onTransfer(m.uid, m.name)} style={{ padding: "5px 10px", borderRadius: 8, background: "#1a1000", border: "1px solid #4d3300", color: "#ffaa00", fontFamily: "inherit", fontSize: 12, minHeight: 30 }}>👑 이전</button>
-                    <button onClick={() => onKick(m.uid, m.name)} style={{ padding: "5px 10px", borderRadius: 8, background: "#1a0808", border: "1px solid #3d1010", color: "#ff7070", fontFamily: "inherit", fontSize: 12, minHeight: 30 }}>강퇴</button>
+                    <button onClick={() => onTransfer(m.uid, m.name)} style={{ padding: "5px 10px", borderRadius: 8, background: "rgba(255,170,0,0.08)", border: "1px solid rgba(255,170,0,0.3)", color: "#ffaa00", fontFamily: "inherit", fontSize: 12, minHeight: 30 }}>👑 이전</button>
+                    <button onClick={() => onKick(m.uid, m.name)} style={{ padding: "5px 10px", borderRadius: 8, background: "rgba(255,68,68,0.08)", border: "1px solid rgba(255,68,68,0.3)", color: "#ff4444", fontFamily: "inherit", fontSize: 12, minHeight: 30 }}>강퇴</button>
                   </div>
                 )}
               </div>
@@ -1812,7 +1812,7 @@ function BottomNav({ tab, setTab, onUpload, newFeedCount = 0, newChatCount = 0 }
   ];
 
   return (
-    <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 480, background: "var(--bg)", borderTop: "1px solid #161616", paddingBottom: safeBottom, display: "flex", alignItems: "center", zIndex: 100, backdropFilter: "blur(20px)" }}>
+    <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 480, background: "var(--bg)", borderTop: "1px solid var(--border)", paddingBottom: safeBottom, display: "flex", alignItems: "center", zIndex: 100, backdropFilter: "blur(20px)" }}>
       {tabs.slice(0, 2).map(t => (
         <button key={t.id} onClick={() => setTab(t.id)} style={{ flex: 1, padding: "10px 0 8px", border: "none", background: "transparent", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, minHeight: 58 }}>
           <div style={{ position: "relative" }}>
