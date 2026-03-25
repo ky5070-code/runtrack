@@ -1023,7 +1023,7 @@ function ChatTab({ setId, currentUser }) {
       </div>
 
       {/* 입력창 */}
-      <div style={{ display: "flex", gap: 8, alignItems: "center", padding: "10px 12px", paddingBottom: `calc(10px + ${safeBottom})`, borderTop: "1px solid #111", background: "#060606", flexShrink: 0 }}>
+      <div style={{ display: "flex", gap: 8, alignItems: "center", padding: "10px 14px", paddingBottom: `calc(10px + ${safeBottom})`, paddingRight: "14px", borderTop: "1px solid #111", background: "#060606", flexShrink: 0 }}>
         <button onClick={() => setShowScheduleModal(true)}
           style={{ width: 42, height: 42, borderRadius: 21, background: "#0d0d0d", border: "1px solid #1a3028", color: "#00cc66", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
           📅
@@ -1035,7 +1035,7 @@ function ChatTab({ setId, currentUser }) {
           onKeyDown={e => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), handleSend())}
           placeholder="메시지 입력..."
           maxLength={500}
-          style={{ flex: 1, background: "#0d0d0d", border: "1px solid #222", borderRadius: 22, padding: "10px 16px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none", transition: "border-color 0.15s" }}
+          style={{ flex: 1, minWidth: 0, background: "#0d0d0d", border: "1px solid #222", borderRadius: 22, padding: "10px 16px", color: "#e0e0e0", fontFamily: "inherit", fontSize: 14, outline: "none", transition: "border-color 0.15s" }}
           onFocus={e => e.target.style.borderColor = "#00ff88"}
           onBlur={e => e.target.style.borderColor = "#222"}
         />
@@ -1582,7 +1582,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
     setPhotoUploading(false);
   };
 
-  const saveProfile = async () => { await onUpdateProfile({ name, bio, avatar: selectedAvatar, photoURL }); setEditMode(false); };
+  const saveProfile = async () => { await onUpdateProfile({ name, bio, avatar: selectedAvatar, photoURL: photoURL || null }); setEditMode(false); };
 
   const handlePayment = async () => {
     setPayLoading(true);
