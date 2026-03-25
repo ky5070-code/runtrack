@@ -1742,7 +1742,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
             </div>
             {(currentSet.members || []).map(m => (
               <div key={m.uid} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: "#080808", border: "1px solid #111", borderRadius: 12, marginBottom: 6 }}>
-                <div style={{ width: 34, height: 34, borderRadius: 17, background: "#111", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{m.avatar || "🏃"}</div>
+                <Avatar user={m} size={34} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 15, fontWeight: 700 }}>
                     {m.name}

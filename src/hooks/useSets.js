@@ -80,6 +80,7 @@ export function useSets(currentUser) {
         uid: currentUser.uid,
         name: currentUser.name,
         avatar: currentUser.avatar || "🏃",
+        photoURL: currentUser.photoURL || null,
         joinedAt: new Date().toISOString(),
       }),
     });

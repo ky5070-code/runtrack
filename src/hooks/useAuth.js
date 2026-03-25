@@ -79,6 +79,23 @@ export function useAuth() {
     const ref = doc(db, "users", user.uid);
     await setDoc(ref, updates, { merge: true });
     setProfile((p) => ({ ...p, ...updates }));
+
+    // photoURL 변경 시 가입된 모든 크루의 members 배열도 업데이트
+    if (updates.photoURL !== undefined) {
+      try {
+        const setsQ = query(collection(db, "sets"), where("memberIds", "array-contains", user.uid));
+        const setsSnap = await getDocs(setsQ);
+        for (const setDoc2 of setsSnap.docs) {
+          const data = setDoc2.data();
+          const updatedMembers = (data.members || []).map(m =>
+            m.uid === user.uid ? { ...m, photoURL: updates.photoURL } : m
+          );
+          await updateDoc(setDoc2.ref, { members: updatedMembers });
+        }
+      } catch (e) {
+        console.warn("크루 멤버 photoURL 업데이트 실패:", e);
+      }
+    }
   };
 
   const redeemCoupon = async (code) => {
