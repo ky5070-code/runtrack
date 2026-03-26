@@ -92,11 +92,11 @@ export default function LoginScreen({ onLogin }) {
 
         {/* 인앱 브라우저 경고 */}
         {inApp && (
-          <div style={{ width: "100%", marginBottom: 24, background: "#1a1000", border: "1px solid #4d3300", borderRadius: 16, padding: "16px", animation: "fadeUp 0.4s ease both" }}>
+          <div style={{ width: "100%", marginBottom: 24, background: "var(--accent-bg)", border: "1px solid #4d3300", borderRadius: 16, padding: "16px", animation: "fadeUp 0.4s ease both" }}>
             <div style={{ fontSize: 22, marginBottom: 8, textAlign: "center" }}>⚠️</div>
             <div style={{ fontSize: 15, fontWeight: 800, color: "#ffaa00", marginBottom: 6, textAlign: "center" }}>외부 브라우저에서 열어주세요</div>
             <div style={{ fontSize: 13, color: "#886600", lineHeight: 1.8, textAlign: "center" }}>카카오톡·인스타 앱 내 브라우저에서는<br />Google 로그인이 차단됩니다.</div>
-            <div style={{ marginTop: 10, background: "#110d00", borderRadius: 10, padding: "10px 12px" }}>
+            <div style={{ marginTop: 10, background: "var(--bg4)", borderRadius: 10, padding: "10px 12px" }}>
               <div style={{ fontSize: 12, color: "#664400", marginBottom: 4, fontWeight: 700 }}>여는 방법</div>
               <div style={{ fontSize: 12, color: "#886600", lineHeight: 2 }}>
                 📱 아이폰 → 우측 하단 <b style={{color:"#ffaa00"}}>⋯</b> → Safari로 열기<br />
@@ -139,7 +139,7 @@ export default function LoginScreen({ onLogin }) {
           style={{
             width: "100%", padding: "17px",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 12,
-            background: inApp ? "#111" : "#00ff88",
+            background: inApp ? "#111" : "var(--accent)",
             border: inApp ? "1px solid #222" : "none",
             borderRadius: 16,
             fontFamily: "inherit", fontSize: 17, fontWeight: 900,

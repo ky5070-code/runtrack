@@ -51,31 +51,31 @@ function CreateSetModal({ onClose, onCreate }) {
         <div style={{ fontSize: 12, color: "#333", letterSpacing: 2, marginBottom: 10 }}>크루 아이콘</div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
           {EMOJIS.map(e => (
-            <button key={e} onClick={() => setEmoji(e)} style={{ width: 44, height: 44, borderRadius: 22, background: emoji === e ? "#0d1f14" : "#0d0d0d", border: emoji === e ? "2px solid #00ff88" : "1px solid #1a1a1a", fontSize: 24 }}>{e}</button>
+            <button key={e} onClick={() => setEmoji(e)} style={{ width: 44, height: 44, borderRadius: 22, background: emoji === e ? "var(--accent-bg)" : "var(--bg3)", border: emoji === e ? "2px solid var(--accent)" : "1px solid var(--border)", fontSize: 24 }}>{e}</button>
           ))}
         </div>
 
         {/* 러닝크루 이름 */}
         <div style={{ fontSize: 12, color: "#333", letterSpacing: 2, marginBottom: 8 }}>러닝크루 이름 *</div>
         <input value={name} onChange={e => setName(e.target.value)} placeholder="예: 대치동 러닝크루" maxLength={30}
-          style={{ width: "100%", background: "#080808", border: "1px solid var(--border)", borderRadius: 12, padding: "13px 14px", color: "var(--text1)", fontFamily: "inherit", fontSize: 16, outline: "none", marginBottom: 14, boxSizing: "border-box" }} />
+          style={{ width: "100%", background: "var(--input-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: "13px 14px", color: "var(--text1)", fontFamily: "inherit", fontSize: 16, outline: "none", marginBottom: 14, boxSizing: "border-box" }} />
 
         {/* 설명 */}
         <div style={{ fontSize: 12, color: "#333", letterSpacing: 2, marginBottom: 8 }}>설명 (선택)</div>
         <textarea value={desc} onChange={e => setDesc(e.target.value)} placeholder="이 크루에 대해 소개해주세요" maxLength={100} rows={3}
-          style={{ width: "100%", background: "#080808", border: "1px solid var(--border)", borderRadius: 12, padding: "13px 14px", color: "var(--text1)", fontFamily: "inherit", fontSize: 15, outline: "none", resize: "none", marginBottom: 16, boxSizing: "border-box", lineHeight: 1.6 }} />
+          style={{ width: "100%", background: "var(--input-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: "13px 14px", color: "var(--text1)", fontFamily: "inherit", fontSize: 15, outline: "none", resize: "none", marginBottom: 16, boxSizing: "border-box", lineHeight: 1.6 }} />
 
         {/* 공개/비공개 */}
         <div style={{ display: "flex", gap: 8, marginBottom: 22 }}>
           {[[true, "🌍 공개", "누구나 검색하고 입장 가능"], [false, "🔒 비공개", "링크로만 입장 가능"]].map(([val, label, desc]) => (
-            <button key={String(val)} onClick={() => setIsPublic(val)} style={{ flex: 1, padding: "12px 10px", borderRadius: 14, border: isPublic === val ? "1.5px solid #00ff88" : "1px solid #1a1a1a", background: isPublic === val ? "#0d1f14" : "#080808", textAlign: "left" }}>
+            <button key={String(val)} onClick={() => setIsPublic(val)} style={{ flex: 1, padding: "12px 10px", borderRadius: 14, border: isPublic === val ? "1.5px solid var(--accent)" : "1px solid var(--border)", background: isPublic === val ? "var(--accent-bg)" : "var(--bg2)", textAlign: "left" }}>
               <div style={{ fontSize: 15, fontWeight: 700, color: isPublic === val ? "var(--accent)" : "#555", marginBottom: 4 }}>{label}</div>
               <div style={{ fontSize: 12, color: "var(--text4)", lineHeight: 1.4 }}>{desc}</div>
             </button>
           ))}
         </div>
 
-        <button onClick={handleCreate} disabled={!name.trim() || loading} style={{ width: "100%", padding: "16px", background: name.trim() ? "var(--accent)" : "#0d0d0d", border: "none", borderRadius: 14, color: name.trim() ? "#000" : "#333", fontFamily: "inherit", fontSize: 17, fontWeight: 800, minHeight: 54 }}>
+        <button onClick={handleCreate} disabled={!name.trim() || loading} style={{ width: "100%", padding: "16px", background: name.trim() ? "var(--accent-grad, var(--accent))" : "var(--bg3)", border: "none", borderRadius: 14, color: name.trim() ? "#fff" : "var(--text4)", fontFamily: "inherit", fontSize: 17, fontWeight: 800, minHeight: 54 }}>
           {loading ? "만드는 중..." : "러닝크루 만들기 🚀"}
         </button>
       </div>
@@ -116,7 +116,7 @@ function JoinSetModal({ onClose, onJoin, currentUser }) {
         </div>
 
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="러닝크루 이름 검색..."
-          style={{ width: "100%", background: "#080808", border: "1px solid var(--border)", borderRadius: 12, padding: "12px 14px", color: "var(--text1)", fontFamily: "inherit", fontSize: 16, outline: "none", marginBottom: 14, boxSizing: "border-box" }} />
+          style={{ width: "100%", background: "var(--input-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: "12px 14px", color: "var(--text1)", fontFamily: "inherit", fontSize: 16, outline: "none", marginBottom: 14, boxSizing: "border-box" }} />
 
         {filtered.length === 0 && (
           <div style={{ textAlign: "center", padding: "40px 0", color: "var(--text4)" }}>
@@ -126,8 +126,8 @@ function JoinSetModal({ onClose, onJoin, currentUser }) {
         )}
 
         {filtered.map(s => (
-          <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px", background: "#080808", border: "1px solid #111", borderRadius: 14, marginBottom: 8 }}>
-            <div style={{ width: 48, height: 48, borderRadius: 24, background: "#0d1f14", border: "1px solid #1a3d28", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, flexShrink: 0 }}>{s.emoji}</div>
+          <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px", background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 14, marginBottom: 8 }}>
+            <div style={{ width: 48, height: 48, borderRadius: 24, background: "var(--accent-bg)", border: "1px solid var(--accent-bd)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, flexShrink: 0 }}>{s.emoji}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 16, fontWeight: 700 }}>{s.name}</div>
               {s.description && <div style={{ fontSize: 13, color: "var(--text4)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.description}</div>}
@@ -201,12 +201,12 @@ export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
         )}
 
         {mySets.map(set => (
-          <div key={set.id} onClick={() => onEnterSet(set)} style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px", background: "var(--bg2)", border: `1px solid ${set.adminId === currentUser?.uid ? "#1a3d28" : "#161616"}`, borderRadius: 18, marginBottom: 10, cursor: "pointer" }}>
-            <div style={{ width: 56, height: 56, borderRadius: 18, background: set.adminId === currentUser?.uid ? "#0d1f14" : "#0d0d0d", border: `1.5px solid ${set.adminId === currentUser?.uid ? "#1a3d28" : "var(--border)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30, flexShrink: 0 }}>{set.emoji}</div>
+          <div key={set.id} onClick={() => onEnterSet(set)} style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px", background: "var(--bg2)", border: `1px solid ${set.adminId === currentUser?.uid ? "var(--accent-bd)" : "var(--border)"}`, borderRadius: 18, marginBottom: 10, cursor: "pointer" }}>
+            <div style={{ width: 56, height: 56, borderRadius: 18, background: set.adminId === currentUser?.uid ? "var(--accent-bg)" : "var(--bg4)", border: `1.5px solid ${set.adminId === currentUser?.uid ? "var(--accent-bd)" : "var(--border)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30, flexShrink: 0 }}>{set.emoji}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <div style={{ fontSize: 17, fontWeight: 800, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{set.name}</div>
-                {set.adminId === currentUser?.uid && <span style={{ background: "#0d1f14", border: "1px solid #1a3d28", borderRadius: 4, padding: "1px 6px", fontSize: 11, color: "var(--accent2)", flexShrink: 0 }}>관리자</span>}
+                {set.adminId === currentUser?.uid && <span style={{ background: "var(--accent-bg)", border: "1px solid var(--accent-bd)", borderRadius: 4, padding: "1px 6px", fontSize: 11, color: "var(--accent2)", flexShrink: 0 }}>관리자</span>}
                 
               </div>
               {set.description && <div style={{ fontSize: 14, color: "var(--text4)", marginTop: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{set.description}</div>}
