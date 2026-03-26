@@ -103,7 +103,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
   };
 
   return (
-    <div style={{ background: isMyPost ? "var(--card-me)" : "var(--card)", border: isMyPost ? "1.5px solid #00cc55" : "1px solid #181818", borderRadius: 18, marginBottom: 12, boxShadow: isMyPost ? "0 2px 20px rgba(0,255,136,0.08)" : "none", isolation: "isolate" }}>
+    <div style={{ background: isMyPost ? "var(--card-me)" : "var(--card)", border: isMyPost ? "1.5px solid var(--accent)" : "1px solid var(--border)", borderRadius: 18, marginBottom: 12, boxShadow: isMyPost ? "0 2px 20px rgba(0,255,136,0.08)" : "none", isolation: "isolate" }}>
 
       {!isMyPost && <div style={{ height: 3, background: post.source === "ai" ? "linear-gradient(90deg,#00ff88,#009944)" : "var(--border)" }} />}
 
@@ -192,9 +192,9 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
           </div>
         )}
 
-        <div style={{ background: isMyPost ? "var(--accent-bg)" : "var(--card)", border: isMyPost ? "1px solid #1a3020" : "1px solid #141414", borderRadius: 14, padding: "12px 14px", marginBottom: 12, display: "flex" }}>
+        <div style={{ background: isMyPost ? "var(--accent-bg)" : "var(--card)", border: isMyPost ? "1px solid var(--accent-bd)" : "1px solid var(--border)", borderRadius: 14, padding: "12px 14px", marginBottom: 12, display: "flex" }}>
           {[[Number(post.dist).toFixed(2) + "km", "거리", true], [fmtTime(post.duration), "시간", false], [post.pace || "--", "페이스", false], [post.calories || "--", "칼로리", false]].map(([v, l, accent], i) => (
-            <div key={l} style={{ flex: 1, borderLeft: i > 0 ? "1px solid #141414" : "none", paddingLeft: i > 0 ? 10 : 0 }}>
+            <div key={l} style={{ flex: 1, borderLeft: i > 0 ? "1px solid var(--border)" : "none", paddingLeft: i > 0 ? 10 : 0 }}>
               <div style={{ fontSize: 11, color: "var(--text4)", marginBottom: 3 }}>{l}</div>
               <div style={{ fontSize: i === 0 ? 17 : 13, fontWeight: 800, color: accent ? "#00ff88" : "#d0d0d0" }}>{v}</div>
             </div>
@@ -378,7 +378,7 @@ function NoticeBoard({ notices, isAdmin, onAdd, onDelete }) {
             rows={3} maxLength={300}
             style={{ width: "100%", background: "var(--bg2)", border: "1px solid var(--accent-bd)", borderRadius: 10, padding: "10px 12px", color: "var(--text1)", fontFamily: "inherit", fontSize: 14, outline: "none", resize: "none", boxSizing: "border-box", marginBottom: 8 }} />
           <button onClick={handleAdd} disabled={!text.trim() || loading}
-            style={{ width: "100%", padding: "11px", borderRadius: 10, border: "none", background: text.trim() ? "var(--accent-grad, var(--accent))" : "var(--bg4)", color: text.trim() ? "#000" : "#333", fontFamily: "inherit", fontSize: 14, fontWeight: 800 }}>
+            style={{ width: "100%", padding: "11px", borderRadius: 10, border: "none", background: text.trim() ? "var(--accent-grad, var(--accent))" : "var(--bg4)", color: text.trim() ? "#fff" : "var(--text4)", fontFamily: "inherit", fontSize: 14, fontWeight: 800 }}>
             {loading ? "등록 중..." : "공지 등록"}
           </button>
         </div>
@@ -788,7 +788,7 @@ function NotificationModal({ notifications, onClose, onMarkAllRead, onDelete, sc
             : n.type === "feed" ? " 님이 새 러닝을 공유했어요"
             : " 님이 메시지를 보냈어요";
           return (
-            <div key={n.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: n.read ? "var(--bg)" : "#0a1a0f", border: `1px solid ${n.read ? "#111" : "#1a3d28"}`, borderRadius: 14, marginBottom: 8 }}>
+            <div key={n.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: n.read ? "var(--bg)" : "var(--accent-bg)", border: `1px solid ${n.read ? "var(--border)" : "var(--accent-bd)"}`, borderRadius: 14, marginBottom: 8 }}>
               <div style={{ width: 42, height: 42, borderRadius: 21, background: "var(--bg4)", border: "1.5px solid #1e1e1e", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0, position: "relative" }}>
                 {n.fromUserAvatar || "🏃"}
                 <div style={{ position: "absolute", bottom: -2, right: -2, width: 18, height: 18, borderRadius: 9, background: "var(--modal-bg)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13 }}>
@@ -1004,8 +1004,8 @@ function ChatTab({ setId, currentUser }) {
                     <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", marginBottom: 3, paddingLeft: 4 }}>{msg.userName}</div>
                   )}
                   <div style={{
-                    background: isMe ? "#00ff88" : "var(--border)",
-                    color: isMe ? "#000" : "var(--text1)",
+                    background: isMe ? "var(--accent-grad, var(--accent))" : "var(--bg4)",
+                    color: isMe ? "#fff" : "var(--text1)",
                     borderRadius: isMe ? (isNewSender ? "18px 4px 18px 18px" : "18px 18px 18px 18px") : (isNewSender ? "4px 18px 18px 18px" : "18px 18px 18px 18px"),
                     padding: "9px 13px", fontSize: 14, lineHeight: 1.5, wordBreak: "break-word",
                     border: isMe ? "none" : "1px solid #1e1e1e",
@@ -1041,7 +1041,7 @@ function ChatTab({ setId, currentUser }) {
           onBlur={e => e.target.style.borderColor = "var(--border2)"}
         />
         <button onClick={handleSend} disabled={!text.trim() || sending}
-          style={{ width: 42, height: 42, borderRadius: 21, background: text.trim() ? "var(--accent-grad, var(--accent))" : "var(--bg4)", border: "none", color: text.trim() ? "#000" : "#333", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s" }}>
+          style={{ width: 42, height: 42, borderRadius: 21, background: text.trim() ? "var(--accent-grad, var(--accent))" : "var(--bg4)", border: "none", color: text.trim() ? "#fff" : "var(--text4)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s" }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
           </svg>
@@ -1258,7 +1258,7 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
             const locked = v !== "week" && !isPro;
             return (
               <button key={v} onClick={() => !locked && setChartView(v)}
-                style={{ flex: 1, padding: "8px", borderRadius: 10, border: "none", background: chartView === v ? "#00ff88" : "#111", color: chartView === v ? "#000" : locked ? "var(--text4)" : "#555", fontFamily: "inherit", fontSize: 13, fontWeight: 700 }}>
+                style={{ flex: 1, padding: "8px", borderRadius: 10, border: "none", background: chartView === v ? "var(--accent-grad, var(--accent))" : "var(--bg3)", color: chartView === v ? "#fff" : locked ? "var(--text4)" : "var(--text3)", fontFamily: "inherit", fontSize: 13, fontWeight: 700 }}>
                 {l}
               </button>
             );
@@ -1271,7 +1271,7 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
             return (
               <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
                 {w.dist > 0 && <div style={{ fontSize: 9, color: isLast ? "#00ff88" : "#444" }}>{w.dist.toFixed(1)}</div>}
-                <div style={{ width: "100%", height: h, background: isLast ? "#00ff88" : "#1a3020", borderRadius: "3px 3px 0 0", minHeight: h > 0 ? 4 : 0 }} />
+                <div style={{ width: "100%", height: h, background: isLast ? "var(--accent)" : "var(--accent-bg)", borderRadius: "3px 3px 0 0", minHeight: h > 0 ? 4 : 0 }} />
                 <div style={{ fontSize: 9, color: isLast ? "#00ff88" : "var(--text4)", textAlign: "center", wordBreak: "keep-all" }}>{w.label}</div>
               </div>
             );
@@ -1751,7 +1751,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
               {isAdmin ? "👑 멤버 관리" : "👥 멤버 목록"}
             </div>
             {(currentSet.members || []).map(m => (
-              <div key={m.uid} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: "var(--bg)", border: "1px solid #111", borderRadius: 12, marginBottom: 6 }}>
+              <div key={m.uid} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 12, marginBottom: 6 }}>
                 <Avatar user={m} size={34} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 15, fontWeight: 700 }}>
@@ -1979,7 +1979,7 @@ export default function CommunityApp({ currentUser, currentSet, onLeaveSet, onLo
       {/* 주간 요약 - 채팅 탭에서는 숨김 */}
       <div style={{ margin: "0 18px 12px", background: "var(--bg2)", border: "1px solid #161616", borderRadius: 16, padding: "12px 16px", display: tab === "chat" ? "none" : "flex", flexShrink: 0 }}>
         {[[`${myWeekDist.toFixed(1)}km`, "이번 주"], [`${posts.filter(p => { if (p.userId !== currentUser?.uid) return false; const ts = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt||0); return ts.getTime() >= getThisWeekStart(); }).length}회`, "이번 주 횟수"], [`${calcStreak(posts, currentUser?.uid)}일`, "🔥 스트릭"]].map(([v, l], i) => (
-          <div key={l} style={{ flex: 1, borderLeft: i > 0 ? "1px solid #141414" : "none", paddingLeft: i > 0 ? 14 : 0 }}>
+          <div key={l} style={{ flex: 1, borderLeft: i > 0 ? "1px solid var(--border)" : "none", paddingLeft: i > 0 ? 14 : 0 }}>
             <div style={{ fontSize: 19, fontWeight: 800, color: "var(--accent)" }}>{v}</div>
             <div style={{ fontSize: 12, color: "var(--text4)" }}>{l}</div>
           </div>
