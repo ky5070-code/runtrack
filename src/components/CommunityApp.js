@@ -232,7 +232,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
                   <button key={e} onClick={() => onReact(post.id, e)} style={{
                     padding: "5px 10px", borderRadius: 20, minHeight: 34, flexShrink: 0,
                     border: active ? "1px solid var(--accent)" : "1px solid var(--border)",
-                    background: active ? "var(--accent-bg)" : "var(--bg2)",
+                    background: active ? "var(--accent-bg)" : "var(--bg4)",
                     fontSize: 15, display: "flex", alignItems: "center", gap: 3, whiteSpace: "nowrap"
                   }}>
                     <span>{e}</span>{count > 0 && <span style={{ fontSize: 13, color: active ? "var(--accent)" : "var(--text3)", lineHeight: 1 }}>{count}</span>}
