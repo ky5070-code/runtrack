@@ -103,7 +103,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
   };
 
   return (
-    <div style={{ background: isMyPost ? "var(--card-me)" : "var(--card)", border: isMyPost ? "1.5px solid var(--accent)" : "1px solid var(--border)", borderRadius: 18, marginBottom: 12, boxShadow: isMyPost ? "0 2px 20px rgba(0,255,136,0.08)" : "none", isolation: "isolate" }}>
+    <div style={{ background: isMyPost ? "var(--card-me)" : "var(--card)", border: isMyPost ? "1.5px solid var(--accent)" : "1px solid var(--border)", borderRadius: 18, marginBottom: 12, boxShadow: isMyPost ? "0 2px 20px rgba(219,39,119,0.08)" : "none", isolation: "isolate" }}>
 
       {!isMyPost && <div style={{ height: 3, background: post.source === "ai" ? "linear-gradient(90deg,var(--accent),var(--accent2))" : "var(--border)" }} />}
 
@@ -232,10 +232,10 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
                   <button key={e} onClick={() => onReact(post.id, e)} style={{
                     padding: "5px 10px", borderRadius: 20, minHeight: 34, flexShrink: 0,
                     border: active ? "1px solid var(--accent)" : "1px solid var(--border)",
-                    background: active ? "#0d1f14" : "#0d0d0d",
+                    background: active ? "var(--accent-bg)" : "var(--bg2)",
                     fontSize: 15, display: "flex", alignItems: "center", gap: 3, whiteSpace: "nowrap"
                   }}>
-                    <span>{e}</span>{count > 0 && <span style={{ fontSize: 13, color: active ? "var(--accent)" : "#555", lineHeight: 1 }}>{count}</span>}
+                    <span>{e}</span>{count > 0 && <span style={{ fontSize: 13, color: active ? "var(--accent)" : "var(--text3)", lineHeight: 1 }}>{count}</span>}
                   </button>
                 );
               })}
@@ -789,7 +789,7 @@ function NotificationModal({ notifications, onClose, onMarkAllRead, onDelete, sc
             : " 님이 메시지를 보냈어요";
           return (
             <div key={n.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: n.read ? "var(--bg)" : "var(--accent-bg)", border: `1px solid ${n.read ? "var(--border)" : "var(--accent-bd)"}`, borderRadius: 14, marginBottom: 8 }}>
-              <div style={{ width: 42, height: 42, borderRadius: 21, background: "var(--bg4)", border: "1.5px solid #1e1e1e", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0, position: "relative" }}>
+              <div style={{ width: 42, height: 42, borderRadius: 21, background: "var(--bg3)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0, position: "relative" }}>
                 {n.fromUserAvatar || "🏃"}
                 <div style={{ position: "absolute", bottom: -2, right: -2, width: 18, height: 18, borderRadius: 9, background: "var(--modal-bg)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13 }}>
                   {typeIcon}
@@ -1519,7 +1519,7 @@ function MonthlyAIReport({ myPosts }) {
         </div>
       ) : !generated ? (
         <button onClick={generateReport}
-          style={{ width: "100%", padding: "12px", borderRadius: 12, border: "none", background: "var(--accent)", color: "#000", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>
+          style={{ width: "100%", padding: "12px", borderRadius: 12, border: "none", background: "var(--accent-grad, var(--accent))", color: "#fff", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>
           ✨ 이번 달 리포트 생성 ({monthPosts.length}회 기록)
         </button>
       ) : (
