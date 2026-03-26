@@ -40,7 +40,7 @@ const getThisWeekStart = () => {
 
 /* ══ TOAST & CONFIRM ══ */
 function Toast({ message, type }) {
-  const bg = type === "success" ? "#00ff88" : type === "error" ? "#ff4444" : "#ffaa00";
+  const bg = type === "success" ? "var(--accent)" : type === "error" ? "#ff4444" : "#ffaa00";
   const color = type === "success" ? "#000" : "var(--text1)";
   return (
     <div style={{ position: "fixed", top: 60, left: "50%", transform: "translateX(-50%)", background: bg, color, borderRadius: 14, padding: "12px 22px", fontSize: 15, fontWeight: 700, zIndex: 999, boxShadow: "0 4px 20px rgba(0,0,0,0.5)", whiteSpace: "nowrap", maxWidth: "85vw", textAlign: "center" }}>
@@ -50,7 +50,7 @@ function Toast({ message, type }) {
 }
 
 function ConfirmModal({ message, onConfirm, onCancel, confirmLabel, confirmColor }) {
-  const btnColor = confirmColor || "#00ff88";
+  const btnColor = confirmColor || "var(--accent)";
   return (
     <div onClick={onCancel} style={{ position: "fixed", inset: 0, background: "var(--overlay)", zIndex: 400, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 32px" }}>
       <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 320, background: "var(--bg4)", borderRadius: 20, padding: "24px 20px", border: "1px solid var(--border2)" }}>
@@ -105,7 +105,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
   return (
     <div style={{ background: isMyPost ? "var(--card-me)" : "var(--card)", border: isMyPost ? "1.5px solid var(--accent)" : "1px solid var(--border)", borderRadius: 18, marginBottom: 12, boxShadow: isMyPost ? "0 2px 20px rgba(0,255,136,0.08)" : "none", isolation: "isolate" }}>
 
-      {!isMyPost && <div style={{ height: 3, background: post.source === "ai" ? "linear-gradient(90deg,#00ff88,#009944)" : "var(--border)" }} />}
+      {!isMyPost && <div style={{ height: 3, background: post.source === "ai" ? "linear-gradient(90deg,var(--accent),var(--accent2))" : "var(--border)" }} />}
 
       <div style={{ padding: "14px 14px 12px" }}>
         {/* 이름/아바타 */}
@@ -196,7 +196,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
           {[[Number(post.dist).toFixed(2) + "km", "거리", true], [fmtTime(post.duration), "시간", false], [post.pace || "--", "페이스", false], [post.calories || "--", "칼로리", false]].map(([v, l, accent], i) => (
             <div key={l} style={{ flex: 1, borderLeft: i > 0 ? "1px solid var(--border)" : "none", paddingLeft: i > 0 ? 10 : 0 }}>
               <div style={{ fontSize: 11, color: "var(--text4)", marginBottom: 3 }}>{l}</div>
-              <div style={{ fontSize: i === 0 ? 17 : 13, fontWeight: 800, color: accent ? "#00ff88" : "#d0d0d0" }}>{v}</div>
+              <div style={{ fontSize: i === 0 ? 17 : 13, fontWeight: 800, color: accent ? "var(--accent)" : "var(--text1)" }}>{v}</div>
             </div>
           ))}
         </div>
@@ -231,7 +231,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
                 return (
                   <button key={e} onClick={() => onReact(post.id, e)} style={{
                     padding: "5px 10px", borderRadius: 20, minHeight: 34, flexShrink: 0,
-                    border: active ? "1px solid #00ff88" : "1px solid #1e1e1e",
+                    border: active ? "1px solid var(--accent)" : "1px solid var(--border)",
                     background: active ? "#0d1f14" : "#0d0d0d",
                     fontSize: 15, display: "flex", alignItems: "center", gap: 3, whiteSpace: "nowrap"
                   }}>
@@ -295,7 +295,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
                   style={{ flex: 1, minWidth: 0, background: "var(--bg2)", border: "1px solid var(--accent)", borderRadius: 20, padding: "8px 12px", color: "var(--text1)", fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box" }}
                 />
                 <button onClick={() => { submitComment(); setShowCommentInput(false); }}
-                  style={{ width: 32, height: 32, borderRadius: 16, background: commentText.trim() ? "#00ff88" : "var(--border)", border: "none", color: commentText.trim() ? "#000" : "#444", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  style={{ width: 32, height: 32, borderRadius: 16, background: commentText.trim() ? "var(--accent)" : "var(--border)", border: "none", color: commentText.trim() ? "#000" : "#444", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
                   </svg>
@@ -324,7 +324,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
                 placeholder="댓글을 입력하세요..."
                 style={{ flex: 1, minWidth: 0, background: "var(--input-bg)", border: "1px solid var(--border2)", borderRadius: 20, padding: "9px 12px", color: "var(--text1)", fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box" }} />
               <button onClick={() => { submitComment(); setShowCommentInput(false); }}
-                style={{ width: 34, height: 34, borderRadius: 17, background: commentText.trim() ? "#00ff88" : "var(--border)", border: "none", color: commentText.trim() ? "#000" : "#444", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                style={{ width: 34, height: 34, borderRadius: 17, background: commentText.trim() ? "var(--accent)" : "var(--border)", border: "none", color: commentText.trim() ? "#000" : "#444", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
                 </svg>
@@ -365,7 +365,7 @@ function NoticeBoard({ notices, isAdmin, onAdd, onDelete }) {
         <div style={{ fontSize: 13, color: "var(--accent2)", fontWeight: 700 }}>📢 공지사항</div>
         {isAdmin && (
           <button onClick={() => setShowInput(s => !s)}
-            style={{ background: showInput ? "#1a3028" : "none", border: "1px solid var(--accent-bd)", borderRadius: 8, padding: "4px 10px", color: "var(--accent2)", fontFamily: "inherit", fontSize: 12, fontWeight: 700 }}>
+            style={{ background: showInput ? "var(--accent-bg)" : "none", border: "1px solid var(--accent-bd)", borderRadius: 8, padding: "4px 10px", color: "var(--accent2)", fontFamily: "inherit", fontSize: 12, fontWeight: 700 }}>
             {showInput ? "취소" : "+ 공지 작성"}
           </button>
         )}
@@ -515,7 +515,7 @@ function UploadModal({ onClose, onPost, currentUser, isPro }) {
             <div style={{ fontSize: 17, color: "var(--accent)", fontWeight: 700, marginBottom: 8 }}>Claude AI가 분석 중이에요</div>
             <div style={{ fontSize: 14, color: "var(--text5)", marginBottom: 20 }}>거리 · 시간 · 페이스 · 칼로리 추출 중</div>
             <div style={{ height: 3, background: "var(--bg4)", borderRadius: 2, overflow: "hidden" }}>
-              <div style={{ height: "100%", width: "40%", background: "linear-gradient(90deg,transparent,#00ff88,transparent)", animation: "scan 1.4s ease-in-out infinite" }} />
+              <div style={{ height: "100%", width: "40%", background: "linear-gradient(90deg,transparent,var(--accent),transparent)", animation: "scan 1.4s ease-in-out infinite" }} />
             </div>
           </div>
         )}
@@ -645,7 +645,7 @@ function LeaderboardTab({ posts, currentUser, isPro }) {
             return (
               <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 5 }}>
                 <Avatar user={s.user} size={44} />
-                <div style={{ fontSize: 14, fontWeight: 700, color: rank === 0 ? "#00ff88" : "#888", textAlign: "center" }}>{s.user.name}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: rank === 0 ? "var(--accent)" : "var(--text3)", textAlign: "center" }}>{s.user.name}</div>
                 <div style={{ fontSize: 15, color: "var(--accent)", fontWeight: 800 }}>{s.dist.toFixed(1)}km</div>
                 <div style={{ width: "100%", height: heights[i], background: rank === 0 ? "var(--accent-grad, linear-gradient(180deg,var(--accent),var(--accent2)))" : "var(--bg3)", borderRadius: "10px 10px 0 0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, border: rank !== 0 ? "1px solid #1a1a1a" : "none" }}>{medals[rank]}</div>
               </div>
@@ -752,7 +752,7 @@ function NotificationModal({ notifications, onClose, onMarkAllRead, onDelete, sc
             {upcomingSchedules.map(s => {
               const sc = s.schedule;
               const dday = getDday(sc.date, sc.time);
-              const ddayColor = dday === "D-Day" ? "#ff6b6b" : dday === "D-1" ? "#ffaa00" : "#00ff88";
+              const ddayColor = dday === "D-Day" ? "#ff6b6b" : dday === "D-1" ? "#ffaa00" : "var(--accent)";
               return (
                 <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: "var(--accent-bg)", border: "1px solid var(--accent-bd)", borderRadius: 14, marginBottom: 8 }}>
                   <div style={{ width: 46, height: 46, borderRadius: 12, background: "#0a1a0a", border: `1.5px solid ${ddayColor}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -1084,7 +1084,7 @@ function ScheduleCreateModal({ onClose, onCreate }) {
             <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--text3)", fontFamily: "inherit", fontSize: 15, fontWeight: 700 }}>취소</button>
             <div style={{ fontSize: 16, fontWeight: 800 }}>🏃 러닝 일정 만들기</div>
             <button onClick={handleCreate} disabled={!title.trim() || !date || loading}
-              style={{ background: "none", border: "none", color: title.trim() && date ? "#00ff88" : "#333", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>
+              style={{ background: "none", border: "none", color: title.trim() && date ? "var(--accent)" : "var(--text4)", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>
               {loading ? "저장 중..." : "저장"}
             </button>
           </div>
@@ -1231,9 +1231,9 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
                 <span style={{ fontSize: 14, color: "var(--text5)" }}>/ {goal}km</span>
               </div>
               <div style={{ background: "var(--bg4)", borderRadius: 8, height: 10, overflow: "hidden" }}>
-                <div style={{ width: `${goalPct}%`, height: "100%", background: goalPct >= 100 ? "#00ff88" : "linear-gradient(90deg,#00aa55,#00ff88)", borderRadius: 8, transition: "width 0.5s" }} />
+                <div style={{ width: `${goalPct}%`, height: "100%", background: goalPct >= 100 ? "var(--accent)" : "var(--accent-grad, linear-gradient(90deg,var(--accent2),var(--accent)))", borderRadius: 8, transition: "width 0.5s" }} />
               </div>
-              <div style={{ fontSize: 12, color: goalPct >= 100 ? "#00ff88" : "#444", marginTop: 6, textAlign: "right" }}>
+              <div style={{ fontSize: 12, color: goalPct >= 100 ? "var(--accent)" : "var(--text3)", marginTop: 6, textAlign: "right" }}>
                 {goalPct >= 100 ? "🎉 목표 달성!" : `${(goal - thisWeekDist).toFixed(1)}km 남음`}
               </div>
             </>
@@ -1270,9 +1270,9 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
             const h = maxDist > 0 ? Math.max((w.dist / maxDist) * 72, w.dist > 0 ? 5 : 0) : 0;
             return (
               <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                {w.dist > 0 && <div style={{ fontSize: 9, color: isLast ? "#00ff88" : "#444" }}>{w.dist.toFixed(1)}</div>}
+                {w.dist > 0 && <div style={{ fontSize: 9, color: isLast ? "var(--accent)" : "var(--text4)" }}>{w.dist.toFixed(1)}</div>}
                 <div style={{ width: "100%", height: h, background: isLast ? "var(--accent)" : "var(--accent-bg)", borderRadius: "3px 3px 0 0", minHeight: h > 0 ? 4 : 0 }} />
-                <div style={{ fontSize: 9, color: isLast ? "#00ff88" : "var(--text4)", textAlign: "center", wordBreak: "keep-all" }}>{w.label}</div>
+                <div style={{ fontSize: 9, color: isLast ? "var(--accent)" : "var(--text4)", textAlign: "center", wordBreak: "keep-all" }}>{w.label}</div>
               </div>
             );
           })}
@@ -1644,7 +1644,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
                 <>
                   <input ref={photoInputRef} type="file" accept="image/*" onChange={handlePhotoChange} style={{ display: "none" }} />
                   <button onClick={() => photoInputRef.current?.click()} disabled={photoUploading}
-                    style={{ position: "absolute", bottom: 0, right: 0, width: 24, height: 24, borderRadius: 12, background: photoUploading ? "#333" : "#00ff88", border: "2px solid var(--bg3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#000", padding: 0 }}>
+                    style={{ position: "absolute", bottom: 0, right: 0, width: 24, height: 24, borderRadius: 12, background: photoUploading ? "var(--bg4)" : "var(--accent)", border: "2px solid var(--bg3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#000", padding: 0 }}>
                     {photoUploading ? "⏳" : "📷"}
                   </button>
                 </>
@@ -1708,9 +1708,9 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
                   { type: "yearly",  label: "연간", price: "29,900원", sub: "월 2,491원 · 36% 할인", badge: "BEST" },
                 ].map(p => (
                   <button key={p.type} onClick={() => setPayPlan(p.type)}
-                    style={{ flex: 1, padding: "12px 8px", borderRadius: 14, border: payPlan === p.type ? "1.5px solid #00ff88" : "1px solid #222", background: payPlan === p.type ? "#0a1a0a" : "var(--bg2)", textAlign: "center", position: "relative" }}>
+                    style={{ flex: 1, padding: "12px 8px", borderRadius: 14, border: payPlan === p.type ? "1.5px solid var(--accent)" : "1px solid #222", background: payPlan === p.type ? "#0a1a0a" : "var(--bg2)", textAlign: "center", position: "relative" }}>
                     {p.badge && <div style={{ position: "absolute", top: -8, right: 6, background: "var(--accent)", color: "#000", fontSize: 10, fontWeight: 900, borderRadius: 6, padding: "2px 6px" }}>{p.badge}</div>}
-                    <div style={{ fontSize: 13, color: payPlan === p.type ? "#00ff88" : "#555", fontWeight: 700 }}>{p.label}</div>
+                    <div style={{ fontSize: 13, color: payPlan === p.type ? "var(--accent)" : "var(--text3)", fontWeight: 700 }}>{p.label}</div>
                     <div style={{ fontSize: 16, fontWeight: 900, color: payPlan === p.type ? "#e0e0e0" : "#444", marginTop: 3 }}>{p.price}</div>
                     <div style={{ fontSize: 11, color: "var(--text5)", marginTop: 2 }}>{p.sub}</div>
                   </button>
@@ -1739,7 +1739,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
                   {couponLoading ? "..." : "적용"}
                 </button>
               </div>
-              {couponMsg && <div style={{ marginTop: 8, fontSize: 13, color: couponMsg.ok ? "#00ff88" : "#ff4444", fontWeight: 600 }}>{couponMsg.text}</div>}
+              {couponMsg && <div style={{ marginTop: 8, fontSize: 13, color: couponMsg.ok ? "var(--accent)" : "#ff4444", fontWeight: 600 }}>{couponMsg.text}</div>}
             </>
           )}
         </div>
@@ -1823,7 +1823,7 @@ function BottomNav({ tab, setTab, onUpload, newFeedCount = 0, newChatCount = 0 }
               </div>
             )}
           </div>
-          <span style={{ fontSize: 11, color: tab === t.id ? "#00ff88" : "#888", fontWeight: tab === t.id ? 700 : 500 }}>{t.label}</span>
+          <span style={{ fontSize: 11, color: tab === t.id ? "var(--accent)" : "var(--text3)", fontWeight: tab === t.id ? 700 : 500 }}>{t.label}</span>
         </button>
       ))}
 
@@ -1846,7 +1846,7 @@ function BottomNav({ tab, setTab, onUpload, newFeedCount = 0, newChatCount = 0 }
               </div>
             )}
           </div>
-          <span style={{ fontSize: 11, color: tab === t.id ? "#00ff88" : "#888", fontWeight: tab === t.id ? 700 : 500 }}>{t.label}</span>
+          <span style={{ fontSize: 11, color: tab === t.id ? "var(--accent)" : "var(--text3)", fontWeight: tab === t.id ? 700 : 500 }}>{t.label}</span>
         </button>
       ))}
     </div>
