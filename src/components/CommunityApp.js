@@ -40,7 +40,7 @@ const getThisWeekStart = () => {
 
 /* ══ TOAST & CONFIRM ══ */
 function Toast({ message, type }) {
-  const bg = type === "success" ? "#22D3EE" : type === "error" ? "#ff4444" : "#ffaa00";
+  const bg = type === "success" ? "#00ff88" : type === "error" ? "#ff4444" : "#ffaa00";
   const color = type === "success" ? "#000" : "var(--text1)";
   return (
     <div style={{ position: "fixed", top: 60, left: "50%", transform: "translateX(-50%)", background: bg, color, borderRadius: 14, padding: "12px 22px", fontSize: 15, fontWeight: 700, zIndex: 999, boxShadow: "0 4px 20px rgba(0,0,0,0.5)", whiteSpace: "nowrap", maxWidth: "85vw", textAlign: "center" }}>
@@ -50,7 +50,7 @@ function Toast({ message, type }) {
 }
 
 function ConfirmModal({ message, onConfirm, onCancel, confirmLabel, confirmColor }) {
-  const btnColor = confirmColor || "#22D3EE";
+  const btnColor = confirmColor || "#00ff88";
   return (
     <div onClick={onCancel} style={{ position: "fixed", inset: 0, background: "var(--overlay)", zIndex: 400, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 32px" }}>
       <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 320, background: "var(--bg4)", borderRadius: 20, padding: "24px 20px", border: "1px solid var(--border2)" }}>
@@ -196,7 +196,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
           {[[Number(post.dist).toFixed(2) + "km", "거리", true], [fmtTime(post.duration), "시간", false], [post.pace || "--", "페이스", false], [post.calories || "--", "칼로리", false]].map(([v, l, accent], i) => (
             <div key={l} style={{ flex: 1, borderLeft: i > 0 ? "1px solid #141414" : "none", paddingLeft: i > 0 ? 10 : 0 }}>
               <div style={{ fontSize: 11, color: "var(--text4)", marginBottom: 3 }}>{l}</div>
-              <div style={{ fontSize: i === 0 ? 17 : 13, fontWeight: 800, color: accent ? "#22D3EE" : "#d0d0d0" }}>{v}</div>
+              <div style={{ fontSize: i === 0 ? 17 : 13, fontWeight: 800, color: accent ? "#00ff88" : "#d0d0d0" }}>{v}</div>
             </div>
           ))}
         </div>
@@ -232,7 +232,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
                   <button key={e} onClick={() => onReact(post.id, e)} style={{
                     padding: "5px 10px", borderRadius: 20, minHeight: 34, flexShrink: 0,
                     border: active ? "1px solid #00ff88" : "1px solid #1e1e1e",
-                    background: active ? "#0d1e24" : "#0d0d0d",
+                    background: active ? "#0d1f14" : "#0d0d0d",
                     fontSize: 15, display: "flex", alignItems: "center", gap: 3, whiteSpace: "nowrap"
                   }}>
                     <span>{e}</span>{count > 0 && <span style={{ fontSize: 13, color: active ? "var(--accent)" : "#555", lineHeight: 1 }}>{count}</span>}
@@ -295,7 +295,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
                   style={{ flex: 1, minWidth: 0, background: "var(--bg2)", border: "1px solid var(--accent)", borderRadius: 20, padding: "8px 12px", color: "var(--text1)", fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box" }}
                 />
                 <button onClick={() => { submitComment(); setShowCommentInput(false); }}
-                  style={{ width: 32, height: 32, borderRadius: 16, background: commentText.trim() ? "#22D3EE" : "var(--border)", border: "none", color: commentText.trim() ? "#000" : "#444", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  style={{ width: 32, height: 32, borderRadius: 16, background: commentText.trim() ? "#00ff88" : "var(--border)", border: "none", color: commentText.trim() ? "#000" : "#444", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
                   </svg>
@@ -324,7 +324,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
                 placeholder="댓글을 입력하세요..."
                 style={{ flex: 1, minWidth: 0, background: "var(--input-bg)", border: "1px solid var(--border2)", borderRadius: 20, padding: "9px 12px", color: "var(--text1)", fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box" }} />
               <button onClick={() => { submitComment(); setShowCommentInput(false); }}
-                style={{ width: 34, height: 34, borderRadius: 17, background: commentText.trim() ? "#22D3EE" : "var(--border)", border: "none", color: commentText.trim() ? "#000" : "#444", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                style={{ width: 34, height: 34, borderRadius: 17, background: commentText.trim() ? "#00ff88" : "var(--border)", border: "none", color: commentText.trim() ? "#000" : "#444", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
                 </svg>
@@ -365,7 +365,7 @@ function NoticeBoard({ notices, isAdmin, onAdd, onDelete }) {
         <div style={{ fontSize: 13, color: "var(--accent2)", fontWeight: 700 }}>📢 공지사항</div>
         {isAdmin && (
           <button onClick={() => setShowInput(s => !s)}
-            style={{ background: showInput ? "#164e63" : "none", border: "1px solid var(--accent-bd)", borderRadius: 8, padding: "4px 10px", color: "var(--accent2)", fontFamily: "inherit", fontSize: 12, fontWeight: 700 }}>
+            style={{ background: showInput ? "#1a3028" : "none", border: "1px solid var(--accent-bd)", borderRadius: 8, padding: "4px 10px", color: "var(--accent2)", fontFamily: "inherit", fontSize: 12, fontWeight: 700 }}>
             {showInput ? "취소" : "+ 공지 작성"}
           </button>
         )}
@@ -378,7 +378,7 @@ function NoticeBoard({ notices, isAdmin, onAdd, onDelete }) {
             rows={3} maxLength={300}
             style={{ width: "100%", background: "var(--bg2)", border: "1px solid var(--accent-bd)", borderRadius: 10, padding: "10px 12px", color: "var(--text1)", fontFamily: "inherit", fontSize: 14, outline: "none", resize: "none", boxSizing: "border-box", marginBottom: 8 }} />
           <button onClick={handleAdd} disabled={!text.trim() || loading}
-            style={{ width: "100%", padding: "11px", borderRadius: 10, border: "none", background: text.trim() ? "#22D3EE" : "#111", color: text.trim() ? "#000" : "#333", fontFamily: "inherit", fontSize: 14, fontWeight: 800 }}>
+            style={{ width: "100%", padding: "11px", borderRadius: 10, border: "none", background: text.trim() ? "#00ff88" : "#111", color: text.trim() ? "#000" : "#333", fontFamily: "inherit", fontSize: 14, fontWeight: 800 }}>
             {loading ? "등록 중..." : "공지 등록"}
           </button>
         </div>
@@ -568,7 +568,7 @@ function UploadModal({ onClose, onPost, currentUser, isPro }) {
           </div>
           <textarea value={caption} onChange={e => setCaption(e.target.value)} placeholder="오늘의 러닝은 어땠나요? 경로, 날씨, 느낀 점을 공유해봐요 🏃"
             style={{ width: "100%", background: "var(--bg)", border: "1px solid #1e1e1e", borderRadius: 14, padding: "14px", color: "var(--text2)", fontFamily: "inherit", fontSize: 15, outline: "none", resize: "none", height: 120, boxSizing: "border-box", lineHeight: 1.7 }} />
-          <button onClick={handlePost} disabled={posting} style={{ width: "100%", marginTop: 14, padding: "17px", background: posting ? "#0d3320" : "#22D3EE", border: "none", borderRadius: 14, color: posting ? "#22D3EE" : "#000", fontFamily: "inherit", fontSize: 17, fontWeight: 800, minHeight: 56 }}>
+          <button onClick={handlePost} disabled={posting} style={{ width: "100%", marginTop: 14, padding: "17px", background: posting ? "#0d3320" : "#00ff88", border: "none", borderRadius: 14, color: posting ? "#00ff88" : "#000", fontFamily: "inherit", fontSize: 17, fontWeight: 800, minHeight: 56 }}>
             {posting ? "업로드 중..." : "커뮤니티에 공유하기 🚀"}
           </button>
         </>}
@@ -622,7 +622,7 @@ function LeaderboardTab({ posts, currentUser, isPro }) {
           const locked = v === "all" && !isPro;
           return (
             <button key={v} onClick={() => !locked && setPeriod(v)}
-              style={{ flex: 1, padding: "11px", borderRadius: 12, border: locked ? "1px solid #1a1a1a" : "none", background: period === v ? "#22D3EE" : "#0d0d0d", color: period === v ? "#000" : locked ? "#333" : "#444", fontFamily: "inherit", fontSize: 13, fontWeight: 700, minHeight: 46 }}>
+              style={{ flex: 1, padding: "11px", borderRadius: 12, border: locked ? "1px solid #1a1a1a" : "none", background: period === v ? "#00ff88" : "#0d0d0d", color: period === v ? "#000" : locked ? "#333" : "#444", fontFamily: "inherit", fontSize: 13, fontWeight: 700, minHeight: 46 }}>
               {locked ? "🔒 " : ""}{l}
             </button>
           );
@@ -645,7 +645,7 @@ function LeaderboardTab({ posts, currentUser, isPro }) {
             return (
               <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 5 }}>
                 <Avatar user={s.user} size={44} />
-                <div style={{ fontSize: 14, fontWeight: 700, color: rank === 0 ? "#22D3EE" : "#888", textAlign: "center" }}>{s.user.name}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: rank === 0 ? "#00ff88" : "#888", textAlign: "center" }}>{s.user.name}</div>
                 <div style={{ fontSize: 15, color: "var(--accent)", fontWeight: 800 }}>{s.dist.toFixed(1)}km</div>
                 <div style={{ width: "100%", height: heights[i], background: rank === 0 ? "linear-gradient(180deg,var(--accent),var(--accent2))" : "var(--bg3)", borderRadius: "10px 10px 0 0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, border: rank !== 0 ? "1px solid #1a1a1a" : "none" }}>{medals[rank]}</div>
               </div>
@@ -655,7 +655,7 @@ function LeaderboardTab({ posts, currentUser, isPro }) {
       )}
 
       {scores.map((s, i) => (
-        <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px", background: s.user.uid === currentUser?.uid ? "var(--accent-bg)" : "var(--bg3)", border: `1px solid ${s.user.uid === currentUser?.uid ? "#155e75" : "#161616"}`, borderRadius: 14, marginBottom: 8, minHeight: 66 }}>
+        <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px", background: s.user.uid === currentUser?.uid ? "var(--accent-bg)" : "var(--bg3)", border: `1px solid ${s.user.uid === currentUser?.uid ? "#1a3d28" : "#161616"}`, borderRadius: 14, marginBottom: 8, minHeight: 66 }}>
           <div style={{ fontSize: i < 3 ? 22 : 14, width: 28, textAlign: "center", color: i < 3 ? "inherit" : "var(--text4)", fontWeight: 700 }}>{i < 3 ? medals[i] : i + 1}</div>
           <Avatar user={s.user} size={44} />
           <div style={{ flex: 1 }}>
@@ -752,10 +752,10 @@ function NotificationModal({ notifications, onClose, onMarkAllRead, onDelete, sc
             {upcomingSchedules.map(s => {
               const sc = s.schedule;
               const dday = getDday(sc.date, sc.time);
-              const ddayColor = dday === "D-Day" ? "#ff6b6b" : dday === "D-1" ? "#ffaa00" : "#22D3EE";
+              const ddayColor = dday === "D-Day" ? "#ff6b6b" : dday === "D-1" ? "#ffaa00" : "#00ff88";
               return (
                 <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: "var(--accent-bg)", border: "1px solid var(--accent-bd)", borderRadius: 14, marginBottom: 8 }}>
-                  <div style={{ width: 46, height: 46, borderRadius: 12, background: "#0a1820", border: `1.5px solid ${ddayColor}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <div style={{ width: 46, height: 46, borderRadius: 12, background: "#0a1a0a", border: `1.5px solid ${ddayColor}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     <div style={{ fontSize: 11, fontWeight: 900, color: ddayColor, letterSpacing: -0.5 }}>{dday}</div>
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -788,7 +788,7 @@ function NotificationModal({ notifications, onClose, onMarkAllRead, onDelete, sc
             : n.type === "feed" ? " 님이 새 러닝을 공유했어요"
             : " 님이 메시지를 보냈어요";
           return (
-            <div key={n.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: n.read ? "var(--bg)" : "#0a1a0f", border: `1px solid ${n.read ? "#111" : "#155e75"}`, borderRadius: 14, marginBottom: 8 }}>
+            <div key={n.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: n.read ? "var(--bg)" : "#0a1a0f", border: `1px solid ${n.read ? "#111" : "#1a3d28"}`, borderRadius: 14, marginBottom: 8 }}>
               <div style={{ width: 42, height: 42, borderRadius: 21, background: "var(--bg4)", border: "1.5px solid #1e1e1e", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0, position: "relative" }}>
                 {n.fromUserAvatar || "🏃"}
                 <div style={{ position: "absolute", bottom: -2, right: -2, width: 18, height: 18, borderRadius: 9, background: "var(--modal-bg)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13 }}>
@@ -967,7 +967,7 @@ function ChatTab({ setId, currentUser }) {
                           onClick={() => joinSchedule(msg.id, currentUser, !!isJoined)}
                           disabled={!isJoined && isFull}
                           style={{ width: "100%", padding: "10px", borderRadius: 10, border: "none", fontFamily: "inherit", fontSize: 14, fontWeight: 700,
-                            background: isJoined ? "#111" : "#22D3EE",
+                            background: isJoined ? "#111" : "#00ff88",
                             color: isJoined ? "#555" : "#000",
                             border: isJoined ? "1px solid #222" : "none",
                           }}>
@@ -1004,7 +1004,7 @@ function ChatTab({ setId, currentUser }) {
                     <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", marginBottom: 3, paddingLeft: 4 }}>{msg.userName}</div>
                   )}
                   <div style={{
-                    background: isMe ? "#22D3EE" : "var(--border)",
+                    background: isMe ? "#00ff88" : "var(--border)",
                     color: isMe ? "#000" : "var(--text1)",
                     borderRadius: isMe ? (isNewSender ? "18px 4px 18px 18px" : "18px 18px 18px 18px") : (isNewSender ? "4px 18px 18px 18px" : "18px 18px 18px 18px"),
                     padding: "9px 13px", fontSize: 14, lineHeight: 1.5, wordBreak: "break-word",
@@ -1041,7 +1041,7 @@ function ChatTab({ setId, currentUser }) {
           onBlur={e => e.target.style.borderColor = "var(--border2)"}
         />
         <button onClick={handleSend} disabled={!text.trim() || sending}
-          style={{ width: 42, height: 42, borderRadius: 21, background: text.trim() ? "#22D3EE" : "#111", border: "none", color: text.trim() ? "#000" : "#333", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s" }}>
+          style={{ width: 42, height: 42, borderRadius: 21, background: text.trim() ? "#00ff88" : "#111", border: "none", color: text.trim() ? "#000" : "#333", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s" }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
           </svg>
@@ -1084,7 +1084,7 @@ function ScheduleCreateModal({ onClose, onCreate }) {
             <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--text3)", fontFamily: "inherit", fontSize: 15, fontWeight: 700 }}>취소</button>
             <div style={{ fontSize: 16, fontWeight: 800 }}>🏃 러닝 일정 만들기</div>
             <button onClick={handleCreate} disabled={!title.trim() || !date || loading}
-              style={{ background: "none", border: "none", color: title.trim() && date ? "#22D3EE" : "#333", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>
+              style={{ background: "none", border: "none", color: title.trim() && date ? "#00ff88" : "#333", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>
               {loading ? "저장 중..." : "저장"}
             </button>
           </div>
@@ -1231,9 +1231,9 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
                 <span style={{ fontSize: 14, color: "var(--text5)" }}>/ {goal}km</span>
               </div>
               <div style={{ background: "var(--bg4)", borderRadius: 8, height: 10, overflow: "hidden" }}>
-                <div style={{ width: `${goalPct}%`, height: "100%", background: goalPct >= 100 ? "#22D3EE" : "linear-gradient(90deg,#00aa55,#00ff88)", borderRadius: 8, transition: "width 0.5s" }} />
+                <div style={{ width: `${goalPct}%`, height: "100%", background: goalPct >= 100 ? "#00ff88" : "linear-gradient(90deg,#00aa55,#00ff88)", borderRadius: 8, transition: "width 0.5s" }} />
               </div>
-              <div style={{ fontSize: 12, color: goalPct >= 100 ? "#22D3EE" : "#444", marginTop: 6, textAlign: "right" }}>
+              <div style={{ fontSize: 12, color: goalPct >= 100 ? "#00ff88" : "#444", marginTop: 6, textAlign: "right" }}>
                 {goalPct >= 100 ? "🎉 목표 달성!" : `${(goal - thisWeekDist).toFixed(1)}km 남음`}
               </div>
             </>
@@ -1258,7 +1258,7 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
             const locked = v !== "week" && !isPro;
             return (
               <button key={v} onClick={() => !locked && setChartView(v)}
-                style={{ flex: 1, padding: "8px", borderRadius: 10, border: "none", background: chartView === v ? "#22D3EE" : "#111", color: chartView === v ? "#000" : locked ? "var(--text4)" : "#555", fontFamily: "inherit", fontSize: 13, fontWeight: 700 }}>
+                style={{ flex: 1, padding: "8px", borderRadius: 10, border: "none", background: chartView === v ? "#00ff88" : "#111", color: chartView === v ? "#000" : locked ? "var(--text4)" : "#555", fontFamily: "inherit", fontSize: 13, fontWeight: 700 }}>
                 {l}
               </button>
             );
@@ -1270,9 +1270,9 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
             const h = maxDist > 0 ? Math.max((w.dist / maxDist) * 72, w.dist > 0 ? 5 : 0) : 0;
             return (
               <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                {w.dist > 0 && <div style={{ fontSize: 9, color: isLast ? "#22D3EE" : "#444" }}>{w.dist.toFixed(1)}</div>}
-                <div style={{ width: "100%", height: h, background: isLast ? "#22D3EE" : "#1a3020", borderRadius: "3px 3px 0 0", minHeight: h > 0 ? 4 : 0 }} />
-                <div style={{ fontSize: 9, color: isLast ? "#22D3EE" : "var(--text4)", textAlign: "center", wordBreak: "keep-all" }}>{w.label}</div>
+                {w.dist > 0 && <div style={{ fontSize: 9, color: isLast ? "#00ff88" : "#444" }}>{w.dist.toFixed(1)}</div>}
+                <div style={{ width: "100%", height: h, background: isLast ? "#00ff88" : "#1a3020", borderRadius: "3px 3px 0 0", minHeight: h > 0 ? 4 : 0 }} />
+                <div style={{ fontSize: 9, color: isLast ? "#00ff88" : "var(--text4)", textAlign: "center", wordBreak: "keep-all" }}>{w.label}</div>
               </div>
             );
           })}
@@ -1291,7 +1291,7 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
               {earned.length === 0 && <div style={{ fontSize: 13, color: "var(--text4)", textAlign: "center", padding: "8px 0" }}>아직 획득한 배지가 없어요. 달려보세요!</div>}
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: locked.length > 0 ? 10 : 0 }}>
                 {earned.map(b => (
-                  <div key={b.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, background: "#0a1820", border: "1px solid var(--accent-bd)", borderRadius: 12, padding: "10px 12px", minWidth: 72 }}>
+                  <div key={b.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, background: "#0a1a0a", border: "1px solid var(--accent-bd)", borderRadius: 12, padding: "10px 12px", minWidth: 72 }}>
                     <span style={{ fontSize: 26 }}>{b.emoji}</span>
                     <span style={{ fontSize: 11, color: "var(--accent)", fontWeight: 700, textAlign: "center" }}>{b.name}</span>
                     <span style={{ fontSize: 10, color: "var(--text4)", textAlign: "center" }}>{b.desc}</span>
@@ -1388,7 +1388,7 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
               <div key={m.label} style={{ display: "flex", alignItems: "center", marginBottom: 10 }}>
                 <div style={{ width: 70, fontSize: 12, color: "var(--text4)" }}>{m.label}</div>
                 <div style={{ flex: 1, display: "flex", gap: 6, alignItems: "center" }}>
-                  <div style={{ flex: 1, background: "#0a1820", border: "1px solid var(--accent-bd)", borderRadius: 8, padding: "6px 10px", textAlign: "center" }}>
+                  <div style={{ flex: 1, background: "#0a1a0a", border: "1px solid var(--accent-bd)", borderRadius: 8, padding: "6px 10px", textAlign: "center" }}>
                     <div style={{ fontSize: 14, fontWeight: 800, color: "var(--accent)" }}>{m.me}</div>
                     <div style={{ fontSize: 10, color: "var(--text4)" }}>나</div>
                   </div>
@@ -1644,7 +1644,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
                 <>
                   <input ref={photoInputRef} type="file" accept="image/*" onChange={handlePhotoChange} style={{ display: "none" }} />
                   <button onClick={() => photoInputRef.current?.click()} disabled={photoUploading}
-                    style={{ position: "absolute", bottom: 0, right: 0, width: 24, height: 24, borderRadius: 12, background: photoUploading ? "#333" : "#22D3EE", border: "2px solid #0d0d0d", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#000", padding: 0 }}>
+                    style={{ position: "absolute", bottom: 0, right: 0, width: 24, height: 24, borderRadius: 12, background: photoUploading ? "#333" : "#00ff88", border: "2px solid #0d0d0d", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#000", padding: 0 }}>
                     {photoUploading ? "⏳" : "📷"}
                   </button>
                 </>
@@ -1660,7 +1660,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
                 : <div style={{ fontSize: 14, color: "var(--text3)", marginTop: 4 }}>{currentUser?.bio || "한 줄 소개를 입력해보세요"}</div>}
             </div>
           </div>
-          <button onClick={() => editMode ? saveProfile() : setEditMode(true)} style={{ background: editMode ? "#22D3EE" : "#111", border: "1px solid #1e1e1e", borderRadius: 10, padding: "9px 16px", color: editMode ? "#000" : "#666", fontFamily: "inherit", fontSize: 15, fontWeight: 700, minHeight: 42 }}>
+          <button onClick={() => editMode ? saveProfile() : setEditMode(true)} style={{ background: editMode ? "#00ff88" : "#111", border: "1px solid #1e1e1e", borderRadius: 10, padding: "9px 16px", color: editMode ? "#000" : "#666", fontFamily: "inherit", fontSize: 15, fontWeight: 700, minHeight: 42 }}>
             {editMode ? "저장" : "편집"}
           </button>
         </div>
@@ -1708,9 +1708,9 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
                   { type: "yearly",  label: "연간", price: "29,900원", sub: "월 2,491원 · 36% 할인", badge: "BEST" },
                 ].map(p => (
                   <button key={p.type} onClick={() => setPayPlan(p.type)}
-                    style={{ flex: 1, padding: "12px 8px", borderRadius: 14, border: payPlan === p.type ? "1.5px solid #00ff88" : "1px solid #222", background: payPlan === p.type ? "#0a1820" : "var(--bg2)", textAlign: "center", position: "relative" }}>
+                    style={{ flex: 1, padding: "12px 8px", borderRadius: 14, border: payPlan === p.type ? "1.5px solid #00ff88" : "1px solid #222", background: payPlan === p.type ? "#0a1a0a" : "var(--bg2)", textAlign: "center", position: "relative" }}>
                     {p.badge && <div style={{ position: "absolute", top: -8, right: 6, background: "var(--accent)", color: "#000", fontSize: 10, fontWeight: 900, borderRadius: 6, padding: "2px 6px" }}>{p.badge}</div>}
-                    <div style={{ fontSize: 13, color: payPlan === p.type ? "#22D3EE" : "#555", fontWeight: 700 }}>{p.label}</div>
+                    <div style={{ fontSize: 13, color: payPlan === p.type ? "#00ff88" : "#555", fontWeight: 700 }}>{p.label}</div>
                     <div style={{ fontSize: 16, fontWeight: 900, color: payPlan === p.type ? "#e0e0e0" : "#444", marginTop: 3 }}>{p.price}</div>
                     <div style={{ fontSize: 11, color: "var(--text5)", marginTop: 2 }}>{p.sub}</div>
                   </button>
@@ -1735,11 +1735,11 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
                   placeholder="쿠폰 코드 입력" maxLength={20}
                   style={{ flex: 1, background: "var(--bg)", border: "1px solid var(--border2)", borderRadius: 10, padding: "10px 12px", color: "var(--text1)", fontFamily: "inherit", fontSize: 14, outline: "none", letterSpacing: 2 }} />
                 <button onClick={handleRedeem} disabled={!couponCode.trim() || couponLoading}
-                  style={{ padding: "10px 16px", borderRadius: 10, background: couponCode.trim() ? "#22D3EE" : "#111", border: "none", color: couponCode.trim() ? "#000" : "#333", fontFamily: "inherit", fontSize: 14, fontWeight: 800, flexShrink: 0 }}>
+                  style={{ padding: "10px 16px", borderRadius: 10, background: couponCode.trim() ? "#00ff88" : "#111", border: "none", color: couponCode.trim() ? "#000" : "#333", fontFamily: "inherit", fontSize: 14, fontWeight: 800, flexShrink: 0 }}>
                   {couponLoading ? "..." : "적용"}
                 </button>
               </div>
-              {couponMsg && <div style={{ marginTop: 8, fontSize: 13, color: couponMsg.ok ? "#22D3EE" : "#ff4444", fontWeight: 600 }}>{couponMsg.text}</div>}
+              {couponMsg && <div style={{ marginTop: 8, fontSize: 13, color: couponMsg.ok ? "#00ff88" : "#ff4444", fontWeight: 600 }}>{couponMsg.text}</div>}
             </>
           )}
         </div>
@@ -1823,7 +1823,7 @@ function BottomNav({ tab, setTab, onUpload, newFeedCount = 0, newChatCount = 0 }
               </div>
             )}
           </div>
-          <span style={{ fontSize: 11, color: tab === t.id ? "#22D3EE" : "#888", fontWeight: tab === t.id ? 700 : 500 }}>{t.label}</span>
+          <span style={{ fontSize: 11, color: tab === t.id ? "#00ff88" : "#888", fontWeight: tab === t.id ? 700 : 500 }}>{t.label}</span>
         </button>
       ))}
 
@@ -1846,7 +1846,7 @@ function BottomNav({ tab, setTab, onUpload, newFeedCount = 0, newChatCount = 0 }
               </div>
             )}
           </div>
-          <span style={{ fontSize: 11, color: tab === t.id ? "#22D3EE" : "#888", fontWeight: tab === t.id ? 700 : 500 }}>{t.label}</span>
+          <span style={{ fontSize: 11, color: tab === t.id ? "#00ff88" : "#888", fontWeight: tab === t.id ? 700 : 500 }}>{t.label}</span>
         </button>
       ))}
     </div>

@@ -139,7 +139,7 @@ export default function LoginScreen({ onLogin }) {
           style={{
             width: "100%", padding: "17px",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 12,
-            background: inApp ? "#111" : "#22D3EE",
+            background: inApp ? "#111" : "#00ff88",
             border: inApp ? "1px solid #222" : "none",
             borderRadius: 16,
             fontFamily: "inherit", fontSize: 17, fontWeight: 900,
