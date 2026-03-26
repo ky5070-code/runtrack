@@ -156,7 +156,7 @@ export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
       {/* 헤더 */}
       <div style={{ padding: "14px 20px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
-          <div style={{ fontSize: 10, color: "var(--border)", letterSpacing: 4 }}>RUNTRACK</div>
+          <div style={{ fontSize: 10, color: "var(--border)", letterSpacing: 4 }}>RUNCREW</div>
           <div style={{ fontSize: 24, fontWeight: 800, color: "var(--accent)", letterSpacing: -0.5 }}>HOME</div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
