@@ -378,7 +378,7 @@ function NoticeBoard({ notices, isAdmin, onAdd, onDelete }) {
             rows={3} maxLength={300}
             style={{ width: "100%", background: "var(--bg2)", border: "1px solid var(--accent-bd)", borderRadius: 10, padding: "10px 12px", color: "var(--text1)", fontFamily: "inherit", fontSize: 14, outline: "none", resize: "none", boxSizing: "border-box", marginBottom: 8 }} />
           <button onClick={handleAdd} disabled={!text.trim() || loading}
-            style={{ width: "100%", padding: "11px", borderRadius: 10, border: "none", background: text.trim() ? "#00ff88" : "#111", color: text.trim() ? "#000" : "#333", fontFamily: "inherit", fontSize: 14, fontWeight: 800 }}>
+            style={{ width: "100%", padding: "11px", borderRadius: 10, border: "none", background: text.trim() ? "var(--accent-grad, var(--accent))" : "var(--bg4)", color: text.trim() ? "#000" : "#333", fontFamily: "inherit", fontSize: 14, fontWeight: 800 }}>
             {loading ? "등록 중..." : "공지 등록"}
           </button>
         </div>
@@ -523,7 +523,7 @@ function UploadModal({ onClose, onPost, currentUser, isPro }) {
         {step === "confirm" && <>
           {previewUrl && <div style={{ height: 130, borderRadius: 14, overflow: "hidden", marginBottom: 18, position: "relative" }}>
             <img src={previewUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.6 }} />
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom,transparent 40%,#0d0d0d)" }} />
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom,transparent 40%,var(--bg3))" }} />
             {result && <div style={{ position: "absolute", top: 10, right: 10, background: "var(--accent-bg)", border: "1px solid var(--accent)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "var(--accent)" }}>AI 분석 완료 ✓</div>}
           </div>}
           {/* AI 피드백 */}
@@ -568,7 +568,7 @@ function UploadModal({ onClose, onPost, currentUser, isPro }) {
           </div>
           <textarea value={caption} onChange={e => setCaption(e.target.value)} placeholder="오늘의 러닝은 어땠나요? 경로, 날씨, 느낀 점을 공유해봐요 🏃"
             style={{ width: "100%", background: "var(--bg)", border: "1px solid #1e1e1e", borderRadius: 14, padding: "14px", color: "var(--text2)", fontFamily: "inherit", fontSize: 15, outline: "none", resize: "none", height: 120, boxSizing: "border-box", lineHeight: 1.7 }} />
-          <button onClick={handlePost} disabled={posting} style={{ width: "100%", marginTop: 14, padding: "17px", background: posting ? "#0d3320" : "#00ff88", border: "none", borderRadius: 14, color: posting ? "#00ff88" : "#000", fontFamily: "inherit", fontSize: 17, fontWeight: 800, minHeight: 56 }}>
+          <button onClick={handlePost} disabled={posting} style={{ width: "100%", marginTop: 14, padding: "17px", background: posting ? "var(--accent-bg)" : "var(--accent-grad, var(--accent))", border: "none", borderRadius: 14, color: posting ? "var(--accent)" : "#fff", fontFamily: "inherit", fontSize: 17, fontWeight: 800, minHeight: 56 }}>
             {posting ? "업로드 중..." : "커뮤니티에 공유하기 🚀"}
           </button>
         </>}
@@ -622,7 +622,7 @@ function LeaderboardTab({ posts, currentUser, isPro }) {
           const locked = v === "all" && !isPro;
           return (
             <button key={v} onClick={() => !locked && setPeriod(v)}
-              style={{ flex: 1, padding: "11px", borderRadius: 12, border: locked ? "1px solid #1a1a1a" : "none", background: period === v ? "#00ff88" : "#0d0d0d", color: period === v ? "#000" : locked ? "#333" : "#444", fontFamily: "inherit", fontSize: 13, fontWeight: 700, minHeight: 46 }}>
+              style={{ flex: 1, padding: "11px", borderRadius: 12, border: locked ? "1px solid var(--border)" : "none", background: period === v ? "var(--accent-grad, var(--accent))" : "var(--bg3)", color: period === v ? "#fff" : locked ? "var(--text4)" : "var(--text3)", fontFamily: "inherit", fontSize: 13, fontWeight: 700, minHeight: 46 }}>
               {locked ? "🔒 " : ""}{l}
             </button>
           );
@@ -967,7 +967,7 @@ function ChatTab({ setId, currentUser }) {
                           onClick={() => joinSchedule(msg.id, currentUser, !!isJoined)}
                           disabled={!isJoined && isFull}
                           style={{ width: "100%", padding: "10px", borderRadius: 10, border: "none", fontFamily: "inherit", fontSize: 14, fontWeight: 700,
-                            background: isJoined ? "#111" : "#00ff88",
+                            background: isJoined ? "var(--bg4)" : "var(--accent-grad, var(--accent))",
                             color: isJoined ? "#555" : "#000",
                             border: isJoined ? "1px solid #222" : "none",
                           }}>
@@ -1041,7 +1041,7 @@ function ChatTab({ setId, currentUser }) {
           onBlur={e => e.target.style.borderColor = "var(--border2)"}
         />
         <button onClick={handleSend} disabled={!text.trim() || sending}
-          style={{ width: 42, height: 42, borderRadius: 21, background: text.trim() ? "#00ff88" : "#111", border: "none", color: text.trim() ? "#000" : "#333", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s" }}>
+          style={{ width: 42, height: 42, borderRadius: 21, background: text.trim() ? "var(--accent-grad, var(--accent))" : "var(--bg4)", border: "none", color: text.trim() ? "#000" : "#333", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s" }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
           </svg>
@@ -1291,7 +1291,7 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
               {earned.length === 0 && <div style={{ fontSize: 13, color: "var(--text4)", textAlign: "center", padding: "8px 0" }}>아직 획득한 배지가 없어요. 달려보세요!</div>}
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: locked.length > 0 ? 10 : 0 }}>
                 {earned.map(b => (
-                  <div key={b.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, background: "#0a1a0a", border: "1px solid var(--accent-bd)", borderRadius: 12, padding: "10px 12px", minWidth: 72 }}>
+                  <div key={b.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, background: "var(--accent-bg)", border: "1px solid var(--accent-bd)", borderRadius: 12, padding: "10px 12px", minWidth: 72 }}>
                     <span style={{ fontSize: 26 }}>{b.emoji}</span>
                     <span style={{ fontSize: 11, color: "var(--accent)", fontWeight: 700, textAlign: "center" }}>{b.name}</span>
                     <span style={{ fontSize: 10, color: "var(--text4)", textAlign: "center" }}>{b.desc}</span>
@@ -1388,7 +1388,7 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
               <div key={m.label} style={{ display: "flex", alignItems: "center", marginBottom: 10 }}>
                 <div style={{ width: 70, fontSize: 12, color: "var(--text4)" }}>{m.label}</div>
                 <div style={{ flex: 1, display: "flex", gap: 6, alignItems: "center" }}>
-                  <div style={{ flex: 1, background: "#0a1a0a", border: "1px solid var(--accent-bd)", borderRadius: 8, padding: "6px 10px", textAlign: "center" }}>
+                  <div style={{ flex: 1, background: "var(--accent-bg)", border: "1px solid var(--accent-bd)", borderRadius: 8, padding: "6px 10px", textAlign: "center" }}>
                     <div style={{ fontSize: 14, fontWeight: 800, color: "var(--accent)" }}>{m.me}</div>
                     <div style={{ fontSize: 10, color: "var(--text4)" }}>나</div>
                   </div>
@@ -1644,7 +1644,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
                 <>
                   <input ref={photoInputRef} type="file" accept="image/*" onChange={handlePhotoChange} style={{ display: "none" }} />
                   <button onClick={() => photoInputRef.current?.click()} disabled={photoUploading}
-                    style={{ position: "absolute", bottom: 0, right: 0, width: 24, height: 24, borderRadius: 12, background: photoUploading ? "#333" : "#00ff88", border: "2px solid #0d0d0d", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#000", padding: 0 }}>
+                    style={{ position: "absolute", bottom: 0, right: 0, width: 24, height: 24, borderRadius: 12, background: photoUploading ? "#333" : "#00ff88", border: "2px solid var(--bg3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#000", padding: 0 }}>
                     {photoUploading ? "⏳" : "📷"}
                   </button>
                 </>
@@ -1660,7 +1660,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
                 : <div style={{ fontSize: 14, color: "var(--text3)", marginTop: 4 }}>{currentUser?.bio || "한 줄 소개를 입력해보세요"}</div>}
             </div>
           </div>
-          <button onClick={() => editMode ? saveProfile() : setEditMode(true)} style={{ background: editMode ? "#00ff88" : "#111", border: "1px solid #1e1e1e", borderRadius: 10, padding: "9px 16px", color: editMode ? "#000" : "#666", fontFamily: "inherit", fontSize: 15, fontWeight: 700, minHeight: 42 }}>
+          <button onClick={() => editMode ? saveProfile() : setEditMode(true)} style={{ background: editMode ? "var(--accent-grad, var(--accent))" : "var(--bg4)", border: "1px solid #1e1e1e", borderRadius: 10, padding: "9px 16px", color: editMode ? "#fff" : "var(--text3)", fontFamily: "inherit", fontSize: 15, fontWeight: 700, minHeight: 42 }}>
             {editMode ? "저장" : "편집"}
           </button>
         </div>
@@ -1735,7 +1735,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
                   placeholder="쿠폰 코드 입력" maxLength={20}
                   style={{ flex: 1, background: "var(--bg)", border: "1px solid var(--border2)", borderRadius: 10, padding: "10px 12px", color: "var(--text1)", fontFamily: "inherit", fontSize: 14, outline: "none", letterSpacing: 2 }} />
                 <button onClick={handleRedeem} disabled={!couponCode.trim() || couponLoading}
-                  style={{ padding: "10px 16px", borderRadius: 10, background: couponCode.trim() ? "#00ff88" : "#111", border: "none", color: couponCode.trim() ? "#000" : "#333", fontFamily: "inherit", fontSize: 14, fontWeight: 800, flexShrink: 0 }}>
+                  style={{ padding: "10px 16px", borderRadius: 10, background: couponCode.trim() ? "var(--accent-grad, var(--accent))" : "var(--bg4)", border: "none", color: couponCode.trim() ? "#fff" : "var(--text4)", fontFamily: "inherit", fontSize: 14, fontWeight: 800, flexShrink: 0 }}>
                   {couponLoading ? "..." : "적용"}
                 </button>
               </div>

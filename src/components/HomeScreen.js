@@ -69,13 +69,13 @@ function CreateSetModal({ onClose, onCreate }) {
         <div style={{ display: "flex", gap: 8, marginBottom: 22 }}>
           {[[true, "🌍 공개", "누구나 검색하고 입장 가능"], [false, "🔒 비공개", "링크로만 입장 가능"]].map(([val, label, desc]) => (
             <button key={String(val)} onClick={() => setIsPublic(val)} style={{ flex: 1, padding: "12px 10px", borderRadius: 14, border: isPublic === val ? "1.5px solid #00ff88" : "1px solid #1a1a1a", background: isPublic === val ? "#0d1f14" : "#080808", textAlign: "left" }}>
-              <div style={{ fontSize: 15, fontWeight: 700, color: isPublic === val ? "#00ff88" : "#555", marginBottom: 4 }}>{label}</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: isPublic === val ? "var(--accent)" : "#555", marginBottom: 4 }}>{label}</div>
               <div style={{ fontSize: 12, color: "var(--text4)", lineHeight: 1.4 }}>{desc}</div>
             </button>
           ))}
         </div>
 
-        <button onClick={handleCreate} disabled={!name.trim() || loading} style={{ width: "100%", padding: "16px", background: name.trim() ? "#00ff88" : "#0d0d0d", border: "none", borderRadius: 14, color: name.trim() ? "#000" : "#333", fontFamily: "inherit", fontSize: 17, fontWeight: 800, minHeight: 54 }}>
+        <button onClick={handleCreate} disabled={!name.trim() || loading} style={{ width: "100%", padding: "16px", background: name.trim() ? "var(--accent)" : "#0d0d0d", border: "none", borderRadius: 14, color: name.trim() ? "#000" : "#333", fontFamily: "inherit", fontSize: 17, fontWeight: 800, minHeight: 54 }}>
           {loading ? "만드는 중..." : "러닝크루 만들기 🚀"}
         </button>
       </div>
