@@ -172,7 +172,7 @@ export default function HomeScreen({ currentUser, onEnterSet, onLogout }) {
 
         {/* 액션 버튼 */}
         <div style={{ display: "flex", gap: 10, marginBottom: 24 }}>
-          <button onClick={() => setShowCreate(true)} style={{ flex: 1, padding: "14px", background: "var(--accent)", border: "none", borderRadius: 14, color: "#000", fontFamily: "inherit", fontSize: 16, fontWeight: 800, minHeight: 52 }}>
+          <button onClick={() => setShowCreate(true)} style={{ flex: 1, padding: "14px", background: "var(--accent)", border: "none", borderRadius: 14, color: "#fff", fontFamily: "inherit", fontSize: 16, fontWeight: 800, minHeight: 52 }}>
             + 러닝크루 만들기
           </button>
           <button onClick={() => setShowJoin(true)} style={{ flex: 1, padding: "14px", background: "var(--modal-bg)", border: "1px solid var(--border)", borderRadius: 14, color: "var(--text3)", fontFamily: "inherit", fontSize: 16, fontWeight: 700, minHeight: 52 }}>

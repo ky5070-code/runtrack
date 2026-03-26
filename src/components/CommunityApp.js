@@ -117,7 +117,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <div style={{ fontSize: 16, fontWeight: 700, color: isMyPost ? "var(--text1)" : "#e0e0e0" }}>{isMyPost ? (currentUser?.name || "나") : (author.name || "러너")}</div>
-              {isMyPost && <span style={{ background: "var(--accent)", color: "#000", borderRadius: 5, padding: "1px 7px", fontSize: 11, fontWeight: 800 }}>나</span>}
+              {isMyPost && <span style={{ background: "var(--accent-grad, var(--accent))", color: "#fff", borderRadius: 5, padding: "1px 7px", fontSize: 11, fontWeight: 800 }}>나</span>}
               {(isMyPost ? currentUser?.isPro : author?.isPro) && <span style={{ background: "transparent", border: "1px solid #555", color: "var(--text3)", borderRadius: 5, padding: "1px 7px", fontSize: 11, fontWeight: 800, letterSpacing: 0.5 }}>PRO</span>}
             </div>
             <div style={{ display: "flex", gap: 6, marginTop: 2, alignItems: "center" }}>
@@ -186,7 +186,7 @@ function PostCard({ post, currentUser, onReact, onComment, onDelete, onEdit, onD
                 <button onClick={() => setShowEditModal(false)}
                   style={{ flex: 1, padding: "14px", borderRadius: 12, border: "1px solid var(--border2)", background: "transparent", color: "var(--text3)", fontFamily: "inherit", fontSize: 15, fontWeight: 700 }}>취소</button>
                 <button onClick={() => { onEdit && onEdit(post.id, { caption: editCaption }); setShowEditModal(false); }}
-                  style={{ flex: 1, padding: "14px", borderRadius: 12, border: "none", background: "var(--accent)", color: "#000", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>저장</button>
+                  style={{ flex: 1, padding: "14px", borderRadius: 12, border: "none", background: "var(--accent-grad, var(--accent))", color: "#fff", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>저장</button>
               </div>
             </div>
           </div>
@@ -647,7 +647,7 @@ function LeaderboardTab({ posts, currentUser, isPro }) {
                 <Avatar user={s.user} size={44} />
                 <div style={{ fontSize: 14, fontWeight: 700, color: rank === 0 ? "#00ff88" : "#888", textAlign: "center" }}>{s.user.name}</div>
                 <div style={{ fontSize: 15, color: "var(--accent)", fontWeight: 800 }}>{s.dist.toFixed(1)}km</div>
-                <div style={{ width: "100%", height: heights[i], background: rank === 0 ? "linear-gradient(180deg,var(--accent),var(--accent2))" : "var(--bg3)", borderRadius: "10px 10px 0 0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, border: rank !== 0 ? "1px solid #1a1a1a" : "none" }}>{medals[rank]}</div>
+                <div style={{ width: "100%", height: heights[i], background: rank === 0 ? "var(--accent-grad, linear-gradient(180deg,var(--accent),var(--accent2)))" : "var(--bg3)", borderRadius: "10px 10px 0 0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, border: rank !== 0 ? "1px solid #1a1a1a" : "none" }}>{medals[rank]}</div>
               </div>
             );
           })}
@@ -1442,7 +1442,7 @@ function StatsTab({ posts, currentUser, isPro, onUpdateProfile }) {
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={() => setShowGoalEdit(false)} style={{ flex: 1, padding: "13px", borderRadius: 12, border: "1px solid var(--border2)", background: "transparent", color: "var(--text3)", fontFamily: "inherit", fontSize: 15, fontWeight: 700 }}>취소</button>
               <button onClick={async () => { await onUpdateProfile({ weeklyGoal: parseFloat(goalInput) || 0 }); setShowGoalEdit(false); }}
-                style={{ flex: 1, padding: "13px", borderRadius: 12, border: "none", background: "var(--accent)", color: "#000", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>저장</button>
+                style={{ flex: 1, padding: "13px", borderRadius: 12, border: "none", background: "var(--accent-grad, var(--accent))", color: "#fff", fontFamily: "inherit", fontSize: 15, fontWeight: 800 }}>저장</button>
             </div>
           </div>
         </div>
@@ -1718,7 +1718,7 @@ function ProfileModal({ currentUser, posts, currentSet, isAdmin, onKick, onTrans
               </div>
 
               <button onClick={handlePayment} disabled={payLoading}
-                style={{ width: "100%", padding: "14px", borderRadius: 12, border: "none", background: "var(--accent)", color: "#000", fontFamily: "inherit", fontSize: 16, fontWeight: 800, marginBottom: 12 }}>
+                style={{ width: "100%", padding: "14px", borderRadius: 12, border: "none", background: "var(--accent-grad, var(--accent))", color: "#fff", fontFamily: "inherit", fontSize: 16, fontWeight: 800, marginBottom: 12 }}>
                 {payLoading ? "결제 준비 중..." : `💳 ${payPlan === "yearly" ? "29,900원" : "3,900원"} 결제하기`}
               </button>
 
