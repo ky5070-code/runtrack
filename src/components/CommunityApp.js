@@ -68,7 +68,7 @@ function ConfirmModal({ message, onConfirm, onCancel, confirmLabel, confirmColor
 const Avatar = ({ user, size = 38 }) => (
   <div style={{
     width: size, height: size, borderRadius: size / 2,
-    background: "linear-gradient(135deg,#111,#1a1a1a)",
+    background: "var(--bg4)",
     border: "1.5px solid #222", display: "flex", alignItems: "center",
     justifyContent: "center", fontSize: size * 0.44, flexShrink: 0,
     overflow: "hidden", position: "relative",
